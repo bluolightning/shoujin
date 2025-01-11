@@ -1,35 +1,28 @@
 import { useState } from 'react';
-import reactLogo from '@/assets/react.svg';
-import wxtLogo from '/wxt.svg';
 import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0);
+    const [currentUrl, setCurrentUrl] = useState<string | null>(null);
 
-  return (
-    <>
-      <div>
-        <a href="https://wxt.dev" target="_blank">
-          <img src={wxtLogo} className="logo" alt="WXT logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>WXT + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the WXT and React logos to learn more
-      </p>
-    </>
-  );
+    useEffect(() => {
+        const getCurrentTabUrl = async () => {
+            try {
+                const tabs = await chrome.tabs.query({
+                    active: true,
+                    currentWindow: true,
+                });
+                if (tabs && tabs[0] && tabs[0].url) {
+                    setCurrentUrl(tabs[0].url);
+                }
+            } catch (err: any) {
+                console.error('Error getting tab URL:', err);
+            }
+        };
+
+        getCurrentTabUrl();
+    }, []);
+
+    return <h2>{currentUrl}</h2>;
 }
 
 export default App;
