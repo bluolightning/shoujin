@@ -24,8 +24,17 @@ export default defineBackground(() => {
         console.log('Current tab URL:', url);
     })();
 
-    browser.runtime.onMessage.addListener((message) => {
+    browser.runtime.onMessage.addListener((message, _, sendResponse) => {
         console.log('Message from:', message);
-        return 'Hello from background!';
+
+        if (message.type === 'page-focused') {
+            sendResponse({ status: 'Page focused received' });
+        } else if (message.type === 'page-unfocused') {
+            sendResponse({ status: 'Page unfocused received' });
+        } else {
+            sendResponse({ status: 'Unknown message type' });
+        }
+
+        return true;
     });
 });

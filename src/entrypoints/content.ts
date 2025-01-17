@@ -2,7 +2,7 @@ export default defineContentScript({
     matches: ['<all_urls>'],
     main() {
         function grabDate() {
-            console.log('Hello time.');
+            console.log('grabbing date');
 
             let date = Date.now();
             console.log('Current date:', date);
@@ -30,7 +30,7 @@ export default defineContentScript({
                         fullurl: urlInfo.href,
                     });
 
-                    console.log('logging response: ' + response);
+                    console.log('logging response: ' + response.status);
                 })();
             } else {
                 console.log('Page focused');
@@ -42,7 +42,7 @@ export default defineContentScript({
                         fullurl: urlInfo.href,
                     });
 
-                    console.log('logging response: ' + response);
+                    console.log('logging response: ' + response.status);
                 })();
 
                 grabDate();
