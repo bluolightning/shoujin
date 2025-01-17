@@ -4,16 +4,11 @@ export default defineContentScript({
         function grabDate() {
             console.log('grabbing date');
 
-            let date = Date.now();
+            const date = Date.now();
             console.log('Current date:', date);
         }
 
-        let urlInfo: {
-            href: string;
-            hostname: string;
-            pathname: string;
-        };
-        urlInfo = {
+        const urlInfo = {
             href: window.location.href, // The full url
             hostname: window.location.hostname,
             pathname: window.location.pathname,
