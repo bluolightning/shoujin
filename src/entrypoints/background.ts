@@ -1,19 +1,31 @@
 export default defineBackground(() => {
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log("Message from content script:", message);
-  
-    if (message.action === 'pageVisible') {
-      console.log("Page became visible:", message.url);
-    } else if (message.action === 'pageHidden') {
-      console.log("Page became hidden:", message.url);
-    } else if (message.action === 'pageFocused'){
-      console.log("Page focused", message.url);
-    } else if (message.action === 'pageBlurred'){
-      console.log("Page blurred", message.url);
-    } else if (message.action === 'tabActivated') {
-      console.log("Tab activated:", message.url);
-    } else if (message.action === 'tabDeactivated'){
-      console.log("Tab deactivated:", message.url);
+    async function getCurrentTabUrl() {
+        try {
+            const tabs = await browser.tabs.query({
+                active: true,
+                currentWindow: true,
+            });
+            if (tabs && tabs[0] && tabs[0].url) {
+                return tabs[0].url;
+            }
+        } catch (err) {
+            console.error('Error getting tab URL:', err);
+        }
     }
-  });
+
+    (async () => {
+        let url = await getCurrentTabUrl();
+
+        while (!url) {
+            setInterval(() => {}, 1000);
+            url = await getCurrentTabUrl();
+        }
+
+        console.log('Current tab URL:', url);
+    })();
+
+    browser.runtime.onMessage.addListener((message) => {
+        console.log('Message from:', message);
+        return 'Hello from background!';
+    });
 });
