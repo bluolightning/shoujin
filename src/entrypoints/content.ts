@@ -1,22 +1,23 @@
 export default defineContentScript({
     matches: ['<all_urls>'],
     main() {
-        function grabDate() {
-            console.log('grabbing date');
-
-            const date = Date.now();
-            console.log('Current date:', date);
-        }
+        let startTime = new Date();
+        let endTime: Date;
 
         const urlInfo = {
-            href: window.location.href, // The full url
+            href: window.location.href,
             hostname: window.location.hostname,
             pathname: window.location.pathname,
         };
 
+        // Send message to background script when page is focused or unfocused
         document.addEventListener('visibilitychange', function () {
             if (document.hidden) {
                 console.log('Page unfocused');
+                endTime = new Date();
+
+                const timeOnPage = (+endTime - +startTime) / 1000;
+                console.log(timeOnPage);
 
                 (async () => {
                     const response = await browser.runtime.sendMessage({
@@ -24,11 +25,11 @@ export default defineContentScript({
                         url: urlInfo.hostname,
                         fullurl: urlInfo.href,
                     });
-
                     console.log('logging response: ' + response.status);
                 })();
             } else {
                 console.log('Page focused');
+                startTime = new Date();
 
                 (async () => {
                     const response = await browser.runtime.sendMessage({
@@ -36,11 +37,8 @@ export default defineContentScript({
                         url: urlInfo.hostname,
                         fullurl: urlInfo.href,
                     });
-
                     console.log('logging response: ' + response.status);
                 })();
-
-                grabDate();
             }
         });
     },
