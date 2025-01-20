@@ -36,9 +36,10 @@ export default defineBackground(() => {
             console.log('Time spent on page:', message.time, message.url);
             sendResponse({ status: 'Page unfocused received' });
 
-            setInterval(() => {
-                const storedData = StorageManager.getAllPageTimes();
-                console.log('Stored data:', storedData);
+            setTimeout(() => {
+                StorageManager.getAllPageTimes().then((data) => {
+                    console.log('Stored data:', data);
+                });
             }, 3000);
             
         } else {
