@@ -30,6 +30,8 @@ export default defineBackground(() => {
         if (message.type === 'page-focused') {
             sendResponse({ status: 'Page focused received' });
         } else if (message.type === 'page-unfocused') {
+
+            console.log('Time spent on page:', message.time);
             sendResponse({ status: 'Page unfocused received' });
         } else {
             sendResponse({ status: 'Unknown message type' });
