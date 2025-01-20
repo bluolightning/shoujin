@@ -1,3 +1,5 @@
+import { StorageManager } from '@/modules/storage';
+
 export default defineBackground(() => {
     async function getCurrentTabUrl() {
         try {
@@ -30,9 +32,15 @@ export default defineBackground(() => {
         if (message.type === 'page-focused') {
             sendResponse({ status: 'Page focused received' });
         } else if (message.type === 'page-unfocused') {
-
-            console.log('Time spent on page:', message.time);
+            StorageManager.savePageTime(message.url, message.time);
+            console.log('Time spent on page:', message.time, message.url);
             sendResponse({ status: 'Page unfocused received' });
+
+            setInterval(() => {
+                const storedData = StorageManager.getAllPageTimes();
+                console.log('Stored data:', storedData);
+            }, 3000);
+            
         } else {
             sendResponse({ status: 'Unknown message type' });
         }

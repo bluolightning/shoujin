@@ -7,7 +7,7 @@ export default defineConfig({
     srcDir: 'src',
 
     manifest: {
-        permissions: ['tabs'],
+        permissions: ['tabs', 'storage'],
         host_permissions: ['https://developer.chrome.com/*'],
     },
 });
