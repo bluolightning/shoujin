@@ -23,7 +23,7 @@ export class StorageManager {
                 });
             }
 
-            await chrome.storage.local.set({ [this.STORAGE_KEY]: data });
+            await browser.storage.local.set({ [this.STORAGE_KEY]: data });
         } catch (error) {
             console.error('Error saving page time:', error);
         }
@@ -31,7 +31,7 @@ export class StorageManager {
 
     static async getAllPageTimes(): Promise<PageTimeEntry[]> {
         try {
-            const result = await chrome.storage.local.get(this.STORAGE_KEY);
+            const result = await browser.storage.local.get(this.STORAGE_KEY);
             return result[this.STORAGE_KEY] || [];
         } catch (error) {
             console.error('Error getting page times:', error);
@@ -41,7 +41,7 @@ export class StorageManager {
 
     static async clearAllData(): Promise<void> {
         try {
-            await chrome.storage.local.remove(this.STORAGE_KEY);
+            await browser.storage.local.remove(this.STORAGE_KEY);
         } catch (error) {
             console.error('Error clearing storage:', error);
         }
