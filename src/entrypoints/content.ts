@@ -19,15 +19,16 @@ export default defineContentScript({
             type: 'page-focused' | 'page-unfocused',
             time?: number | null | undefined
         ): Promise<void> => {
-                const response: MessageResponse =
-                    await browser.runtime.sendMessage({
-                        type,
-                        time,
-                        url: urlInfo.hostname,
-                        fullurl: urlInfo.href,
-                    });
-                
-                console.log('logging response:', response.status);
+            const response: MessageResponse = await browser.runtime.sendMessage(
+                {
+                    type,
+                    time,
+                    url: urlInfo.hostname,
+                    fullurl: urlInfo.href,
+                }
+            );
+
+            console.log('logging response:', response.status);
         };
 
         // Listen for page visibility changes

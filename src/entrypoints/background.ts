@@ -41,7 +41,6 @@ export default defineBackground(() => {
                     console.log('Stored data:', data);
                 });
             }, 3000);
-            
         } else {
             sendResponse({ status: 'Unknown message type' });
         }

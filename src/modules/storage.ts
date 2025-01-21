@@ -10,7 +10,7 @@ export class StorageManager {
     static async savePageTime(url: string, timeSpent: number): Promise<void> {
         try {
             const data = await this.getAllPageTimes();
-            const entry = data.find(item => item.url === url);
+            const entry = data.find((item) => item.url === url);
 
             if (entry) {
                 entry.timeSpent += timeSpent;
@@ -19,7 +19,7 @@ export class StorageManager {
                 data.push({
                     url,
                     timeSpent,
-                    lastVisited: Date.now()
+                    lastVisited: Date.now(),
                 });
             }
 
