@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
                 if (tabs && tabs[0] && tabs[0].url) {
                     setCurrentUrl(tabs[0].url);
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('Error getting tab URL:', err);
             }
         };
