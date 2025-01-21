@@ -41,7 +41,7 @@ export class StorageManager {
 
     static async clearAllData(): Promise<void> {
         try {
-            await browser.storage.local.remove(this.STORAGE_KEY);
+            await browser.storage.local.set({ [this.STORAGE_KEY]: [] });
         } catch (error) {
             console.error('Error clearing storage:', error);
         }
