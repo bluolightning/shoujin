@@ -36,9 +36,10 @@ export default defineContentScript({
                 endTime = new Date();
 
                 const timeOnPage = (+endTime - +startTime) / 1000;
-                console.log(timeOnPage);
+                const roundedTime = Math.round(timeOnPage * 1000) / 1000;
 
-                sendMessage('page-unfocused', timeOnPage);
+                console.log(roundedTime);
+                sendMessage('page-unfocused', roundedTime);
             } else {
                 startTime = new Date();
                 sendMessage('page-focused', null);
