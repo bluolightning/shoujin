@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import '../../output.css';
 
 function App() {
     const [currentUrl, setCurrentUrl] = useState<string | null>(null);
@@ -22,7 +23,12 @@ function App() {
         getCurrentTabUrl();
     }, []);
 
-    return <h2>{currentUrl}</h2>;
+    return (
+        <>
+            <p className="text-3xl font-bold underline">hi</p>
+            <h2>{currentUrl}</h2>
+        </>
+    );
 }
 
 export default App;
