@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import './App.css';
 import '../../output.css';
 
@@ -27,6 +28,7 @@ function App() {
         <>
             <p className="text-3xl font-bold underline">hi</p>
             <h2>{currentUrl}</h2>
+            <Button variant="default">Click me</Button>
         </>
     );
 }
