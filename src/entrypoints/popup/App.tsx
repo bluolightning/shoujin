@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import '../../output.css';
 
 function App() {
     const [currentUrl, setCurrentUrl] = useState<string | null>(null);
@@ -31,9 +30,8 @@ function App() {
 
     return (
         <>
-            <p className="text-3xl font-bold underline">hi</p>
             <h2>{currentUrl}</h2>
-            <button onClick={openNewTab}>Open Page in New Tab</button>
+            <button onClick={openNewTab}>Open Extension Page</button>
         </>
     );
 }

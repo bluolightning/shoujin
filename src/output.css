@@ -555,7 +555,7 @@ video {
 }
 
 :root {
-  --background: 0 0% 98%;
+  --background: 0 0% 100%;
   --foreground: 222.2 47.4% 11.2%;
   --muted: 210 40% 96.1%;
   --muted-foreground: 215.4 16.3% 46.9%;
@@ -1127,11 +1127,6 @@ body {
   text-align: center;
 }
 
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-}
-
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
@@ -1150,10 +1145,6 @@ body {
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
-}
-
-.font-bold {
-  font-weight: 700;
 }
 
 .font-medium {
@@ -1211,10 +1202,6 @@ body {
 
 .text-sidebar-primary-foreground {
   color: hsl(var(--sidebar-primary-foreground));
-}
-
-.underline {
-  text-decoration-line: underline;
 }
 
 .underline-offset-4 {
