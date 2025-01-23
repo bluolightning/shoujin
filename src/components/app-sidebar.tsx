@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { GalleryVerticalEnd } from 'lucide-react';
 
 import {
     Sidebar,
@@ -156,7 +155,13 @@ const data = {
     ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+    onSectionChange,
+    ...props
+}: React.ComponentProps<typeof Sidebar> & {
+    onSectionChange: (section: string) => void;
+}) {
+    const [activeSection, setActiveSection] = React.useState<string>('');
     return (
         <Sidebar {...props}>
             <SidebarHeader>
@@ -165,11 +170,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuButton size="lg" asChild>
                             <a href="#">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <GalleryVerticalEnd className="size-4" />
+                                    <img
+                                        src="/wxt.svg"
+                                        alt="timeeo"
+                                        className="size-4"
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
                                     <span className="font-semibold">
-                                        Documentation
+                                        timeeo
                                     </span>
                                     <span className="">v1.0.0</span>
                                 </div>
@@ -196,7 +205,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             >
                                                 <SidebarMenuSubButton
                                                     asChild
-                                                    isActive={item.isActive}
+                                                    isActive={
+                                                        activeSection ===
+                                                        item.title
+                                                    }
+                                                    onClick={() => {
+                                                        setActiveSection(
+                                                            item.title
+                                                        );
+                                                        onSectionChange(
+                                                            item.title
+                                                        );
+                                                    }}
                                                 >
                                                     <a href={item.url}>
                                                         {item.title}
