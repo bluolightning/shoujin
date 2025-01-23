@@ -171,7 +171,7 @@ export function AppSidebar({
                             <a href="#">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                     <img
-                                        src="/wxt.svg"
+                                        src="/logo.svg"
                                         alt="timeeo"
                                         className="size-4"
                                     />
