@@ -25,7 +25,7 @@ function App() {
 
     const openNewTab = () => {
         chrome.tabs.create({
-            url: chrome.runtime.getURL('thepage.html'),
+            url: chrome.runtime.getURL('mainPage.html'),
         });
     };
 
