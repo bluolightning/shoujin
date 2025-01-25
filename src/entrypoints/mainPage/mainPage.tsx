@@ -12,12 +12,16 @@ const router = createBrowserRouter(
             element: <Page />,
         },
         {
+            path: '/mainPage.html',
+            element: <Page />,
+        },
+        {
             path: '/dashboard',
             element: <Dashboard />,
         },
         {
-            path: '/mainPage.html',
-            element: <Page />,
+            path: '/dopcan',
+            element: <Dopcan />,
         },
     ],
     {

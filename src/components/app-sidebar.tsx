@@ -26,8 +26,8 @@ const data = {
                     url: 'dashboard',
                 },
                 {
-                    title: 'Project Structure',
-                    url: 'project-structure',
+                    title: 'Dopcan',
+                    url: 'dopcan',
                 },
             ],
         },
