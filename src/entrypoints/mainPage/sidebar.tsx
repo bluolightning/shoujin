@@ -16,6 +16,7 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { Link } from 'react-router';
 
 export default function Page() {
     const [activeSection, setActiveSection] = useState<string>('');
@@ -35,8 +36,9 @@ export default function Page() {
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="#">
+                                    <BreadcrumbLink>
                                         Building Your Application
+                                        <Link to="/profile">Profile page</Link>
                                     </BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator className="hidden md:block" />
