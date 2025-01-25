@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import Page from './sidebar';
 import Dashboard from './Dashboard';
+import Dopcan from './Dopcan';
+import ContributionGuide from './ContributionGuide';
 import '@/output.css';
 
 const router = createBrowserRouter(
@@ -16,12 +18,16 @@ const router = createBrowserRouter(
             element: <Page />,
         },
         {
-            path: '/dashboard',
+            path: '/Dashboard',
             element: <Dashboard />,
         },
         {
-            path: '/dopcan',
+            path: '/Dopcan',
             element: <Dopcan />,
+        },
+        {
+            path: '/ContributionGuide',
+            element: <ContributionGuide />,
         },
     ],
     {

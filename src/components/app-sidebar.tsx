@@ -23,11 +23,11 @@ const data = {
             items: [
                 {
                     title: 'Dashboard',
-                    url: 'dashboard',
+                    url: 'Dashboard',
                 },
                 {
                     title: 'Dopcan',
-                    url: 'dopcan',
+                    url: 'Dopcan',
                 },
             ],
         },
@@ -37,7 +37,7 @@ const data = {
             items: [
                 {
                     title: 'Contribution Guide',
-                    url: 'contribution-guide',
+                    url: 'ContributionGuide',
                 },
             ],
         },

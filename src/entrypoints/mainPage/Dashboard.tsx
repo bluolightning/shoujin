@@ -1,7 +1,9 @@
 const Dashboard = () => {
     return (
         <div>
-            <h1>Hello from the (not) main page of the app!</h1>
+            <h1>
+                Hello from the <strong>Dashboard</strong> main page of the app!
+            </h1>
         </div>
     );
 };
