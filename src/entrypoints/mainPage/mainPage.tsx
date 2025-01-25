@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import Page from './sidebar';
-import App from './App';
+import Dashboard from './Dashboard';
 import '@/output.css';
 
 const router = createBrowserRouter(
@@ -12,8 +12,8 @@ const router = createBrowserRouter(
             element: <Page />,
         },
         {
-            path: '/profile',
-            element: <App />,
+            path: '/dashboard',
+            element: <Dashboard />,
         },
         {
             path: '/mainPage.html',

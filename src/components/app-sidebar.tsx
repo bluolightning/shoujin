@@ -13,6 +13,7 @@ import {
     SidebarMenuSubItem,
     SidebarRail,
 } from '@/components/ui/sidebar';
+import { Link } from 'react-router';
 
 const data = {
     navMain: [
@@ -22,11 +23,11 @@ const data = {
             items: [
                 {
                     title: 'Dashboard',
-                    url: '#',
+                    url: 'dashboard',
                 },
                 {
                     title: 'Project Structure',
-                    url: '#',
+                    url: 'project-structure',
                 },
             ],
         },
@@ -36,7 +37,7 @@ const data = {
             items: [
                 {
                     title: 'Contribution Guide',
-                    url: '#',
+                    url: 'contribution-guide',
                 },
             ],
         },
@@ -89,8 +90,7 @@ export function AppSidebar({
                                     <SidebarMenuSub>
                                         {item.items.map((item) => (
                                             <SidebarMenuSubItem
-                                                key={item.title}
-                                            >
+                                                key={item.title}>
                                                 <SidebarMenuSubButton
                                                     asChild
                                                     isActive={
@@ -104,11 +104,10 @@ export function AppSidebar({
                                                         onSectionChange(
                                                             item.title
                                                         );
-                                                    }}
-                                                >
-                                                    <a href={item.url}>
+                                                    }}>
+                                                    <Link to={`/${item.url}`}>
                                                         {item.title}
-                                                    </a>
+                                                    </Link>
                                                 </SidebarMenuSubButton>
                                             </SidebarMenuSubItem>
                                         ))}
