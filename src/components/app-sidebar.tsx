@@ -105,7 +105,7 @@ export function AppSidebar({
                                                             item.title
                                                         );
                                                     }}>
-                                                    <Link to={`/${item.url}`}>
+                                                    <Link to={item.url}>
                                                         {item.title}
                                                     </Link>
                                                 </SidebarMenuSubButton>
