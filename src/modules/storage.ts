@@ -23,6 +23,8 @@ export class StorageManager {
                 });
             }
 
+            data.sort((a, b) => b.timeSpent - a.timeSpent); // Sort by time spent (descending)
+
             await browser.storage.local.set({ [this.STORAGE_KEY]: data });
         } catch (error) {
             console.error('Error saving page time:', error);
