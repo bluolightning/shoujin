@@ -18,13 +18,39 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
-const chartData = [
-    { site: 'chrome', time: 275, fill: 'var(--color-chrome)' },
-    { site: 'safari', time: 200, fill: 'var(--color-safari)' },
-    { site: 'firefox', time: 287, fill: 'var(--color-firefox)' },
-    { site: 'edge', time: 173, fill: 'var(--color-edge)' },
-    { site: 'other', time: 190, fill: 'var(--color-other)' },
-];
+
+import { StorageManager } from '@/modules/storage';
+
+interface ChartDataPoints {
+    site: string;
+    time: number;
+    fill: string;
+}
+
+let chartData: ChartDataPoints[] = [];
+
+(async function fetchPageTimes() {
+    const data = await StorageManager.getAllPageTimes();
+    chartData = [
+        {
+            site: 'chrome',
+            time: data[0].timeSpent,
+            fill: 'var(--color-chrome)',
+        },
+        {
+            site: 'safari',
+            time: data[1].timeSpent,
+            fill: 'var(--color-safari)',
+        },
+        {
+            site: 'firefox',
+            time: data[2].timeSpent,
+            fill: 'var(--color-firefox)',
+        },
+        { site: 'edge', time: data[3].timeSpent, fill: 'var(--color-edge)' },
+        { site: 'other', time: data[4].timeSpent, fill: 'var(--color-other)' },
+    ];
+})();
 
 const chartConfig = {
     time: {
@@ -95,7 +121,9 @@ export function PieChartDonut() {
                                                     x={viewBox.cx}
                                                     y={viewBox.cy}
                                                     className="fill-foreground text-3xl font-bold">
-                                                    {totalTime.toLocaleString()}
+                                                    {Math.round(
+                                                        totalTime
+                                                    ).toLocaleString()}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
