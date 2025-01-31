@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Outlet } from 'react-router';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export default function Page() {
     const [activeSection, setActiveSection] = useState<string>('');
@@ -50,6 +51,11 @@ export default function Page() {
                                     </BreadcrumbItem>
                                 </BreadcrumbList>
                             </Breadcrumb>
+                            <Separator
+                                orientation="vertical"
+                                className="mr-2 h-4"
+                            />
+                            <ModeToggle />
                         </div>
                     </header>
                     <div className="flex flex-1 flex-col gap-4 p-4">
