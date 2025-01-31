@@ -1,6 +1,5 @@
 import React from 'react';
 import { DonutTestChart } from '@/components/DonutTestChart';
-import { TestChart } from '@/components/TestChart';
 
 const Dopcan = () => {
     return (
@@ -10,7 +9,6 @@ const Dopcan = () => {
             </h1>
 
             <DonutTestChart />
-            <TestChart />
         </div>
     );
 };
