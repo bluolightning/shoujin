@@ -61,7 +61,7 @@ const chartConfig = {
         color: 'hsl(var(--chart-1))',
     },
     safari: {
-        label: 'Safari',
+        label: 'bbg',
         color: 'hsl(var(--chart-2))',
     },
     firefox: {
@@ -101,7 +101,7 @@ export function PieChartDonut() {
                         <Pie
                             data={chartData}
                             dataKey="time"
-                            nameKey="browser"
+                            nameKey="site"
                             innerRadius={60}
                             strokeWidth={5}>
                             <Label
