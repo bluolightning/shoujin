@@ -27,6 +27,18 @@ interface ChartDataPoints {
     fill: string;
 }
 
+interface LabelProps {
+    cx?: number;
+    cy?: number;
+    x?: number;
+    y?: number;
+    textAnchor?: string;
+    dominantBaseline?: string;
+    payload: {
+        site?: string;
+    };
+}
+
 let chartData: ChartDataPoints[] = [];
 
 (async function fetchPageTimes() {
@@ -105,7 +117,7 @@ export function DonutTestChart() {
                             innerRadius={60}
                             strokeWidth={5}
                             labelLine={false}
-                            label={({ payload, ...props }) => {
+                            label={({ payload, ...props }: LabelProps) => {
                                 return (
                                     <text
                                         cx={props.cx}
