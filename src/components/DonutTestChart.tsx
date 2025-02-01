@@ -105,7 +105,10 @@ export function DonutTestChart() {
                 <ChartContainer
                     config={chartConfig}
                     className="mx-auto aspect-square max-h-[250px]">
-                    <PieChart>
+                    <PieChart
+                        {...{
+                            overflow: 'visible',
+                        }}>
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent hideLabel />}
