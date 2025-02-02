@@ -21,6 +21,18 @@ import {
 
 import { StorageManager } from '@/modules/storage';
 
+interface LabelProps {
+    cx?: number;
+    cy?: number;
+    x?: number;
+    y?: number;
+    textAnchor?: string;
+    dominantBaseline?: string;
+    payload: {
+        site?: string;
+    };
+}
+
 interface ChartDataPoints {
     site: string;
     time: number;
@@ -29,54 +41,78 @@ interface ChartDataPoints {
 
 let chartData: ChartDataPoints[] = [];
 
+let chartConfig: ChartConfig = {
+    first: { label: '', color: '' },
+    second: { label: '', color: '' },
+    third: { label: '', color: '' },
+    fourth: { label: '', color: '' },
+    fifth: { label: '', color: '' },
+    sixth: { label: '', color: '' },
+};
+
 (async function fetchPageTimes() {
     const data = await StorageManager.getAllPageTimes();
+
     chartData = [
         {
-            site: 'chrome',
+            site: data[0].url,
             time: data[0].timeSpent,
-            fill: 'var(--color-chrome)',
+            fill: 'var(--color-first)',
         },
         {
-            site: 'safari',
+            site: data[1].url,
             time: data[1].timeSpent,
-            fill: 'var(--color-safari)',
+            fill: 'var(--color-second)',
         },
         {
-            site: 'firefox',
+            site: data[2].url,
             time: data[2].timeSpent,
-            fill: 'var(--color-firefox)',
+            fill: 'var(--color-third)',
         },
-        { site: 'edge', time: data[3].timeSpent, fill: 'var(--color-edge)' },
-        { site: 'other', time: data[4].timeSpent, fill: 'var(--color-other)' },
+        {
+            site: data[3].url,
+            time: data[3].timeSpent,
+            fill: 'var(--color-fourth)',
+        },
+        {
+            site: data[4].url,
+            time: data[4].timeSpent,
+            fill: 'var(--color-fifth)',
+        },
+        {
+            site: data[5].url,
+            time: data[5].timeSpent,
+            fill: 'var(--color-sixth)',
+        },
     ];
-})();
 
-const chartConfig = {
-    time: {
-        label: 'Time',
-    },
-    chrome: {
-        label: 'Chrome',
-        color: 'hsl(var(--chart-1))',
-    },
-    safari: {
-        label: 'bbg',
-        color: 'hsl(var(--chart-2))',
-    },
-    firefox: {
-        label: 'Firefox',
-        color: 'hsl(var(--chart-3))',
-    },
-    edge: {
-        label: 'Edge',
-        color: 'hsl(var(--chart-4))',
-    },
-    other: {
-        label: 'Other',
-        color: 'hsl(var(--chart-5))',
-    },
-} satisfies ChartConfig;
+    chartConfig = {
+        first: {
+            label: 'Chrome',
+            color: 'hsl(var(--chart-1))',
+        },
+        second: {
+            label: 'bbg',
+            color: 'hsl(var(--chart-2))',
+        },
+        third: {
+            label: 'Firefox',
+            color: 'hsl(var(--chart-3))',
+        },
+        fourth: {
+            label: 'Edge',
+            color: 'hsl(var(--chart-4))',
+        },
+        fifth: {
+            label: 'Fifth',
+            color: 'hsl(var(--chart-5))',
+        },
+        sixth: {
+            label: 'Sixth',
+            color: 'hsl(var(--chart-6))',
+        },
+    } satisfies ChartConfig;
+})();
 
 export function PieChartDonut() {
     const totalTime = React.useMemo(() => {
@@ -93,7 +129,10 @@ export function PieChartDonut() {
                 <ChartContainer
                     config={chartConfig}
                     className="mx-auto aspect-square max-h-[250px]">
-                    <PieChart>
+                    <PieChart
+                        {...{
+                            overflow: 'visible',
+                        }}>
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent hideLabel />}
@@ -103,7 +142,24 @@ export function PieChartDonut() {
                             dataKey="time"
                             nameKey="site"
                             innerRadius={60}
-                            strokeWidth={5}>
+                            strokeWidth={5}
+                            labelLine={false}
+                            label={({ payload, ...props }: LabelProps) => {
+                                return (
+                                    <text
+                                        cx={props.cx}
+                                        cy={props.cy}
+                                        x={props.x}
+                                        y={props.y}
+                                        textAnchor={props.textAnchor}
+                                        dominantBaseline={
+                                            props.dominantBaseline
+                                        }
+                                        fill="hsla(var(--foreground))">
+                                        {payload.site}
+                                    </text>
+                                );
+                            }}>
                             <Label
                                 content={({ viewBox }) => {
                                     if (
