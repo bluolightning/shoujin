@@ -76,6 +76,11 @@ let chartConfig: ChartConfig = {
         {
             site: data[4].url,
             time: data[4].timeSpent,
+            fill: 'var(--color-fifth)',
+        },
+        {
+            site: 'other',
+            time: data[5].timeSpent,
             fill: 'var(--color-other)',
         },
     ];
@@ -100,9 +105,13 @@ let chartConfig: ChartConfig = {
             label: 'Edge',
             color: 'hsl(var(--chart-4))',
         },
+        fifth: {
+            label: 'Fifth',
+            color: 'hsl(var(--chart-5))',
+        },
         other: {
             label: 'Other',
-            color: 'hsl(var(--chart-5))',
+            color: 'hsl(var(--chart-6))',
         },
     } satisfies ChartConfig;
 })();
