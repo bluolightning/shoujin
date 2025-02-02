@@ -56,32 +56,32 @@ let chartConfig: ChartConfig = {
     chartData = [
         {
             site: data[0].url,
-            time: data[0].timeSpent,
+            time: Math.round(data[0].timeSpent),
             fill: 'var(--color-first)',
         },
         {
             site: data[1].url,
-            time: data[1].timeSpent,
+            time: Math.round(data[1].timeSpent),
             fill: 'var(--color-second)',
         },
         {
             site: data[2].url,
-            time: data[2].timeSpent,
+            time: Math.round(data[2].timeSpent),
             fill: 'var(--color-third)',
         },
         {
             site: data[3].url,
-            time: data[3].timeSpent,
+            time: Math.round(data[3].timeSpent),
             fill: 'var(--color-fourth)',
         },
         {
             site: data[4].url,
-            time: data[4].timeSpent,
+            time: Math.round(data[4].timeSpent),
             fill: 'var(--color-fifth)',
         },
         {
             site: data[5].url,
-            time: data[5].timeSpent,
+            time: Math.round(data[5].timeSpent),
             fill: 'var(--color-sixth)',
         },
     ];
