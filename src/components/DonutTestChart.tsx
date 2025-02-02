@@ -42,36 +42,37 @@ interface ChartDataPoints {
 let chartData: ChartDataPoints[] = [];
 
 let chartConfig: ChartConfig = {
-    time: { label: '' },
-    chrome: { label: '', color: '' },
-    safari: { label: '', color: '' },
-    firefox: { label: '', color: '' },
-    edge: { label: '', color: '' },
-    other: { label: '', color: '' },
+    first: { label: '', color: '' },
+    second: { label: '', color: '' },
+    third: { label: '', color: '' },
+    fourth: { label: '', color: '' },
+    fifth: { label: '', color: '' },
+    sixth: { label: '', color: '' },
 };
 
 (async function fetchPageTimes() {
     const data = await StorageManager.getAllPageTimes();
+
     chartData = [
         {
             site: data[0].url,
             time: data[0].timeSpent,
-            fill: 'var(--color-chrome)',
+            fill: 'var(--color-first)',
         },
         {
             site: data[1].url,
             time: data[1].timeSpent,
-            fill: 'var(--color-safari)',
+            fill: 'var(--color-second)',
         },
         {
             site: data[2].url,
             time: data[2].timeSpent,
-            fill: 'var(--color-firefox)',
+            fill: 'var(--color-third)',
         },
         {
             site: data[3].url,
             time: data[3].timeSpent,
-            fill: 'var(--color-edge)',
+            fill: 'var(--color-fourth)',
         },
         {
             site: data[4].url,
@@ -79,29 +80,26 @@ let chartConfig: ChartConfig = {
             fill: 'var(--color-fifth)',
         },
         {
-            site: 'other',
+            site: data[5].url,
             time: data[5].timeSpent,
-            fill: 'var(--color-other)',
+            fill: 'var(--color-sixth)',
         },
     ];
 
     chartConfig = {
-        time: {
-            label: 'Time',
-        },
-        chrome: {
+        first: {
             label: 'Chrome',
             color: 'hsl(var(--chart-1))',
         },
-        safari: {
+        second: {
             label: 'bbg',
             color: 'hsl(var(--chart-2))',
         },
-        firefox: {
+        third: {
             label: 'Firefox',
             color: 'hsl(var(--chart-3))',
         },
-        edge: {
+        fourth: {
             label: 'Edge',
             color: 'hsl(var(--chart-4))',
         },
@@ -109,8 +107,8 @@ let chartConfig: ChartConfig = {
             label: 'Fifth',
             color: 'hsl(var(--chart-5))',
         },
-        other: {
-            label: 'Other',
+        sixth: {
+            label: 'Sixth',
             color: 'hsl(var(--chart-6))',
         },
     } satisfies ChartConfig;
