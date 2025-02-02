@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { Label, Pie, PieChart } from 'recharts';
 
 import {
@@ -122,8 +122,8 @@ export function PieChartDonut() {
     return (
         <Card className="flex flex-col">
             <CardHeader className="items-center pb-0">
-                <CardTitle>Pie Chart - Donut with Text</CardTitle>
-                <CardDescription>January - June 2024</CardDescription>
+                <CardTitle>Top 6 Used Sites</CardTitle>
+                <CardDescription>Date - Date</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
                 <ChartContainer
@@ -185,7 +185,7 @@ export function PieChartDonut() {
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 24}
                                                     className="fill-muted-foreground">
-                                                    Time
+                                                    Seconds
                                                 </tspan>
                                             </text>
                                         );
@@ -198,11 +198,12 @@ export function PieChartDonut() {
             </CardContent>
             <CardFooter className="flex-col gap-2 text-sm">
                 <div className="flex items-center gap-2 font-medium leading-none">
-                    Trending up by 5.2% this month{' '}
+                    Trending up/down by x% this month
                     <TrendingUp className="h-4 w-4" />
+                    <TrendingDown className="h-4 w-4" />
                 </div>
                 <div className="leading-none text-muted-foreground">
-                    Showing total time for the last 6 months
+                    Showing total time for the last x months
                 </div>
             </CardFooter>
         </Card>
