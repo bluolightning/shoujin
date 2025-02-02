@@ -21,12 +21,6 @@ import {
 
 import { StorageManager } from '@/modules/storage';
 
-interface ChartDataPoints {
-    site: string;
-    time: number;
-    fill: string;
-}
-
 interface LabelProps {
     cx?: number;
     cy?: number;
@@ -39,56 +33,79 @@ interface LabelProps {
     };
 }
 
+interface ChartDataPoints {
+    site: string;
+    time: number;
+    fill: string;
+}
+
 let chartData: ChartDataPoints[] = [];
+
+let chartConfig: ChartConfig = {
+    time: { label: '' },
+    chrome: { label: '', color: '' },
+    safari: { label: '', color: '' },
+    firefox: { label: '', color: '' },
+    edge: { label: '', color: '' },
+    other: { label: '', color: '' },
+};
 
 (async function fetchPageTimes() {
     const data = await StorageManager.getAllPageTimes();
     chartData = [
         {
-            site: 'chrome',
+            site: data[0].url,
             time: data[0].timeSpent,
             fill: 'var(--color-chrome)',
         },
         {
-            site: 'safari',
+            site: data[1].url,
             time: data[1].timeSpent,
             fill: 'var(--color-safari)',
         },
         {
-            site: 'firefox',
+            site: data[2].url,
             time: data[2].timeSpent,
             fill: 'var(--color-firefox)',
         },
-        { site: 'edge', time: data[3].timeSpent, fill: 'var(--color-edge)' },
-        { site: 'other', time: data[4].timeSpent, fill: 'var(--color-other)' },
+        {
+            site: data[3].url,
+            time: data[3].timeSpent,
+            fill: 'var(--color-edge)',
+        },
+        {
+            site: data[4].url,
+            time: data[4].timeSpent,
+            fill: 'var(--color-other)',
+        },
     ];
-})();
 
-const chartConfig = {
-    time: {
-        label: 'Time',
-    },
-    chrome: {
-        label: 'Chrome',
-        color: 'hsl(var(--chart-1))',
-    },
-    safari: {
-        label: 'bbg',
-        color: 'hsl(var(--chart-2))',
-    },
-    firefox: {
-        label: 'Firefox',
-        color: 'hsl(var(--chart-3))',
-    },
-    edge: {
-        label: 'Edge',
-        color: 'hsl(var(--chart-4))',
-    },
-    other: {
-        label: 'Other',
-        color: 'hsl(var(--chart-5))',
-    },
-} satisfies ChartConfig;
+    chartConfig = {
+        time: {
+            label: 'Time',
+        },
+        chrome: {
+            label: 'Chrome',
+            color: 'hsl(var(--chart-1))',
+        },
+        safari: {
+            label: 'bbg',
+            color: 'hsl(var(--chart-2))',
+        },
+        firefox: {
+            label: 'Firefox',
+            color: 'hsl(var(--chart-3))',
+        },
+        edge: {
+            label: 'Edge',
+            color: 'hsl(var(--chart-4))',
+        },
+        other: {
+            label: 'Other',
+            color: 'hsl(var(--chart-5))',
+        },
+    } satisfies ChartConfig;
+})();
 
 export function DonutTestChart() {
     const totalTime = React.useMemo(() => {
