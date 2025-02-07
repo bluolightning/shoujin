@@ -2,12 +2,17 @@ interface PageTimeEntry {
     url: string;
     timeSpent: number;
     lastVisited: number;
+    favicon: string | undefined;
 }
 
 export class StorageManager {
     private static readonly STORAGE_KEY = 'timeeo_page_times';
 
-    static async savePageTime(url: string, timeSpent: number): Promise<void> {
+    static async savePageTime(
+        url: string,
+        timeSpent: number,
+        favicon: string | undefined
+    ): Promise<void> {
         try {
             const data = await this.getAllStoredData();
             const entry = data.find((item) => item.url === url);
@@ -15,11 +20,13 @@ export class StorageManager {
             if (entry) {
                 entry.timeSpent += timeSpent;
                 entry.lastVisited = Date.now();
+                entry.favicon = favicon;
             } else {
                 data.push({
                     url,
                     timeSpent,
                     lastVisited: Date.now(),
+                    favicon,
                 });
             }
 
