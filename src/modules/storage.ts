@@ -9,7 +9,7 @@ export class StorageManager {
 
     static async savePageTime(url: string, timeSpent: number): Promise<void> {
         try {
-            const data = await this.getAllPageTimes();
+            const data = await this.getAllStoredData();
             const entry = data.find((item) => item.url === url);
 
             if (entry) {
@@ -31,7 +31,7 @@ export class StorageManager {
         }
     }
 
-    static async getAllPageTimes(): Promise<PageTimeEntry[]> {
+    static async getAllStoredData(): Promise<PageTimeEntry[]> {
         try {
             const result = await browser.storage.local.get(this.STORAGE_KEY);
             return result[this.STORAGE_KEY] || [];

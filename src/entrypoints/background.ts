@@ -12,7 +12,7 @@ export default defineBackground(() => {
             sendResponse({ status: 'Page unfocused received' });
 
             setTimeout(() => {
-                StorageManager.getAllPageTimes().then((data) => {
+                StorageManager.getAllStoredData().then((data) => {
                     console.log('Stored data:', data);
                 });
             }, 3000);
