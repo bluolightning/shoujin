@@ -51,7 +51,7 @@ let chartConfig: ChartConfig = {
 };
 
 (async function fetchPageTimes() {
-    const data = await StorageManager.getAllPageTimes();
+    const data = await StorageManager.getAllStoredData();
 
     chartData = [
         {

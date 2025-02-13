@@ -14,7 +14,7 @@ export default defineContentScript({
             pathname: window.location.pathname,
         };
 
-        // Send a message to the background script
+        // Send a message to the background script when the page is focused or unfocused
         const sendMessage = async (
             type: 'page-focused' | 'page-unfocused',
             time?: number | null | undefined
@@ -35,11 +35,10 @@ export default defineContentScript({
         document.addEventListener('visibilitychange', function () {
             if (document.hidden) {
                 endTime = new Date();
-
                 const timeOnPage = (+endTime - +startTime) / 1000;
                 const roundedTime = Math.round(timeOnPage * 1000) / 1000;
-
                 console.log(roundedTime);
+
                 sendMessage('page-unfocused', roundedTime);
             } else {
                 startTime = new Date();
