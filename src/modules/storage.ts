@@ -1,7 +1,7 @@
 interface PageTimeEntry {
     url: string;
     timeSpent: number;
-    lastVisited: number;
+    lastVisited: string;
     favicon: string | undefined;
 }
 
@@ -19,13 +19,13 @@ export class StorageManager {
 
             if (entry) {
                 entry.timeSpent += timeSpent;
-                entry.lastVisited = Date.now();
+                entry.lastVisited = new Date().toISOString();
                 entry.favicon = favicon;
             } else {
                 data.push({
                     url,
                     timeSpent,
-                    lastVisited: Date.now(),
+                    lastVisited: new Date().toISOString(),
                     favicon,
                 });
             }
