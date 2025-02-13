@@ -2,18 +2,19 @@ import { StorageManager } from '@/modules/storage';
 import getFavicon from '@/utils/getFavicon';
 
 export default defineBackground(() => {
+    let favicon: string | undefined;
     browser.runtime.onMessage.addListener((message, _, sendResponse) => {
         console.log('Message from:', message);
 
         if (message.type === 'page-focused') {
             sendResponse({ status: 'Page focused received' });
+            getFavicon().then((result) => {
+                favicon = result;
+            });
         } else if (message.type === 'page-unfocused') {
-            (async function () {
-                const favicon: string | undefined = await getFavicon();
-                StorageManager.savePageTime(message.url, message.time, favicon);
-                console.log('Time spent on page:', message.time, message.url);
-                sendResponse({ status: 'Page unfocused received' });
-            })();
+            StorageManager.savePageTime(message.url, message.time, favicon);
+            sendResponse({ status: 'Page unfocused received' });
+            console.log('Time spent on page:', message.time, message.url);
 
             setTimeout(() => {
                 //testing only

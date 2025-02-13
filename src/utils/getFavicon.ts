@@ -6,6 +6,8 @@ export default async function getFavicon() {
         });
         if (tabs[0].favIconUrl) {
             return tabs[0].favIconUrl;
+        } else {
+            return 'undefined';
         }
     } catch (err: unknown) {
         console.error('Error getting tab URL:', err);
