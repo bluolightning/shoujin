@@ -20,7 +20,9 @@ export class StorageManager {
             if (entry) {
                 entry.timeSpent += timeSpent;
                 entry.lastVisited = new Date().toISOString();
-                entry.favicon = favicon;
+                if (favicon) {
+                    entry.favicon = favicon;
+                }
             } else {
                 data.push({
                     url,
