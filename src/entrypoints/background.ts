@@ -7,14 +7,14 @@ export default defineBackground(() => {
         console.log('Message from:', message);
 
         if (message.type === 'page-focused') {
-            getFavicon().then((result) => {
+            getFavicon(message.url).then((result) => {
                 favicon = result;
                 console.log('Favicon found:', favicon);
             });
             sendResponse({ status: `Page focused received` });
         } else if (message.type === 'page-unfocused') {
             StorageManager.savePageTime(message.url, message.time, favicon);
-            favicon = undefined;
+            favicon = undefined; //reset favicon so it doesn't get incorrectly saved to a different site
             sendResponse({ status: 'Page unfocused received' });
             console.log('Time spent on page:', message.time, message.url);
 
