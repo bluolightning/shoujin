@@ -1,4 +1,4 @@
-export default async function getFavicon() {
+export default async function getFavicon(url: string) {
     try {
         const tabs = await browser.tabs.query({
             active: true,
@@ -7,7 +7,7 @@ export default async function getFavicon() {
         if (tabs[0].favIconUrl) {
             return tabs[0].favIconUrl;
         } else {
-            return 'undefined';
+            return `https://www.google.com/s2/favicons?domain=${url}&sz=128`;
         }
     } catch (err: unknown) {
         console.error('Error getting tab URL:', err);
