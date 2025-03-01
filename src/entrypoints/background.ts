@@ -24,6 +24,15 @@ export default defineBackground(() => {
                     console.log('Stored data:', data);
                 });
             }, 3000);
+        } else if (message.type === 'detect-idle') {
+            console.log('idle dectection request received');
+            if (chrome.idle) {
+                chrome.idle.queryState(15, (idleState) => {
+                    sendResponse({ status: idleState });
+                });
+            } else {
+                sendResponse({ status: 'Error detecting idle state' });
+            }
         } else {
             sendResponse({ status: 'Unknown message type' });
         }
