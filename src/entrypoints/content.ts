@@ -16,7 +16,7 @@ export default defineContentScript({
 
         // Send a message to the background script when the page is focused or unfocused
         const sendMessage = async (
-            type: 'page-focused' | 'page-unfocused',
+            type: 'page-focused' | 'page-unfocused' | 'detect-idle',
             time?: number | null | undefined
         ): Promise<void> => {
             const response: MessageResponse = await browser.runtime.sendMessage(
@@ -45,5 +45,8 @@ export default defineContentScript({
                 sendMessage('page-focused', null);
             }
         });
+
+        console.log('detecting idle...');
+        sendMessage('detect-idle', null);
     },
 });

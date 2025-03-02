@@ -3,6 +3,12 @@ interface PageTimeEntry {
     timeSpent: number;
     lastVisited: string;
     favicon: string | undefined;
+    dateData: {
+        [date: string]: {
+            dailyTime: number;
+            hours: { [hour: string]: number };
+        };
+    };
 }
 
 export class StorageManager {
@@ -17,18 +23,36 @@ export class StorageManager {
             const data = await this.getAllStoredData();
             const entry = data.find((item) => item.url === url);
 
+            const fullDate = new Date();
+            const date = fullDate.toISOString().substring(0, 10);
+            const hour = 'h' + fullDate.toISOString().substring(11, 13);
+            const dateData = entry?.dateData || {};
+
+            // Create date data if it doesn't exist
+            if (!dateData[date]) {
+                dateData[date] = { dailyTime: 0, hours: {} };
+            }
+            if (!dateData[date].hours[hour]) {
+                dateData[date].hours[hour] = 0;
+            }
+
+            dateData[date].dailyTime += timeSpent;
+            dateData[date].hours[hour] += timeSpent;
+
             if (entry) {
                 entry.timeSpent += timeSpent;
-                entry.lastVisited = new Date().toISOString();
+                entry.lastVisited = fullDate.toISOString();
                 if (favicon) {
                     entry.favicon = favicon;
                 }
+                entry.dateData = dateData;
             } else {
                 data.push({
                     url,
                     timeSpent,
-                    lastVisited: new Date().toISOString(),
+                    lastVisited: fullDate.toISOString(),
                     favicon,
+                    dateData,
                 });
             }
 
