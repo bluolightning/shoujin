@@ -17,13 +17,6 @@ export default defineBackground(() => {
             favicon = undefined; //reset favicon so it doesn't get incorrectly saved to a different site
             sendResponse({ status: 'Page unfocused received' });
             console.log('Time spent on page:', message.time, message.url);
-
-            setTimeout(() => {
-                //testing only
-                StorageManager.getAllStoredData().then((data) => {
-                    console.log('Stored data:', data);
-                });
-            }, 3000);
         } else if (message.type === 'detect-idle') {
             console.log('idle dectection request received');
             if (chrome.idle) {
