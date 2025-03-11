@@ -30,6 +30,7 @@ export default defineBackground(() => {
             sendResponse({ status: 'Unknown message type' });
         }
 
+        console.log(StorageManager.getAllStoredData());
         return true;
     });
 });

@@ -24,8 +24,13 @@ export class StorageManager {
             const entry = data.find((item) => item.url === url);
 
             const fullDate = new Date();
-            const date = fullDate.toISOString().substring(0, 10);
-            const hour = 'h' + fullDate.toISOString().substring(11, 13);
+            const hour = 'h' + fullDate.getHours();
+            const date = (() => {
+                const year = fullDate.getFullYear();
+                const month = String(fullDate.getMonth() + 1).padStart(2, '0');
+                const day = String(fullDate.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            })();
             const dateData = entry?.dateData || {};
 
             // Create date data if it doesn't exist
