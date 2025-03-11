@@ -5,9 +5,9 @@ interface MessageResponse {
 export default defineContentScript({
     matches: ['<all_urls>'],
     main() {
-        let startTime = new Date();
+        let startTime: Date;
         let endTime: Date;
-        let sessionStatus = true;
+        let sessionStatus: boolean = false; // Initialize sessionStatus to false
 
         const urlInfo = {
             href: window.location.href,
@@ -43,7 +43,6 @@ export default defineContentScript({
             console.log(roundedTime);
 
             sessionStatus = false;
-
             sendMessage('page-unfocused', roundedTime);
         }
 
@@ -56,12 +55,14 @@ export default defineContentScript({
             sendMessage('page-focused', null);
         }
 
+        startSession();
+
         // Listen for page visibility changes
         document.addEventListener('visibilitychange', function () {
-            if (document.hidden) {
+            if (document.hidden && sessionStatus) {
                 endSession();
             } else {
-                startSession();
+                if (!sessionStatus) startSession();
             }
         });
 
