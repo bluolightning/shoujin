@@ -40,7 +40,7 @@ export default function Page() {
                                 <BreadcrumbList>
                                     <BreadcrumbItem className="hidden md:block">
                                         <BreadcrumbLink>
-                                            Building Your Application
+                                            App
                                         </BreadcrumbLink>
                                     </BreadcrumbItem>
                                     <BreadcrumbSeparator className="hidden md:block" />
