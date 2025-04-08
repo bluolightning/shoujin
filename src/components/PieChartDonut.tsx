@@ -52,78 +52,56 @@ let chartConfig: ChartConfig = {
 
 (async function fetchPageTimes() {
     const data = await StorageManager.getAllStoredData();
+    chartData = [];
 
-    if (data[0]) {
-        console.log('data defined');
-        chartData = [
-            {
-                site: data[0].url,
-                time: Math.round(data[0].timeSpent),
-                fill: 'var(--color-first)',
-            },
-            {
-                site: data[1].url,
-                time: Math.round(data[1].timeSpent),
-                fill: 'var(--color-second)',
-            },
-            {
-                site: data[2].url,
-                time: Math.round(data[2].timeSpent),
-                fill: 'var(--color-third)',
-            },
-            {
-                site: data[3].url,
-                time: Math.round(data[3].timeSpent),
-                fill: 'var(--color-fourth)',
-            },
-            {
-                site: data[4].url,
-                time: Math.round(data[4].timeSpent),
-                fill: 'var(--color-fifth)',
-            },
-            {
-                site: data[5].url,
-                time: Math.round(data[5].timeSpent),
-                fill: 'var(--color-sixth)',
-            },
-        ];
+    for (let i = 0; i < 6; i++) {
+        let itemNum = 'first';
 
-        chartConfig = {
-            first: {
-                label: 'Chrome',
-                color: 'hsl(var(--chart-1))',
-            },
-            second: {
-                label: 'bbg',
-                color: 'hsl(var(--chart-2))',
-            },
-            third: {
-                label: 'Firefox',
-                color: 'hsl(var(--chart-3))',
-            },
-            fourth: {
-                label: 'Edge',
-                color: 'hsl(var(--chart-4))',
-            },
-            fifth: {
-                label: 'Fifth',
-                color: 'hsl(var(--chart-5))',
-            },
-            sixth: {
-                label: 'Sixth',
-                color: 'hsl(var(--chart-6))',
-            },
-        } satisfies ChartConfig;
-    } else {
-        console.log('data not defined');
-        for (let i = 0; i < 6; i++) {
-            chartData.push({
-                site: 'No Data',
-                time: 1,
-                fill: `hsl(var(--chart-${i + 1}))`,
-            });
+        if (i === 1) {
+            itemNum = 'second';
+        } else if (i === 2) {
+            itemNum = 'third';
+        } else if (i === 3) {
+            itemNum = 'fourth';
+        } else if (i === 4) {
+            itemNum = 'fifth';
+        } else if (i === 5) {
+            itemNum = 'sixth';
         }
+
+        chartData.push({
+            site: data[i]?.url || 'No Data',
+            time: Math.round(data[i]?.timeSpent) || 1,
+            fill: `var(--color-${itemNum})`,
+        });
     }
+
+    chartConfig = {
+        first: {
+            label: 'Chrome',
+            color: 'hsl(var(--chart-1))',
+        },
+        second: {
+            label: 'bbg',
+            color: 'hsl(var(--chart-2))',
+        },
+        third: {
+            label: 'Firefox',
+            color: 'hsl(var(--chart-3))',
+        },
+        fourth: {
+            label: 'Edge',
+            color: 'hsl(var(--chart-4))',
+        },
+        fifth: {
+            label: 'Fifth',
+            color: 'hsl(var(--chart-5))',
+        },
+        sixth: {
+            label: 'Sixth',
+            color: 'hsl(var(--chart-6))',
+        },
+    } satisfies ChartConfig;
 })();
 
 export function PieChartDonut() {
