@@ -66,7 +66,8 @@ export default defineContentScript({
             }
         });
 
-        // Detect idle state - may check computer activity, rather than browser activity
+        /*
+        // Detect idle state - checks computer activity
         let count = 0;
         const intervalId = setInterval(async () => {
             console.log('detecting idle...');
@@ -92,6 +93,71 @@ export default defineContentScript({
                 clearInterval(intervalId);
                 console.log('interval cleared');
             }
-        }, 15000);
+        }, 15000); 
+        */
+
+        //ss
+
+        const idleTimeoutLimit = 10 * 1000;
+        let idleTimer: ReturnType<typeof setTimeout> | null = null;
+        // Fires when the page has gone idle
+        function handlePageIdle() {
+            console.log(
+                `The user is now idle at ${idleTimeoutLimit} milliseconds, ending session.`
+            );
+            // endSession();
+        }
+
+        // Fires when there is user activity
+        function resetIdleTimer() {
+            if (idleTimer !== null) {
+                clearTimeout(idleTimer);
+            }
+            if (!document.hidden) {
+                idleTimer = setTimeout(handlePageIdle, idleTimeoutLimit);
+            }
+            console.log('User activity detected, resetting idle timer.');
+        }
+
+        // List of events to listen for user activity
+        const activityEvents = [
+            'mousemove',
+            'mousedown',
+            'keydown',
+            'scroll',
+            'touchstart',
+            'wheel',
+        ];
+
+        function addActivityListeners() {
+            activityEvents.forEach((eventName) => {
+                document.addEventListener(eventName, resetIdleTimer, true);
+            });
+            document.addEventListener('visibilitychange', resetIdleTimer, true);
+        }
+
+        /*
+        function removeActivityListeners() {
+            activityEvents.forEach((eventName) => {
+                document.removeEventListener(eventName, resetIdleTimer, true);
+            });
+            document.removeEventListener(
+                'visibilitychange',
+                resetIdleTimer,
+                true
+            );
+            if (idleTimer !== null) {
+                clearTimeout(idleTimer);
+            }
+        }
+        */
+
+        /* Unnecessary? - probably fine to delete
+        if (!document.hidden) {
+            resetIdleTimer();
+        } */
+
+        addActivityListeners();
+        console.log('Page Idle Detector script loaded and listening.');
     },
 });
