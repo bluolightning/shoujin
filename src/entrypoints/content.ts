@@ -105,7 +105,9 @@ export default defineContentScript({
             console.log(
                 `The user is now idle at ${idleTimeoutLimit} milliseconds, ending session.`
             );
-            // endSession();
+            if (sessionStatus) {
+                endSession();
+            }
         }
 
         // Fires when there is user activity
@@ -115,6 +117,9 @@ export default defineContentScript({
             }
             if (!document.hidden) {
                 idleTimer = setTimeout(handlePageIdle, idleTimeoutLimit);
+            }
+            if (!sessionStatus) {
+                startSession();
             }
             console.log('User activity detected, resetting idle timer.');
         }
