@@ -7,7 +7,7 @@ export default defineContentScript({
     main() {
         let startTime: Date;
         let endTime: Date;
-        let sessionStatus: boolean = false; // Initialize sessionStatus to false
+        let sessionStatus: boolean = false;
 
         const urlInfo = {
             href: window.location.href,
@@ -59,44 +59,11 @@ export default defineContentScript({
 
         // Listen for page visibility changes
         document.addEventListener('visibilitychange', function () {
+            resetIdleTimer();
             if (document.hidden && sessionStatus) {
                 endSession();
-            } else {
-                if (!sessionStatus) startSession();
             }
         });
-
-        /*
-        // Detect idle state - checks computer activity
-        let count = 0;
-        const intervalId = setInterval(async () => {
-            console.log('detecting idle...');
-            const message = await sendMessage('detect-idle', null);
-
-            if (message === 'active') {
-                console.log('active');
-                if (!sessionStatus) {
-                    startSession();
-                }
-            } else if (message === 'idle' || message === 'locked') {
-                console.log('idle or locked');
-                if (sessionStatus) {
-                    endSession();
-                }
-            } else {
-                console.log('invalid idle state');
-            }
-
-            count++;
-            if (count === 240) {
-                // 240 * 15s = 1 hour; the interval will then be cleared
-                clearInterval(intervalId);
-                console.log('interval cleared');
-            }
-        }, 15000); 
-        */
-
-        //ss
 
         const idleTimeoutLimit = 10 * 1000;
         let idleTimer: ReturnType<typeof setTimeout> | null = null;
@@ -133,13 +100,10 @@ export default defineContentScript({
             'touchstart',
             'wheel',
         ];
-
-        function addActivityListeners() {
-            activityEvents.forEach((eventName) => {
-                document.addEventListener(eventName, resetIdleTimer, true);
-            });
-            document.addEventListener('visibilitychange', resetIdleTimer, true);
-        }
+        activityEvents.forEach((eventName) => {
+            document.addEventListener(eventName, resetIdleTimer, true);
+        });
+        console.log('Page Idle Detector script loaded and listening.');
 
         /*
         function removeActivityListeners() {
@@ -156,13 +120,5 @@ export default defineContentScript({
             }
         }
         */
-
-        /* Unnecessary? - probably fine to delete
-        if (!document.hidden) {
-            resetIdleTimer();
-        } */
-
-        addActivityListeners();
-        console.log('Page Idle Detector script loaded and listening.');
     },
 });
