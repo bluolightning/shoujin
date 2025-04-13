@@ -55,13 +55,17 @@ export default defineContentScript({
             sendMessage('page-focused', null);
         }
 
-        startSession();
-
         // Listen for page visibility changes
         document.addEventListener('visibilitychange', function () {
             resetIdleTimer();
             if (document.hidden && sessionStatus) {
+                if (idleTimer !== null) {
+                    clearTimeout(idleTimer);
+                }
                 endSession();
+            } else if (!document.hidden && !sessionStatus) {
+                startSession();
+                resetIdleTimer();
             }
         });
 
@@ -103,7 +107,9 @@ export default defineContentScript({
         activityEvents.forEach((eventName) => {
             document.addEventListener(eventName, resetIdleTimer, true);
         });
+
         console.log('Page Idle Detector script loaded and listening.');
+        startSession();
 
         /*
         function removeActivityListeners() {
