@@ -81,17 +81,18 @@ export default defineContentScript({
 
         const idleTimeoutLimit = 10 * 1000;
         let idleTimer: ReturnType<typeof setTimeout> | null = null;
+
         // Fires when the page has gone idle
         function handlePageIdle() {
             if (sessionStatus && !checkVidStatus()) {
-                console.log(
-                    `Page is idle at ${idleTimeoutLimit}, sending idle message.`
-                );
+                console.log(`Page is now idle.`);
                 endSession();
+            } else {
+                resetIdleTimer();
             }
         }
 
-        // Fires when there is user activity
+        // Fires when there is user activity or refires when video playing
         function resetIdleTimer() {
             if (idleTimer !== null) {
                 clearTimeout(idleTimer);
@@ -102,7 +103,7 @@ export default defineContentScript({
             if (!sessionStatus) {
                 startSession();
             }
-            console.log('User activity detected, resetting idle timer.');
+            console.log('Resetting idle timer.');
         }
 
         // List of events to listen for user activity
