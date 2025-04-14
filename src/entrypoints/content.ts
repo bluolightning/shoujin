@@ -69,14 +69,24 @@ export default defineContentScript({
             }
         });
 
+        function checkVidStatus() {
+            const videos = document.querySelectorAll('video');
+            for (const video of videos) {
+                if (!video.paused && !video.ended && video.readyState > 2) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         const idleTimeoutLimit = 10 * 1000;
         let idleTimer: ReturnType<typeof setTimeout> | null = null;
         // Fires when the page has gone idle
         function handlePageIdle() {
-            console.log(
-                `The user is now idle at ${idleTimeoutLimit} milliseconds, ending session.`
-            );
-            if (sessionStatus) {
+            if (sessionStatus && !checkVidStatus()) {
+                console.log(
+                    `Page is idle at ${idleTimeoutLimit}, sending idle message.`
+                );
                 endSession();
             }
         }
