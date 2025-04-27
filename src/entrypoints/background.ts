@@ -13,7 +13,10 @@ export default defineBackground(() => {
             });
             sendResponse({ status: `Page focused received` });
         } else if (message.type === 'page-unfocused') {
-            const cleanUrl = message.url.replace(/^(?:https?:\/\/)?(?:www\.)?/, '');
+            const cleanUrl = message.url.replace(
+                /^(?:https?:\/\/)?(?:www\.)?/,
+                ''
+            );
             StorageManager.savePageTime(cleanUrl, message.time, favicon);
             favicon = undefined; //reset favicon so it doesn't get incorrectly saved to a different site
             sendResponse({ status: 'Page unfocused received' });
