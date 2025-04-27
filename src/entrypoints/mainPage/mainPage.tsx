@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import Page from './sidebar';
 import Dashboard from './Dashboard';
 import Dopcan from './Dopcan';
-import ContributionGuide from './ContributionGuide';
+import DataSettings from './DataSettings';
 import Default from './Default';
 import '@/output.css';
 
@@ -26,8 +26,8 @@ const router = createBrowserRouter([
                 element: <Dopcan />,
             },
             {
-                path: 'ContributionGuide',
-                element: <ContributionGuide />,
+                path: 'DataSettings',
+                element: <DataSettings />,
             },
         ],
     },

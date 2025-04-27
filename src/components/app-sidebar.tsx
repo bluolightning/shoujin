@@ -32,12 +32,12 @@ const data = {
             ],
         },
         {
-            title: 'Community',
+            title: 'Settings',
             url: '#',
             items: [
                 {
-                    title: 'Contribution Guide',
-                    url: 'ContributionGuide',
+                    title: 'Data Settings',
+                    url: 'DataSettings',
                 },
             ],
         },
