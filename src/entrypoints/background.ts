@@ -13,10 +13,11 @@ export default defineBackground(() => {
             });
             sendResponse({ status: `Page focused received` });
         } else if (message.type === 'page-unfocused') {
-            StorageManager.savePageTime(message.url, message.time, favicon);
+            const cleanUrl = message.url.replace(/^(?:https?:\/\/)?(?:www\.)?/, '');
+            StorageManager.savePageTime(cleanUrl, message.time, favicon);
             favicon = undefined; //reset favicon so it doesn't get incorrectly saved to a different site
             sendResponse({ status: 'Page unfocused received' });
-            console.log('Time spent on page:', message.time, message.url);
+            console.log('Time spent on page:', message.time, cleanUrl);
         } else if (message.type === 'detect-idle') {
             console.log('idle dectection request received');
             if (chrome.idle) {
