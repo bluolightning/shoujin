@@ -5,8 +5,15 @@ import Page from './sidebar';
 import Dashboard from './Dashboard';
 import Dopcan from './Dopcan';
 import DataSettings from './DataSettings';
-import Default from './Default';
 import '@/output.css';
+
+import '@mantine/core/styles.css';
+import { createTheme, MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
+
+const theme = createTheme({
+    /** Put your mantine theme override here */
+});
 
 const router = createBrowserRouter([
     {
@@ -15,7 +22,7 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Default />,
+                element: <Dashboard />,
             },
             {
                 path: 'Dashboard',
@@ -32,9 +39,12 @@ const router = createBrowserRouter([
         ],
     },
 ]);
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <MantineProvider theme={theme} defaultColorScheme="auto">
+            <ModalsProvider>
+                <RouterProvider router={router} />
+            </ModalsProvider>
+        </MantineProvider>{' '}
     </React.StrictMode>
 );
