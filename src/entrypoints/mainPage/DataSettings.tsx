@@ -2,14 +2,25 @@ import React from 'react';
 import { StorageManager } from '@/modules/storage';
 import { Button, Text } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 
 const DataSettings = () => {
     const handleDeleteAllData = async () => {
         try {
             console.log('Deleting all data...');
             await StorageManager.clearAllData();
+            notifications.show({
+                title: 'Data Deletion Successful',
+                message: 'Your data has been successfully deleted.',
+                color: 'green',
+            });
         } catch (error) {
             console.error('Error deleting data:', error);
+            notifications.show({
+                title: 'Data Deletion Failed',
+                message: 'Error while deleting data.',
+                color: 'red',
+            });
         }
     };
 
@@ -27,13 +38,23 @@ const DataSettings = () => {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            //alert success
+
+            notifications.show({
+                title: 'Backup Successful',
+                message: 'Your data has been backed up successfully.',
+                color: 'green',
+            });
         } catch (error) {
             console.error('Error backing up data:', error);
-            //alert error
+            notifications.show({
+                title: 'Backup Failed',
+                message: 'Error while backing up data.',
+                color: 'red',
+            });
         }
     };
 
+    // Opens a confirmation for data deletion
     const openModal = () =>
         modals.openConfirmModal({
             title: 'Please confirm your action',
