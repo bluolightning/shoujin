@@ -11,9 +11,10 @@ import {
     IconSettings,
     IconSwitchHorizontal,
 } from '@tabler/icons-react';
-import { Code, Group } from '@mantine/core';
+import { Code, Group, Text } from '@mantine/core';
 import classes from './appSidebar.module.css';
 import { Link } from 'react-router';
+//import LogoImage from '~/assets/clock-img.jpeg';
 
 const data = [
     { link: 'Dashboard', label: 'Dashboard', icon: IconBellRinging },
@@ -47,9 +48,16 @@ export function AppSidebar() {
             <div className={classes.navbarMain}>
                 <Group className={classes.header} justify="space-between">
                     <div>
-                        <img src="clock-img.jpeg" alt="Logo" />
+                        {/* <img src={LogoImage} alt="Logo" width="32px" /> */}
+                        <Text
+                            size="lg"
+                            fw={700}
+                            variant="gradient"
+                            gradient={{ from: 'blue', to: 'violet', deg: 90 }}>
+                            timeeo
+                        </Text>
                     </div>
-                    <Code fw={700}>v3.1.2</Code>
+                    <Code fw={700}>v0.0.1</Code>
                 </Group>
                 {links}
             </div>
