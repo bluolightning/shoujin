@@ -1,15 +1,9 @@
 import React from 'react';
 import { useState } from 'react';
 import {
-    Icon2fa,
     IconBellRinging,
     IconDatabaseImport,
-    IconFingerprint,
-    IconKey,
-    IconLogout,
-    IconReceipt2,
     IconSettings,
-    IconSwitchHorizontal,
 } from '@tabler/icons-react';
 import { Code, Group, Text } from '@mantine/core';
 import classes from './appSidebar.module.css';
@@ -20,10 +14,6 @@ const data = [
     { link: 'Dashboard', label: 'Dashboard', icon: IconBellRinging },
     { link: 'Dopcan', label: 'Other Settings', icon: IconSettings },
     { link: 'DataSettings', label: 'Data Settings', icon: IconDatabaseImport },
-    { link: '', label: 'Security', icon: IconFingerprint },
-    { link: '', label: 'SSH Keys', icon: IconKey },
-    { link: '', label: 'Billing', icon: IconReceipt2 },
-    { link: '', label: 'Authentication', icon: Icon2fa },
 ];
 
 export function AppSidebar() {
@@ -62,26 +52,7 @@ export function AppSidebar() {
                 {links}
             </div>
 
-            <div className={classes.footer}>
-                <a
-                    href="#"
-                    className={classes.link}
-                    onClick={(event) => event.preventDefault()}>
-                    <IconSwitchHorizontal
-                        className={classes.linkIcon}
-                        stroke={1.5}
-                    />
-                    <span>Change account</span>
-                </a>
-
-                <a
-                    href="#"
-                    className={classes.link}
-                    onClick={(event) => event.preventDefault()}>
-                    <IconLogout className={classes.linkIcon} stroke={1.5} />
-                    <span>Logout</span>
-                </a>
-            </div>
+            <div className={classes.footer}></div>
         </nav>
     );
 }
