@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
-import { useState } from 'react';
-import { AppSidebar } from '../../components/app-sidebar';
+import { AppSidebar } from '../../components/appSidebar';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -21,12 +20,10 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { ModeToggle } from '@/components/mode-toggle';
 
 export default function Page() {
-    const [activeSection, setActiveSection] = useState<string>('');
-
     return (
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <SidebarProvider>
-                <AppSidebar onSectionChange={setActiveSection} />
+                <AppSidebar />
                 <SidebarInset>
                     <header className="flex h-16 shrink-0 items-center gap-2 border-b">
                         {/* Header stuff */}
@@ -39,14 +36,12 @@ export default function Page() {
                             <Breadcrumb>
                                 <BreadcrumbList>
                                     <BreadcrumbItem className="hidden md:block">
-                                        <BreadcrumbLink>
-                                            App
-                                        </BreadcrumbLink>
+                                        <BreadcrumbLink>App</BreadcrumbLink>
                                     </BreadcrumbItem>
                                     <BreadcrumbSeparator className="hidden md:block" />
                                     <BreadcrumbItem>
                                         <BreadcrumbPage>
-                                            {activeSection}
+                                            breadcrumb
                                         </BreadcrumbPage>
                                     </BreadcrumbItem>
                                 </BreadcrumbList>

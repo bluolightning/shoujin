@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import Page from './sidebar';
 import Dashboard from './Dashboard';
 import Dopcan from './Dopcan';
 import DataSettings from './DataSettings';
@@ -12,6 +11,8 @@ import '@mantine/notifications/styles.css';
 import { createTheme, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
+
+import Page from './sidebar';
 
 const theme = createTheme({
     /** Put your mantine theme override here */
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
         ],
     },
 ]);
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <MantineProvider theme={theme} defaultColorScheme="auto">
