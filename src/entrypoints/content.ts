@@ -119,23 +119,12 @@ export default defineContentScript({
             document.addEventListener(eventName, resetIdleTimer, true);
         });
 
-        console.log('Page Idle Detector script loaded and listening.');
-        startSession();
+        console.log('All detection processes loaded.');
 
-        /*
-        function removeActivityListeners() {
-            activityEvents.forEach((eventName) => {
-                document.removeEventListener(eventName, resetIdleTimer, true);
-            });
-            document.removeEventListener(
-                'visibilitychange',
-                resetIdleTimer,
-                true
-            );
-            if (idleTimer !== null) {
-                clearTimeout(idleTimer);
-            }
+        // Starts session tracking only if the page is not hidden
+        if (!document.hidden && !sessionStatus) {
+            console.log('Starting the first session.');
+            startSession();
         }
-        */
     },
 });
