@@ -13,6 +13,11 @@ const DataSettings = () => {
                 title: 'Data Deletion Successful',
                 message: 'Your data has been successfully deleted.',
                 color: 'green',
+                withCloseButton: false,
+                id: 'delete-data-success',
+                onClick: () => {
+                    notifications.hide('delete-data-success');
+                },
             });
         } catch (error) {
             console.error('Error deleting data:', error);
@@ -20,6 +25,11 @@ const DataSettings = () => {
                 title: 'Data Deletion Failed',
                 message: 'Error while deleting data.',
                 color: 'red',
+                withCloseButton: false,
+                id: 'delete-data-error',
+                onClick: () => {
+                    notifications.hide('delete-data-error');
+                },
             });
         }
     };
@@ -43,6 +53,11 @@ const DataSettings = () => {
                 title: 'Backup Successful',
                 message: 'Your data has been backed up successfully.',
                 color: 'green',
+                withCloseButton: false,
+                id: 'backup-success',
+                onClick: () => {
+                    notifications.hide('backup-success');
+                },
             });
         } catch (error) {
             console.error('Error backing up data:', error);
@@ -50,6 +65,11 @@ const DataSettings = () => {
                 title: 'Backup Failed',
                 message: 'Error while backing up data.',
                 color: 'red',
+                withCloseButton: false,
+                id: 'backup-error',
+                onClick: () => {
+                    notifications.hide('backup-error');
+                },
             });
         }
     };
