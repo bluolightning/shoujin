@@ -5,9 +5,10 @@ import {
     IconDatabaseImport,
     IconSettings,
 } from '@tabler/icons-react';
-import { Code, Group, Text } from '@mantine/core';
+import { Code, Group, Text, Tooltip } from '@mantine/core';
 import classes from './appSidebar.module.css';
 import { Link } from 'react-router';
+import ThemeToggle from './ThemeToggle';
 //import LogoImage from '~/assets/clock-img.jpeg';
 
 const data = [
@@ -52,7 +53,13 @@ export function AppSidebar() {
                 {links}
             </div>
 
-            <div className={classes.footer}></div>
+            <div className={classes.footer}>
+                <Tooltip label="Toggle theme">
+                    <div>
+                        <ThemeToggle />
+                    </div>
+                </Tooltip>
+            </div>
         </nav>
     );
 }
