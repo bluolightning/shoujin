@@ -23,30 +23,17 @@ export class StorageManager {
             const data = await this.getAllStoredData();
             const entry = data.find((item) => item.url === url);
 
-            const fullDate = new Date();
-            const hour = 'h' + fullDate.getHours();
-            const date = (() => {
-                const year = fullDate.getFullYear();
-                const month = String(fullDate.getMonth() + 1).padStart(2, '0');
-                const day = String(fullDate.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            })();
+            const endTime = new Date();
+            const startTime = new Date(endTime.getTime() - timeSpent * 1000);
+
             const dateData = entry?.dateData || {};
 
-            // Create date data if it doesn't exist
-            if (!dateData[date]) {
-                dateData[date] = { dailyTime: 0, hours: {} };
-            }
-            if (!dateData[date].hours[hour]) {
-                dateData[date].hours[hour] = 0;
-            }
-
-            dateData[date].dailyTime += timeSpent;
-            dateData[date].hours[hour] += timeSpent;
+            // Distribute time across the correct hours
+            this.distributeTimeAcrossHours(startTime, endTime, dateData);
 
             if (entry) {
                 entry.timeSpent += timeSpent;
-                entry.lastVisited = fullDate.toISOString();
+                entry.lastVisited = endTime.toISOString();
                 if (favicon) {
                     entry.favicon = favicon;
                 }
@@ -55,7 +42,7 @@ export class StorageManager {
                 data.push({
                     url,
                     timeSpent,
-                    lastVisited: fullDate.toISOString(),
+                    lastVisited: endTime.toISOString(),
                     favicon,
                     dateData,
                 });
@@ -67,6 +54,60 @@ export class StorageManager {
         } catch (error) {
             console.error('Error saving page time:', error);
         }
+    }
+
+    private static distributeTimeAcrossHours(
+        startTime: Date,
+        endTime: Date,
+        dateData: {
+            [date: string]: {
+                dailyTime: number;
+                hours: { [hour: string]: number };
+            };
+        }
+    ): void {
+        const currentTime = new Date(startTime);
+
+        while (currentTime < endTime) {
+            const currentHour = currentTime.getHours();
+            const hourKey = 'h' + currentHour;
+            const dateKey = this.getDateKey(currentTime);
+
+            // Initialize date data if it doesn't exist
+            if (!dateData[dateKey]) {
+                dateData[dateKey] = { dailyTime: 0, hours: {} };
+            }
+            if (!dateData[dateKey].hours[hourKey]) {
+                dateData[dateKey].hours[hourKey] = 0;
+            }
+
+            // Calculate the end of the current hour
+            const nextHour = new Date(currentTime);
+            nextHour.setHours(currentHour + 1, 0, 0, 0);
+
+            // Determine how much time to allocate to this hour
+            const timeInThisHour = Math.min(
+                (nextHour.getTime() - currentTime.getTime()) / 1000,
+                (endTime.getTime() - currentTime.getTime()) / 1000
+            );
+
+            // Add time to this hour and daily total
+            dateData[dateKey].hours[hourKey] += timeInThisHour;
+            dateData[dateKey].dailyTime += timeInThisHour;
+
+            // Move to the next hour
+            currentTime.setTime(
+                Math.min(nextHour.getTime(), endTime.getTime())
+            );
+        }
+    }
+
+    // Helper function to format date as YYYY-MM-DD
+    private static getDateKey(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     static async getAllStoredData(): Promise<PageTimeEntry[]> {
