@@ -76,6 +76,11 @@ const SiteUsageList = () => {
                         alt={entry.url}
                         size="sm"
                         radius="xl"
+                        style={{
+                            backgroundColor: 'var(--mantine-color-gray-1)',
+                            border: '1px solid var(--mantine-color-gray-4)',
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                        }}
                     />
                     <Text size="sm" truncate>
                         {entry.url}
