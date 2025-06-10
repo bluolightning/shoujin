@@ -1,4 +1,4 @@
-interface PageTimeEntry {
+export interface PageTimeEntry {
     url: string;
     timeSpent: number;
     lastVisited: string;

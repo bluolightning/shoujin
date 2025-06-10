@@ -1,12 +1,18 @@
 import React from 'react';
+import { Grid } from '@mantine/core';
 import { PieChartDonut } from '@/components/PieChartDonut';
-//https://ui.mantine.dev/category/stats/
+import SiteUsageList from '@/components/SiteUsageList';
 
 const Dashboard = () => {
     return (
-        <>
-            <PieChartDonut />
-        </>
+        <Grid gutter="md">
+            <Grid.Col span={{ base: 12, md: 5, lg: 4 }}>
+                <PieChartDonut />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 7, lg: 8 }}>
+                <SiteUsageList />
+            </Grid.Col>
+        </Grid>
     );
 };
 
