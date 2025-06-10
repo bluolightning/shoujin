@@ -110,15 +110,15 @@ export function PieChartDonut() {
     }, []);
 
     return (
-        <Card className="flex flex-col">
-            <CardHeader className="items-center pb-0">
+        <Card className='flex flex-col'>
+            <CardHeader className='items-center pb-0'>
                 <CardTitle>Top 6 Used Sites</CardTitle>
                 <CardDescription>Date - Date</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pb-0">
+            <CardContent className='flex-1 pb-0'>
                 <ChartContainer
                     config={chartConfig}
-                    className="mx-auto aspect-square max-h-[250px]">
+                    className='mx-auto aspect-square max-h-[250px]'>
                     <PieChart
                         {...{
                             overflow: 'visible',
@@ -129,8 +129,8 @@ export function PieChartDonut() {
                         />
                         <Pie
                             data={chartData}
-                            dataKey="time"
-                            nameKey="site"
+                            dataKey='time'
+                            nameKey='site'
                             innerRadius={60}
                             strokeWidth={5}
                             labelLine={false}
@@ -145,7 +145,7 @@ export function PieChartDonut() {
                                         dominantBaseline={
                                             props.dominantBaseline
                                         }
-                                        fill="hsla(var(--foreground))">
+                                        fill='hsla(var(--foreground))'>
                                         {payload.site}
                                     </text>
                                 );
@@ -161,12 +161,12 @@ export function PieChartDonut() {
                                             <text
                                                 x={viewBox.cx}
                                                 y={viewBox.cy}
-                                                textAnchor="middle"
-                                                dominantBaseline="middle">
+                                                textAnchor='middle'
+                                                dominantBaseline='middle'>
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={viewBox.cy}
-                                                    className="fill-foreground text-3xl font-bold">
+                                                    className='fill-foreground text-3xl font-bold'>
                                                     {Math.round(
                                                         totalTime
                                                     ).toLocaleString()}
@@ -174,7 +174,7 @@ export function PieChartDonut() {
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 24}
-                                                    className="fill-muted-foreground">
+                                                    className='fill-muted-foreground'>
                                                     Seconds
                                                 </tspan>
                                             </text>
@@ -186,13 +186,13 @@ export function PieChartDonut() {
                     </PieChart>
                 </ChartContainer>
             </CardContent>
-            <CardFooter className="flex-col gap-2 text-sm">
-                <div className="flex items-center gap-2 font-medium leading-none">
+            <CardFooter className='flex-col gap-2 text-sm'>
+                <div className='flex items-center gap-2 font-medium leading-none'>
                     Trending up/down by x% this month
-                    <TrendingUp className="h-4 w-4" />
-                    <TrendingDown className="h-4 w-4" />
+                    <TrendingUp className='h-4 w-4' />
+                    <TrendingDown className='h-4 w-4' />
                 </div>
-                <div className="leading-none text-muted-foreground">
+                <div className='leading-none text-muted-foreground'>
                     Showing total time for the last x months
                 </div>
             </CardFooter>

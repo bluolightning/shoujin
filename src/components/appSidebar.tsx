@@ -37,13 +37,13 @@ export function AppSidebar() {
     return (
         <nav className={classes.navbar}>
             <div className={classes.navbarMain}>
-                <Group className={classes.header} justify="space-between">
+                <Group className={classes.header} justify='space-between'>
                     <div>
                         {/* <img src={LogoImage} alt="Logo" width="32px" /> */}
                         <Text
-                            size="lg"
+                            size='lg'
                             fw={700}
-                            variant="gradient"
+                            variant='gradient'
                             gradient={{ from: 'blue', to: 'violet', deg: 90 }}>
                             timeeo
                         </Text>
@@ -54,7 +54,7 @@ export function AppSidebar() {
             </div>
 
             <div className={classes.footer}>
-                <Tooltip label="Toggle theme">
+                <Tooltip label='Toggle theme'>
                     <div>
                         <ThemeToggle />
                     </div>

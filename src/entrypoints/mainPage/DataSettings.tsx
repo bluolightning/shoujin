@@ -79,7 +79,7 @@ const DataSettings = () => {
         modals.openConfirmModal({
             title: 'Please confirm your action',
             children: (
-                <Text size="sm">
+                <Text size='sm'>
                     Are you sure you want to delete all data? This action cannot
                     be undone.
                 </Text>
@@ -100,14 +100,14 @@ const DataSettings = () => {
                 Hello from the <strong>DataSettings</strong> page of the app!
             </h1>
             <Button
-                variant="gradient"
+                variant='gradient'
                 gradient={{ from: 'red', to: 'pink', deg: 90 }}
                 onClick={openModal}>
                 Delete All Data
             </Button>
 
             <Button
-                variant="gradient"
+                variant='gradient'
                 gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
                 onClick={handleBackup}>
                 Backup Data

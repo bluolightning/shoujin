@@ -6,8 +6,8 @@ import { Outlet } from 'react-router';
 
 export default function Page() {
     return (
-        <MantineProvider defaultColorScheme="dark">
-            <AppShell navbar={{ width: 300, breakpoint: 'sm' }} padding="md">
+        <MantineProvider defaultColorScheme='dark'>
+            <AppShell navbar={{ width: 300, breakpoint: 'sm' }} padding='md'>
                 <AppShell.Navbar>
                     <AppSidebar />
                 </AppShell.Navbar>

@@ -5,7 +5,7 @@ import SiteUsageList from '@/components/SiteUsageList';
 
 const Dashboard = () => {
     return (
-        <Grid gutter="md">
+        <Grid gutter='md'>
             <Grid.Col span={{ base: 12, md: 5, lg: 4 }}>
                 <PieChartDonut />
             </Grid.Col>

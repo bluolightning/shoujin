@@ -70,40 +70,40 @@ const SiteUsageList = () => {
     const rows = usageData.map((entry) => (
         <Table.Tr key={entry.url}>
             <Table.Td>
-                <Group gap="sm" wrap="nowrap">
+                <Group gap='sm' wrap='nowrap'>
                     <Avatar
                         src={entry.favicon || undefined}
                         alt={entry.url}
-                        size="sm"
-                        radius="xl"
+                        size='sm'
+                        radius='xl'
                         style={{
                             backgroundColor: 'var(--mantine-color-gray-1)',
                             border: '1px solid var(--mantine-color-gray-4)',
                             boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
                         }}
                     />
-                    <Text size="sm" truncate>
+                    <Text size='sm' truncate>
                         {entry.url}
                     </Text>
                 </Group>
             </Table.Td>
             <Table.Td>
-                <Text size="sm">{formatTime(entry.timeSpent)}</Text>
+                <Text size='sm'>{formatTime(entry.timeSpent)}</Text>
             </Table.Td>
             <Table.Td>
-                <Text size="sm">{formatDate(entry.lastVisited)}</Text>
+                <Text size='sm'>{formatDate(entry.lastVisited)}</Text>
             </Table.Td>
         </Table.Tr>
     ));
 
     return (
         <Card
-            shadow="sm"
-            padding="lg"
-            radius="md"
+            shadow='sm'
+            padding='lg'
+            radius='md'
             withBorder
             style={{ height: '100%' }}>
-            <Title order={3} mb="md">
+            <Title order={3} mb='md'>
                 Site Usage Details
             </Title>
             {usageData.length > 0 ? (
@@ -114,7 +114,7 @@ const SiteUsageList = () => {
                         striped
                         highlightOnHover
                         withTableBorder
-                        verticalSpacing="sm">
+                        verticalSpacing='sm'>
                         <Table.Thead>
                             <Table.Tr>
                                 <Table.Th>Site</Table.Th>
@@ -127,7 +127,7 @@ const SiteUsageList = () => {
                 </ScrollArea>
             ) : (
                 <Center style={{ height: 200 }}>
-                    <Text c="dimmed">
+                    <Text c='dimmed'>
                         No usage data available yet. Start browsing to see your
                         stats!
                     </Text>
