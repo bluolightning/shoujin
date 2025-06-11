@@ -9,12 +9,6 @@ export default defineContentScript({
         let endTime: Date;
         let sessionStatus: boolean = false;
 
-        const urlInfo = {
-            href: window.location.href,
-            hostname: window.location.hostname,
-            pathname: window.location.pathname,
-        };
-
         // Send a message to the background script when the page is focused or unfocused
         const sendMessage = async (
             type: 'page-focused' | 'page-unfocused' | 'detect-idle',
@@ -24,8 +18,8 @@ export default defineContentScript({
                 {
                     type,
                     time,
-                    url: urlInfo.hostname,
-                    fullurl: urlInfo.href,
+                    url: window.location.hostname,
+                    fullurl: window.location.href,
                 }
             );
 
