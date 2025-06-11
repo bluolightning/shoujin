@@ -1,5 +1,6 @@
 import { StorageManager } from '@/modules/storage';
 import getFavicon from '@/utils/getFavicon';
+import formatUrl from '@/utils/formatUrl';
 
 export default defineBackground(() => {
     let favicon: string | undefined;
@@ -13,14 +14,11 @@ export default defineBackground(() => {
             });
             sendResponse({ status: `Page focused received` });
         } else if (message.type === 'page-unfocused') {
-            const cleanUrl = message.url.replace(
-                /^(?:https?:\/\/)?(?:www\.)?/,
-                ''
-            );
-            StorageManager.savePageTime(cleanUrl, message.time, favicon);
+            const formattedUrl = formatUrl(message.url);
+            StorageManager.savePageTime(formattedUrl, message.time, favicon);
             favicon = undefined; //reset favicon so it doesn't get incorrectly saved to a different site
             sendResponse({ status: 'Page unfocused received' });
-            console.log('Time spent on page:', message.time, cleanUrl);
+            console.log('Time spent on page:', message.time, formattedUrl);
         } else if (message.type === 'detect-idle') {
             console.log('idle dectection request received');
             if (chrome.idle) {
