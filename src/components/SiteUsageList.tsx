@@ -77,8 +77,9 @@ const SiteUsageList = () => {
                         size='sm'
                         radius='xl'
                         style={{
-                            backgroundColor: 'var(--mantine-color-gray-1)',
-                            border: '1px solid var(--mantine-color-gray-4)',
+                            backgroundColor:
+                                'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6))',
+                            border: '1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
                             boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
                         }}
                     />
