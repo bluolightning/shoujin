@@ -1,8 +1,8 @@
 import React from 'react';
-import { StorageManager } from '@/modules/storage';
-import { Button, Text } from '@mantine/core';
-import { modals } from '@mantine/modals';
-import { notifications } from '@mantine/notifications';
+import {StorageManager} from '@/modules/storage';
+import {Button, Text} from '@mantine/core';
+import {modals} from '@mantine/modals';
+import {notifications} from '@mantine/notifications';
 
 const DataSettings = () => {
     const handleDeleteAllData = async () => {
@@ -38,7 +38,7 @@ const DataSettings = () => {
         try {
             const data = await StorageManager.getAllStoredData();
             const jsonString = JSON.stringify(data, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
+            const blob = new Blob([jsonString], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -84,9 +84,9 @@ const DataSettings = () => {
                     be undone.
                 </Text>
             ),
-            labels: { confirm: 'Delete All Data', cancel: 'Cancel' },
-            confirmProps: { color: 'red' },
-            cancelProps: { color: 'blue', variant: 'outline' },
+            labels: {confirm: 'Delete All Data', cancel: 'Cancel'},
+            confirmProps: {color: 'red'},
+            cancelProps: {color: 'blue', variant: 'outline'},
             onCancel: () => console.log('Data deletion cancelled'),
             onConfirm: () => {
                 handleDeleteAllData();
@@ -101,14 +101,14 @@ const DataSettings = () => {
             </h1>
             <Button
                 variant='gradient'
-                gradient={{ from: 'red', to: 'pink', deg: 90 }}
+                gradient={{from: 'red', to: 'pink', deg: 90}}
                 onClick={openModal}>
                 Delete All Data
             </Button>
 
             <Button
                 variant='gradient'
-                gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+                gradient={{from: 'blue', to: 'cyan', deg: 90}}
                 onClick={handleBackup}>
                 Backup Data
             </Button>

@@ -1,20 +1,20 @@
 import React from 'react';
-import { useState } from 'react';
+import {useState} from 'react';
 import {
     IconBellRinging,
     IconDatabaseImport,
     IconSettings,
 } from '@tabler/icons-react';
-import { Code, Group, Text, Tooltip } from '@mantine/core';
+import {Code, Group, Text, Tooltip} from '@mantine/core';
 import classes from './AppSidebar.module.css';
-import { Link } from 'react-router';
+import {Link} from 'react-router';
 import ThemeToggle from './ThemeToggle';
 //import LogoImage from '~/assets/clock-img.jpeg';
 
 const data = [
-    { link: 'Dashboard', label: 'Dashboard', icon: IconBellRinging },
-    { link: 'Dopcan', label: 'Other Settings', icon: IconSettings },
-    { link: 'DataSettings', label: 'Data Settings', icon: IconDatabaseImport },
+    {link: 'Dashboard', label: 'Dashboard', icon: IconBellRinging},
+    {link: 'Dopcan', label: 'Other Settings', icon: IconSettings},
+    {link: 'DataSettings', label: 'Data Settings', icon: IconDatabaseImport},
 ];
 
 export function AppSidebar() {
@@ -44,7 +44,7 @@ export function AppSidebar() {
                             size='lg'
                             fw={700}
                             variant='gradient'
-                            gradient={{ from: 'blue', to: 'violet', deg: 90 }}>
+                            gradient={{from: 'blue', to: 'violet', deg: 90}}>
                             timeeo
                         </Text>
                     </div>

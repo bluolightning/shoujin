@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Card,
     Table,
@@ -10,8 +10,8 @@ import {
     Loader,
     Center,
 } from '@mantine/core';
-import { StorageManager } from '@/modules/storage';
-import type { PageTimeEntry } from '@/modules/storage';
+import {StorageManager} from '@/modules/storage';
+import type {PageTimeEntry} from '@/modules/storage';
 
 // Helper function to format seconds into a human-readable string (e.g., 1h 23m 45s)
 const formatTime = (totalSeconds: number): string => {
@@ -61,7 +61,7 @@ const SiteUsageList = () => {
 
     if (loading) {
         return (
-            <Center style={{ height: '100%' }}>
+            <Center style={{height: '100%'}}>
                 <Loader />
             </Center>
         );
@@ -103,7 +103,7 @@ const SiteUsageList = () => {
             padding='lg'
             radius='md'
             withBorder
-            style={{ height: '100%' }}>
+            style={{height: '100%'}}>
             <Title order={3} mb='md'>
                 Site Usage Details
             </Title>
@@ -127,7 +127,7 @@ const SiteUsageList = () => {
                     </Table>
                 </ScrollArea>
             ) : (
-                <Center style={{ height: 200 }}>
+                <Center style={{height: 200}}>
                     <Text c='dimmed'>
                         No usage data available yet. Start browsing to see your
                         stats!

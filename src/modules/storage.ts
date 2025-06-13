@@ -6,7 +6,7 @@ export interface PageTimeEntry {
     dateData: {
         [date: string]: {
             dailyTime: number;
-            hours: { [hour: string]: number };
+            hours: {[hour: string]: number};
         };
     };
 }
@@ -50,7 +50,7 @@ export class StorageManager {
 
             data.sort((a, b) => b.timeSpent - a.timeSpent); // Sort by time spent (descending)
 
-            await browser.storage.local.set({ [this.STORAGE_KEY]: data });
+            await browser.storage.local.set({[this.STORAGE_KEY]: data});
         } catch (error) {
             console.error('Error saving page time:', error);
         }
@@ -62,7 +62,7 @@ export class StorageManager {
         dateData: {
             [date: string]: {
                 dailyTime: number;
-                hours: { [hour: string]: number };
+                hours: {[hour: string]: number};
             };
         }
     ): void {
@@ -75,7 +75,7 @@ export class StorageManager {
 
             // Initialize date data if it doesn't exist
             if (!dateData[dateKey]) {
-                dateData[dateKey] = { dailyTime: 0, hours: {} };
+                dateData[dateKey] = {dailyTime: 0, hours: {}};
             }
             if (!dateData[dateKey].hours[hourKey]) {
                 dateData[dateKey].hours[hourKey] = 0;
@@ -122,7 +122,7 @@ export class StorageManager {
 
     static async clearAllData(): Promise<void> {
         try {
-            await browser.storage.local.set({ [this.STORAGE_KEY]: [] });
+            await browser.storage.local.set({[this.STORAGE_KEY]: []});
         } catch (error) {
             console.error('Error clearing storage:', error);
         }

@@ -1,4 +1,4 @@
-import { AppSidebar } from '@/components/AppSidebar';
+import {AppSidebar} from '@/components/AppSidebar';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Separator } from '@/components/ui/separator';
+import {Separator} from '@/components/ui/separator';
 import {
     SidebarInset,
     SidebarProvider,

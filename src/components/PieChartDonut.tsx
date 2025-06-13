@@ -1,8 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { TrendingUp, TrendingDown } from 'lucide-react';
-import { Label, Pie, PieChart } from 'recharts';
+import {TrendingUp, TrendingDown} from 'lucide-react';
+import {Label, Pie, PieChart} from 'recharts';
 
 import {
     Card,
@@ -19,7 +19,7 @@ import {
     ChartTooltipContent,
 } from '@/components/ui/chart';
 
-import { StorageManager } from '@/modules/storage';
+import {StorageManager} from '@/modules/storage';
 
 interface LabelProps {
     cx?: number;
@@ -42,12 +42,12 @@ interface ChartDataPoints {
 let chartData: ChartDataPoints[] = [];
 
 let chartConfig: ChartConfig = {
-    first: { label: '', color: '' },
-    second: { label: '', color: '' },
-    third: { label: '', color: '' },
-    fourth: { label: '', color: '' },
-    fifth: { label: '', color: '' },
-    sixth: { label: '', color: '' },
+    first: {label: '', color: ''},
+    second: {label: '', color: ''},
+    third: {label: '', color: ''},
+    fourth: {label: '', color: ''},
+    fifth: {label: '', color: ''},
+    sixth: {label: '', color: ''},
 };
 
 (async function fetchPageTimes() {
@@ -134,7 +134,7 @@ export function PieChartDonut() {
                             innerRadius={60}
                             strokeWidth={5}
                             labelLine={false}
-                            label={({ payload, ...props }: LabelProps) => {
+                            label={({payload, ...props}: LabelProps) => {
                                 return (
                                     <text
                                         cx={props.cx}
@@ -151,7 +151,7 @@ export function PieChartDonut() {
                                 );
                             }}>
                             <Label
-                                content={({ viewBox }) => {
+                                content={({viewBox}) => {
                                     if (
                                         viewBox &&
                                         'cx' in viewBox &&

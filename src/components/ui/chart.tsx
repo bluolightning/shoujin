@@ -1,18 +1,18 @@
 import * as React from 'react';
 import * as RechartsPrimitive from 'recharts';
 
-import { cn } from '@/lib/utils';
+import {cn} from '@/lib/utils';
 
 // Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: '', dark: '.dark' } as const;
+const THEMES = {light: '', dark: '.dark'} as const;
 
 export type ChartConfig = {
     [k in string]: {
         label?: React.ReactNode;
         icon?: React.ComponentType;
     } & (
-        | { color?: string; theme?: never }
-        | { color?: never; theme: Record<keyof typeof THEMES, string> }
+        | {color?: string; theme?: never}
+        | {color?: never; theme: Record<keyof typeof THEMES, string>}
     );
 };
 
@@ -40,12 +40,12 @@ const ChartContainer = React.forwardRef<
             typeof RechartsPrimitive.ResponsiveContainer
         >['children'];
     }
->(({ id, className, children, config, ...props }, ref) => {
+>(({id, className, children, config, ...props}, ref) => {
     const uniqueId = React.useId();
     const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`;
 
     return (
-        <ChartContext.Provider value={{ config }}>
+        <ChartContext.Provider value={{config}}>
             <div
                 data-chart={chartId}
                 ref={ref}
@@ -64,7 +64,7 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = 'Chart';
 
-const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
+const ChartStyle = ({id, config}: {id: string; config: ChartConfig}) => {
     const colorConfig = Object.entries(config).filter(
         ([, config]) => config.theme || config.color
     );
@@ -128,7 +128,7 @@ const ChartTooltipContent = React.forwardRef<
         },
         ref
     ) => {
-        const { config } = useChart();
+        const {config} = useChart();
 
         const tooltipLabel = React.useMemo(() => {
             if (hideLabel || !payload?.length) {
@@ -300,7 +300,7 @@ const ChartLegendContent = React.forwardRef<
         },
         ref
     ) => {
-        const { config } = useChart();
+        const {config} = useChart();
 
         if (!payload?.length) {
             return null;

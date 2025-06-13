@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconMoon, IconSun } from '@tabler/icons-react';
+import {IconMoon, IconSun} from '@tabler/icons-react';
 import cx from 'clsx';
 import {
     ActionIcon,
@@ -10,7 +10,7 @@ import {
 import classes from './ThemeToggle.module.css';
 
 export default function ThemeToggle() {
-    const { setColorScheme } = useMantineColorScheme();
+    const {setColorScheme} = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', {
         getInitialValueInEffect: true,
     });

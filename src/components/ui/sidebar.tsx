@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
-import { VariantProps, cva } from 'class-variance-authority';
-import { PanelLeft } from 'lucide-react';
+import {Slot} from '@radix-ui/react-slot';
+import {VariantProps, cva} from 'class-variance-authority';
+import {PanelLeft} from 'lucide-react';
 
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Skeleton } from '@/components/ui/skeleton';
+import {useIsMobile} from '@/hooks/use-mobile';
+import {cn} from '@/lib/utils';
+import {Button} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
+import {Separator} from '@/components/ui/separator';
+import {Sheet, SheetContent} from '@/components/ui/sheet';
+import {Skeleton} from '@/components/ui/skeleton';
 import {
     Tooltip,
     TooltipContent,
@@ -181,7 +181,7 @@ const Sidebar = React.forwardRef<
         },
         ref
     ) => {
-        const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+        const {isMobile, state, openMobile, setOpenMobile} = useSidebar();
 
         if (collapsible === 'none') {
             return (
@@ -268,8 +268,8 @@ Sidebar.displayName = 'Sidebar';
 const SidebarTrigger = React.forwardRef<
     React.ElementRef<typeof Button>,
     React.ComponentProps<typeof Button>
->(({ className, onClick, ...props }, ref) => {
-    const { toggleSidebar } = useSidebar();
+>(({className, onClick, ...props}, ref) => {
+    const {toggleSidebar} = useSidebar();
 
     return (
         <Button
@@ -293,8 +293,8 @@ SidebarTrigger.displayName = 'SidebarTrigger';
 const SidebarRail = React.forwardRef<
     HTMLButtonElement,
     React.ComponentProps<'button'>
->(({ className, ...props }, ref) => {
-    const { toggleSidebar } = useSidebar();
+>(({className, ...props}, ref) => {
+    const {toggleSidebar} = useSidebar();
 
     return (
         <button
@@ -322,7 +322,7 @@ SidebarRail.displayName = 'SidebarRail';
 const SidebarInset = React.forwardRef<
     HTMLDivElement,
     React.ComponentProps<'main'>
->(({ className, ...props }, ref) => {
+>(({className, ...props}, ref) => {
     return (
         <main
             ref={ref}
@@ -340,7 +340,7 @@ SidebarInset.displayName = 'SidebarInset';
 const SidebarInput = React.forwardRef<
     React.ElementRef<typeof Input>,
     React.ComponentProps<typeof Input>
->(({ className, ...props }, ref) => {
+>(({className, ...props}, ref) => {
     return (
         <Input
             ref={ref}
@@ -358,7 +358,7 @@ SidebarInput.displayName = 'SidebarInput';
 const SidebarHeader = React.forwardRef<
     HTMLDivElement,
     React.ComponentProps<'div'>
->(({ className, ...props }, ref) => {
+>(({className, ...props}, ref) => {
     return (
         <div
             ref={ref}
@@ -373,7 +373,7 @@ SidebarHeader.displayName = 'SidebarHeader';
 const SidebarFooter = React.forwardRef<
     HTMLDivElement,
     React.ComponentProps<'div'>
->(({ className, ...props }, ref) => {
+>(({className, ...props}, ref) => {
     return (
         <div
             ref={ref}
@@ -388,7 +388,7 @@ SidebarFooter.displayName = 'SidebarFooter';
 const SidebarSeparator = React.forwardRef<
     React.ElementRef<typeof Separator>,
     React.ComponentProps<typeof Separator>
->(({ className, ...props }, ref) => {
+>(({className, ...props}, ref) => {
     return (
         <Separator
             ref={ref}
@@ -403,7 +403,7 @@ SidebarSeparator.displayName = 'SidebarSeparator';
 const SidebarContent = React.forwardRef<
     HTMLDivElement,
     React.ComponentProps<'div'>
->(({ className, ...props }, ref) => {
+>(({className, ...props}, ref) => {
     return (
         <div
             ref={ref}
@@ -421,7 +421,7 @@ SidebarContent.displayName = 'SidebarContent';
 const SidebarGroup = React.forwardRef<
     HTMLDivElement,
     React.ComponentProps<'div'>
->(({ className, ...props }, ref) => {
+>(({className, ...props}, ref) => {
     return (
         <div
             ref={ref}
@@ -438,8 +438,8 @@ SidebarGroup.displayName = 'SidebarGroup';
 
 const SidebarGroupLabel = React.forwardRef<
     HTMLDivElement,
-    React.ComponentProps<'div'> & { asChild?: boolean }
->(({ className, asChild = false, ...props }, ref) => {
+    React.ComponentProps<'div'> & {asChild?: boolean}
+>(({className, asChild = false, ...props}, ref) => {
     const Comp = asChild ? Slot : 'div';
 
     return (
@@ -459,8 +459,8 @@ SidebarGroupLabel.displayName = 'SidebarGroupLabel';
 
 const SidebarGroupAction = React.forwardRef<
     HTMLButtonElement,
-    React.ComponentProps<'button'> & { asChild?: boolean }
->(({ className, asChild = false, ...props }, ref) => {
+    React.ComponentProps<'button'> & {asChild?: boolean}
+>(({className, asChild = false, ...props}, ref) => {
     const Comp = asChild ? Slot : 'button';
 
     return (
@@ -483,7 +483,7 @@ SidebarGroupAction.displayName = 'SidebarGroupAction';
 const SidebarGroupContent = React.forwardRef<
     HTMLDivElement,
     React.ComponentProps<'div'>
->(({ className, ...props }, ref) => (
+>(({className, ...props}, ref) => (
     <div
         ref={ref}
         data-sidebar='group-content'
@@ -496,7 +496,7 @@ SidebarGroupContent.displayName = 'SidebarGroupContent';
 const SidebarMenu = React.forwardRef<
     HTMLUListElement,
     React.ComponentProps<'ul'>
->(({ className, ...props }, ref) => (
+>(({className, ...props}, ref) => (
     <ul
         ref={ref}
         data-sidebar='menu'
@@ -509,7 +509,7 @@ SidebarMenu.displayName = 'SidebarMenu';
 const SidebarMenuItem = React.forwardRef<
     HTMLLIElement,
     React.ComponentProps<'li'>
->(({ className, ...props }, ref) => (
+>(({className, ...props}, ref) => (
     <li
         ref={ref}
         data-sidebar='menu-item'
@@ -563,7 +563,7 @@ const SidebarMenuButton = React.forwardRef<
         ref
     ) => {
         const Comp = asChild ? Slot : 'button';
-        const { isMobile, state } = useSidebar();
+        const {isMobile, state} = useSidebar();
 
         const button = (
             <Comp
@@ -572,7 +572,7 @@ const SidebarMenuButton = React.forwardRef<
                 data-size={size}
                 data-active={isActive}
                 className={cn(
-                    sidebarMenuButtonVariants({ variant, size }),
+                    sidebarMenuButtonVariants({variant, size}),
                     className
                 )}
                 {...props}
@@ -610,7 +610,7 @@ const SidebarMenuAction = React.forwardRef<
         asChild?: boolean;
         showOnHover?: boolean;
     }
->(({ className, asChild = false, showOnHover = false, ...props }, ref) => {
+>(({className, asChild = false, showOnHover = false, ...props}, ref) => {
     const Comp = asChild ? Slot : 'button';
 
     return (
@@ -638,7 +638,7 @@ SidebarMenuAction.displayName = 'SidebarMenuAction';
 const SidebarMenuBadge = React.forwardRef<
     HTMLDivElement,
     React.ComponentProps<'div'>
->(({ className, ...props }, ref) => (
+>(({className, ...props}, ref) => (
     <div
         ref={ref}
         data-sidebar='menu-badge'
@@ -661,7 +661,7 @@ const SidebarMenuSkeleton = React.forwardRef<
     React.ComponentProps<'div'> & {
         showIcon?: boolean;
     }
->(({ className, showIcon = false, ...props }, ref) => {
+>(({className, showIcon = false, ...props}, ref) => {
     // Random width between 50 to 90%.
     const width = React.useMemo(() => {
         return `${Math.floor(Math.random() * 40) + 50}%`;
@@ -699,7 +699,7 @@ SidebarMenuSkeleton.displayName = 'SidebarMenuSkeleton';
 const SidebarMenuSub = React.forwardRef<
     HTMLUListElement,
     React.ComponentProps<'ul'>
->(({ className, ...props }, ref) => (
+>(({className, ...props}, ref) => (
     <ul
         ref={ref}
         data-sidebar='menu-sub'
@@ -716,7 +716,7 @@ SidebarMenuSub.displayName = 'SidebarMenuSub';
 const SidebarMenuSubItem = React.forwardRef<
     HTMLLIElement,
     React.ComponentProps<'li'>
->(({ ...props }, ref) => <li ref={ref} {...props} />);
+>(({...props}, ref) => <li ref={ref} {...props} />);
 SidebarMenuSubItem.displayName = 'SidebarMenuSubItem';
 
 const SidebarMenuSubButton = React.forwardRef<
@@ -726,7 +726,7 @@ const SidebarMenuSubButton = React.forwardRef<
         size?: 'sm' | 'md';
         isActive?: boolean;
     }
->(({ asChild = false, size = 'md', isActive, className, ...props }, ref) => {
+>(({asChild = false, size = 'md', isActive, className, ...props}, ref) => {
     const Comp = asChild ? Slot : 'a';
 
     return (

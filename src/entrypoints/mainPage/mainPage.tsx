@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router';
+import {createBrowserRouter, RouterProvider} from 'react-router';
 import Dashboard from './Dashboard';
 import Dopcan from './Dopcan';
 import DataSettings from './DataSettings';
@@ -8,9 +8,9 @@ import '@/output.css';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
-import { createTheme, MantineProvider } from '@mantine/core';
-import { ModalsProvider } from '@mantine/modals';
-import { Notifications } from '@mantine/notifications';
+import {createTheme, MantineProvider} from '@mantine/core';
+import {ModalsProvider} from '@mantine/modals';
+import {Notifications} from '@mantine/notifications';
 
 import Page from './sidebar';
 
