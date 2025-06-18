@@ -8,6 +8,5 @@ export default defineConfig({
 
     manifest: {
         permissions: ['tabs', 'storage', 'idle'],
-        host_permissions: ['https://developer.chrome.com/*'],
     },
 });
