@@ -4,7 +4,13 @@ interface MessageResponse {
 
 export default defineContentScript({
     matches: ['<all_urls>'],
+    allFrames: true,
     main() {
+        if (window.self !== window.top) {
+            console.log('Iframe detected, running alternate code.');
+            return;
+        }
+
         let startTime: Date;
         let endTime: Date;
         let sessionStatus: boolean = false;
