@@ -18,8 +18,6 @@ export default defineContentScript({
 
         if (window.self !== window.top) {
             // Script is running in an iframe
-            console.log('Iframe detected, running alternate code.');
-
             activityEvents.forEach((eventName) => {
                 document.addEventListener(
                     eventName,
