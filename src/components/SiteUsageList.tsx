@@ -1,15 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-    Card,
-    Table,
-    Text,
-    Title,
-    ScrollArea,
-    Avatar,
-    Group,
-    Loader,
-    Center,
-} from '@mantine/core';
+import {Card, Table, Text, Title, ScrollArea, Avatar, Group, Loader, Center} from '@mantine/core';
 import {StorageManager} from '@/modules/storage';
 import type {PageTimeEntry} from '@/modules/storage';
 
@@ -46,9 +36,7 @@ const SiteUsageList = () => {
             try {
                 const data = await StorageManager.getAllStoredData();
                 // Sort data by timeSpent in descending order
-                const sortedData = data.sort(
-                    (a, b) => b.timeSpent - a.timeSpent
-                );
+                const sortedData = data.sort((a, b) => b.timeSpent - a.timeSpent);
                 setUsageData(sortedData);
             } catch (error) {
                 console.error('Failed to fetch usage data:', error);
@@ -98,12 +86,7 @@ const SiteUsageList = () => {
     ));
 
     return (
-        <Card
-            shadow='sm'
-            padding='lg'
-            radius='md'
-            withBorder
-            style={{height: '100%'}}>
+        <Card shadow='sm' padding='lg' radius='md' withBorder style={{height: '100%'}}>
             <Title order={3} mb='md'>
                 Site Usage Details
             </Title>
@@ -111,11 +94,7 @@ const SiteUsageList = () => {
                 <ScrollArea h={450}>
                     {' '}
                     {/* Adjust height as needed */}
-                    <Table
-                        striped
-                        highlightOnHover
-                        withTableBorder
-                        verticalSpacing='sm'>
+                    <Table striped highlightOnHover withTableBorder verticalSpacing='sm'>
                         <Table.Thead>
                             <Table.Tr>
                                 <Table.Th>Site</Table.Th>
@@ -129,8 +108,7 @@ const SiteUsageList = () => {
             ) : (
                 <Center style={{height: 200}}>
                     <Text c='dimmed'>
-                        No usage data available yet. Start browsing to see your
-                        stats!
+                        No usage data available yet. Start browsing to see your stats!
                     </Text>
                 </Center>
             )}

@@ -1,10 +1,6 @@
 import React from 'react';
 import {useState} from 'react';
-import {
-    IconBellRinging,
-    IconDatabaseImport,
-    IconSettings,
-} from '@tabler/icons-react';
+import {IconBellRinging, IconDatabaseImport, IconSettings} from '@tabler/icons-react';
 import {Code, Group, Text, Tooltip} from '@mantine/core';
 import classes from './AppSidebar.module.css';
 import {Link} from 'react-router';

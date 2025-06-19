@@ -96,9 +96,7 @@ export class StorageManager {
             dateData[dateKey].dailyTime += timeInThisHour;
 
             // Move to the next hour
-            currentTime.setTime(
-                Math.min(nextHour.getTime(), endTime.getTime())
-            );
+            currentTime.setTime(Math.min(nextHour.getTime(), endTime.getTime()));
         }
     }
 

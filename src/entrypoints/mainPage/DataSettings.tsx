@@ -80,8 +80,7 @@ const DataSettings = () => {
             title: 'Please confirm your action',
             children: (
                 <Text size='sm'>
-                    Are you sure you want to delete all data? This action cannot
-                    be undone.
+                    Are you sure you want to delete all data? This action cannot be undone.
                 </Text>
             ),
             labels: {confirm: 'Delete All Data', cancel: 'Cancel'},

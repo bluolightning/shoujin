@@ -20,14 +20,12 @@ export default defineContentScript({
             type: 'page-focused' | 'page-unfocused' | 'detect-idle',
             time?: number | null | undefined
         ): Promise<string> => {
-            const response: MessageResponse = await browser.runtime.sendMessage(
-                {
-                    type,
-                    time,
-                    url: window.location.hostname,
-                    fullurl: window.location.href,
-                }
-            );
+            const response: MessageResponse = await browser.runtime.sendMessage({
+                type,
+                time,
+                url: window.location.hostname,
+                fullurl: window.location.href,
+            });
 
             console.log('logging response:', response.status);
             return response.status;

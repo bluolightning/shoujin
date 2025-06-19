@@ -123,10 +123,7 @@ export function PieChartDonut() {
                         {...{
                             overflow: 'visible',
                         }}>
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
-                        />
+                        <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                         <Pie
                             data={chartData}
                             dataKey='time'
@@ -142,9 +139,7 @@ export function PieChartDonut() {
                                         x={props.x}
                                         y={props.y}
                                         textAnchor={props.textAnchor}
-                                        dominantBaseline={
-                                            props.dominantBaseline
-                                        }
+                                        dominantBaseline={props.dominantBaseline}
                                         fill='hsla(var(--foreground))'>
                                         {payload.site}
                                     </text>
@@ -152,11 +147,7 @@ export function PieChartDonut() {
                             }}>
                             <Label
                                 content={({viewBox}) => {
-                                    if (
-                                        viewBox &&
-                                        'cx' in viewBox &&
-                                        'cy' in viewBox
-                                    ) {
+                                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
                                         return (
                                             <text
                                                 x={viewBox.cx}
@@ -167,9 +158,7 @@ export function PieChartDonut() {
                                                     x={viewBox.cx}
                                                     y={viewBox.cy}
                                                     className='fill-foreground text-3xl font-bold'>
-                                                    {Math.round(
-                                                        totalTime
-                                                    ).toLocaleString()}
+                                                    {Math.round(totalTime).toLocaleString()}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
