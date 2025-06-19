@@ -6,9 +6,31 @@ export default defineContentScript({
     matches: ['<all_urls>'],
     allFrames: true,
     main() {
+        // List of events to listen for user activity
+        const activityEvents = [
+            'mousemove',
+            'mousedown',
+            'keydown',
+            'scroll',
+            'touchstart',
+            'wheel',
+        ];
+
         if (window.self !== window.top) {
+            // Script is running in an iframe
             console.log('Iframe detected, running alternate code.');
-            return;
+
+            activityEvents.forEach((eventName) => {
+                document.addEventListener(
+                    eventName,
+                    () => {
+                        window.parent.postMessage({type: 'iframe-activity'}, '*');
+                    },
+                    true
+                );
+            });
+
+            return; // Exit early if running in an iframe
         }
 
         let startTime: Date;
@@ -104,17 +126,15 @@ export default defineContentScript({
             console.log('Resetting idle timer.');
         }
 
-        // List of events to listen for user activity
-        const activityEvents = [
-            'mousemove',
-            'mousedown',
-            'keydown',
-            'scroll',
-            'touchstart',
-            'wheel',
-        ];
         activityEvents.forEach((eventName) => {
             document.addEventListener(eventName, resetIdleTimer, true);
+        });
+
+        window.addEventListener('message', (event) => {
+            if (event.data?.type === 'iframe-activity') {
+                console.log('Activity detected in iframe, resetting idle timer.');
+                resetIdleTimer();
+            }
         });
 
         console.log('All detection processes loaded.');
