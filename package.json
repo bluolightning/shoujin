@@ -28,7 +28,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "esbuild": "^0.25.2",
-        "lucide-react": "^0.503.0",
+        "lucide-react": "^0.517.0",
         "react": "^19.1.0",
         "react-dom": "^19.0.0",
         "react-router": "^7.3.0",
@@ -39,7 +39,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.22.0",
-        "@types/chrome": "^0.0.315",
+        "@types/chrome": "^0.0.326",
         "@types/react": "^19.1.0",
         "@types/react-dom": "^19.0.2",
         "@wxt-dev/module-react": "^1.1.2",
