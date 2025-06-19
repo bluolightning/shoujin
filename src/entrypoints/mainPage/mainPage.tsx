@@ -4,10 +4,10 @@ import {createBrowserRouter, RouterProvider} from 'react-router';
 import Dashboard from './Dashboard';
 import Dopcan from './Dopcan';
 import DataSettings from './DataSettings';
-import '@/output.css';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import '@mantine/charts/styles.css';
 import {createTheme, MantineProvider} from '@mantine/core';
 import {ModalsProvider} from '@mantine/modals';
 import {Notifications} from '@mantine/notifications';

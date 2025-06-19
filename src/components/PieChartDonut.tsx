@@ -3,6 +3,7 @@
 import * as React from 'react';
 import {TrendingUp, TrendingDown} from 'lucide-react';
 import {Label, Pie, PieChart} from 'recharts';
+import '@/output.css';
 
 import {
     Card,
