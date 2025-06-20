@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import {
     Cell,
     Pie,
@@ -158,12 +159,22 @@ const getLabelValue = (
     return value;
 };
 
+interface DonutChartLabelProps {
+    cx: number;
+    cy: number;
+    x: number;
+    y: number;
+    value: number;
+    percent: number;
+    name: string;
+}
+
 const getLabel =
     (
         labelsType: 'value' | 'percent' | 'name',
         valueFormatter?: DonutChartProps['valueFormatter']
     ): PieLabel =>
-    ({x, y, cx, cy, percent, value, name}) => (
+    ({x, y, cx, cy, percent, value, name}: DonutChartLabelProps) => (
         <text
             x={x}
             y={y}
@@ -205,7 +216,6 @@ export const DonutChart = factory<DonutChartFactory>((_props, ref) => {
         children,
         pieChartProps,
         valueFormatter,
-        strokeColor,
         labelsType,
         ...others
     } = props;

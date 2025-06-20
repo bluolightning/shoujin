@@ -18,4 +18,11 @@ export default [
             'no-unused-vars': 'warn',
         },
     },
+    {
+        // Prevent 'unexpected any' errors in manually added  Mantine files
+        files: ['src/components/MantineComponents/**/*.{js,ts,jsx,tsx}'],
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
+        },
+    },
 ];
