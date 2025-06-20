@@ -1,5 +1,5 @@
 import {Text, Card, Center} from '@mantine/core';
-import {DonutChart, DonutChartCell} from '@mantine/charts';
+import {DonutChart, DonutChartCell} from '@/components/MantineComponents/DonutChart/DonutChart';
 import {StorageManager} from '@/modules/storage';
 import {useEffect, useState} from 'react';
 
