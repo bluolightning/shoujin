@@ -100,7 +100,7 @@ export interface DonutChartProps
     pieChartProps?: React.ComponentPropsWithoutRef<typeof ReChartsPieChart>;
 
     /** Type of labels to display, `'value'` by default */
-    labelsType?: 'value' | 'percent';
+    labelsType?: 'value' | 'percent' | 'name';
 
     /** A function to format values inside the tooltip */
     valueFormatter?: (value: number) => string;
@@ -140,10 +140,15 @@ const getLabelValue = (
     labelsType: DonutChartProps['labelsType'],
     value: number,
     percent: number,
+    name: string,
     valueFormatter?: DonutChartProps['valueFormatter']
 ) => {
     if (labelsType === 'percent') {
         return `${(percent * 100).toFixed(0)}%`;
+    }
+
+    if (labelsType === 'name') {
+        return name;
     }
 
     if (typeof valueFormatter === 'function') {
@@ -155,10 +160,10 @@ const getLabelValue = (
 
 const getLabel =
     (
-        labelsType: 'value' | 'percent',
+        labelsType: 'value' | 'percent' | 'name',
         valueFormatter?: DonutChartProps['valueFormatter']
     ): PieLabel =>
-    ({x, y, cx, cy, percent, value}) => (
+    ({x, y, cx, cy, percent, value, name}) => (
         <text
             x={x}
             y={y}
@@ -168,7 +173,8 @@ const getLabel =
             fill='var(--chart-labels-color, var(--mantine-color-dimmed))'
             fontFamily='var(--mantine-font-family)'
             fontSize={12}>
-            <tspan x={x}>{getLabelValue(labelsType, value, percent, valueFormatter)}</tspan>
+            {/* Pass 'name' to the helper function */}
+            <tspan x={x}>{getLabelValue(labelsType, value, percent, name, valueFormatter)}</tspan>
         </text>
     );
 

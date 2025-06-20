@@ -34,7 +34,7 @@ function PieChartDonutNew() {
                         size={200}
                         thickness={28}
                         withLabelsLine={false}
-                        labelsType='percent'
+                        labelsType='name'
                         withLabels={true}
                         data={chartData}
                         chartLabel='Seconds'
