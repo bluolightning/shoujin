@@ -2,6 +2,7 @@ import {Text, Card, Center} from '@mantine/core';
 import {DonutChart, DonutChartCell} from '@/components/MantineComponents/DonutChart/DonutChart';
 import {StorageManager} from '@/modules/storage';
 import {useEffect, useState} from 'react';
+import classes from './PieDonutChartNew.module.css';
 
 function PieChartDonutNew() {
     const [chartData, setChartData] = useState<DonutChartCell[]>([]);
@@ -38,6 +39,7 @@ function PieChartDonutNew() {
                         withLabels={true}
                         data={chartData}
                         chartLabel='Seconds'
+                        pieChartProps={{className: classes.chartWithVisibleLabels}}
                     />
                 </div>
             </Center>

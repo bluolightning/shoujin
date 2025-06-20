@@ -1,0 +1,3 @@
+.chartWithVisibleLabels :global(.recharts-surface) {
+    overflow: visible;
+}
