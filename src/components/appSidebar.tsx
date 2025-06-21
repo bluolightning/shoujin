@@ -13,7 +13,7 @@ const data = [
     {link: 'DataSettings', label: 'Data Settings', icon: IconDatabaseImport},
 ];
 
-export function AppSidebar() {
+function AppSidebar() {
     const [active, setActive] = useState('Dashboard');
 
     const links = data.map((item) => (
@@ -59,3 +59,5 @@ export function AppSidebar() {
         </nav>
     );
 }
+
+export default AppSidebar;
