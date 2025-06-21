@@ -2,9 +2,9 @@ import {Text, Card, Center} from '@mantine/core';
 import {DonutChart, DonutChartCell} from '@/components/MantineComponents/DonutChart/DonutChart';
 import {StorageManager} from '@/modules/storage';
 import {useEffect, useState} from 'react';
-import classes from './PieDonutChartNew.module.css';
+import classes from './PieDonutChart.module.css';
 
-function PieChartDonutNew() {
+function PieChartDonut() {
     const [chartData, setChartData] = useState<DonutChartCell[]>([]);
 
     const chartColors = ['indigo.6', 'yellow.6', 'teal.6', 'cyan.6', 'lime.6', 'orange.6'];
@@ -47,4 +47,4 @@ function PieChartDonutNew() {
     );
 }
 
-export default PieChartDonutNew;
+export default PieChartDonut;

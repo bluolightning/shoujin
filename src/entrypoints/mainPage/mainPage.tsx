@@ -20,7 +20,7 @@ const theme = createTheme({
 
 const router = createBrowserRouter([
     {
-        path: 'mainPage.html',
+        path: 'MainPage.html',
         element: <Page />,
         children: [
             {
