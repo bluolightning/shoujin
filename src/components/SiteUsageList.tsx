@@ -82,6 +82,9 @@ const SiteUsageList = () => {
             <Table.Td>
                 <Text size='sm'>{formatDate(entry.lastVisited)}</Text>
             </Table.Td>
+            <Table.Td>
+                <Text size='sm'>{String(entry.visitCount)}</Text>
+            </Table.Td>
         </Table.Tr>
     ));
 
@@ -100,6 +103,7 @@ const SiteUsageList = () => {
                                 <Table.Th>Site</Table.Th>
                                 <Table.Th>Time Spent</Table.Th>
                                 <Table.Th>Last Visited</Table.Th>
+                                <Table.Th>Page Visits</Table.Th>
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>{rows}</Table.Tbody>
