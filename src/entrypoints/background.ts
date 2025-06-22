@@ -21,7 +21,7 @@ export default defineBackground(() => {
             const formattedUrl = formatUrl(message.url);
             const favicon = tabId ? tabFavicons.get(tabId) : undefined;
 
-            StorageManager.savePageTime(formattedUrl, message.time, favicon);
+            StorageManager.savePageTime(formattedUrl, message.time, favicon, message.firstVisit);
 
             // Remove the favicon from storage for the unfocused tab
             if (tabId) {

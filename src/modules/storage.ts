@@ -9,6 +9,7 @@ export interface PageTimeEntry {
             hours: {[hour: string]: number};
         };
     };
+    visitCount: number;
 }
 
 export class StorageManager {
@@ -17,7 +18,8 @@ export class StorageManager {
     static async savePageTime(
         url: string,
         timeSpent: number,
-        favicon: string | undefined
+        favicon: string | undefined,
+        firstVisit: boolean
     ): Promise<void> {
         try {
             const data = await this.getAllStoredData();
@@ -38,6 +40,7 @@ export class StorageManager {
                     entry.favicon = favicon;
                 }
                 entry.dateData = dateData;
+                entry.visitCount = entry.visitCount + (firstVisit ? 1 : 0);
             } else {
                 data.push({
                     url,
@@ -45,6 +48,7 @@ export class StorageManager {
                     lastVisited: endTime.toISOString(),
                     favicon,
                     dateData,
+                    visitCount: 1,
                 });
             }
 

@@ -31,6 +31,7 @@ export default defineContentScript({
             return; // Exit early if running in an iframe
         }
 
+        let firstVisit = true;
         let startTime: Date;
         let endTime: Date;
         let sessionStatus: boolean = false;
@@ -45,7 +46,10 @@ export default defineContentScript({
                 time,
                 url: window.location.hostname,
                 fullurl: window.location.href,
+                firstVisit,
             });
+
+            firstVisit = false;
 
             console.log('logging response:', response.status);
             return response.status;
