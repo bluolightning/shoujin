@@ -49,7 +49,9 @@ export default defineContentScript({
                 firstVisit,
             });
 
-            firstVisit = false;
+            if (type === 'page-unfocused') {
+                firstVisit = false;
+            }
 
             console.log('logging response:', response.status);
             return response.status;
