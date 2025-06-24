@@ -40,7 +40,7 @@ export class StorageManager {
                     entry.favicon = favicon;
                 }
                 entry.dateData = dateData;
-                entry.visitCount = entry.visitCount + (firstVisit ? 1 : 0);
+                entry.visitCount = entry.visitCount + (firstVisit ? 1 : 0) || 1;
             } else {
                 data.push({
                     url,

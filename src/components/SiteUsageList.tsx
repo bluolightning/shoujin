@@ -1,22 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {Card, Table, Text, Title, ScrollArea, Avatar, Group, Loader, Center} from '@mantine/core';
 import {StorageManager} from '@/modules/storage';
+import formatTime from '@/utils/formatTime';
 import type {PageTimeEntry} from '@/modules/storage';
-
-// Helper function to format seconds into a human-readable string (e.g., 1h 23m 45s)
-const formatTime = (totalSeconds: number): string => {
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = Math.floor(totalSeconds % 60);
-
-    let result = '';
-    if (hours > 0) result += `${hours}h `;
-    if (minutes > 0) result += `${minutes}m `;
-    // Always show seconds if hours and minutes are zero, or if there are any seconds
-    if (seconds > 0 || (hours === 0 && minutes === 0)) result += `${seconds}s`;
-
-    return result.trim() || '0s'; // Handle case where totalSeconds is 0
-};
 
 // Helper function to format ISO date string
 const formatDate = (isoString: string): string => {
@@ -35,9 +21,7 @@ const SiteUsageList = () => {
         const fetchData = async () => {
             try {
                 const data = await StorageManager.getAllStoredData();
-                // Sort data by timeSpent in descending order
-                const sortedData = data.sort((a, b) => b.timeSpent - a.timeSpent);
-                setUsageData(sortedData);
+                setUsageData(data);
             } catch (error) {
                 console.error('Failed to fetch usage data:', error);
             } finally {
