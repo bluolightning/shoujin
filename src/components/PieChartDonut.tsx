@@ -3,6 +3,7 @@ import {DonutChart, DonutChartCell} from '@/components/MantineComponents/DonutCh
 import {StorageManager} from '@/modules/storage';
 import {useEffect, useState} from 'react';
 import classes from './PieDonutChart.module.css';
+import formatTime from '@/utils/formatTime';
 
 function PieChartDonut() {
     const [chartData, setChartData] = useState<DonutChartCell[]>([]);
@@ -24,6 +25,8 @@ function PieChartDonut() {
         })();
     }, []);
 
+    const totalTime = chartData.reduce((sum, item) => sum + item.value, 0);
+
     return (
         <Card shadow='sm' padding='lg' radius='md' withBorder style={{height: '100%'}}>
             <Center>
@@ -38,8 +41,9 @@ function PieChartDonut() {
                         labelsType='name'
                         withLabels={true}
                         data={chartData}
-                        chartLabel='Seconds'
+                        chartLabel={formatTime(totalTime)}
                         pieChartProps={{className: classes.chartWithVisibleLabels}}
+                        valueFormatter={formatTime}
                     />
                 </div>
             </Center>
