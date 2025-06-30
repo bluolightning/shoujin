@@ -53,7 +53,6 @@ export default defineContentScript({
                 firstVisit = false;
             }
 
-            console.log('logging response:', response.status);
             return response.status;
         };
 
@@ -136,7 +135,6 @@ export default defineContentScript({
 
         window.addEventListener('message', (event) => {
             if (event.data?.type === 'iframe-activity') {
-                console.log('Activity detected in iframe, resetting idle timer.');
                 resetIdleTimer();
             }
         });
