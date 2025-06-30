@@ -49,10 +49,6 @@ export default defineContentScript({
                 firstVisit,
             });
 
-            if (type === 'page-unfocused') {
-                firstVisit = false;
-            }
-
             return response.status;
         };
 
@@ -66,7 +62,22 @@ export default defineContentScript({
             console.log(roundedTime);
 
             sessionStatus = false;
-            sendMessage('page-unfocused', roundedTime);
+
+            // Handle whether this page record counts as the first visit or not
+            if (firstVisit) {
+                if (roundedTime >= 5) {
+                    sendMessage('page-unfocused', roundedTime);
+                    firstVisit = false;
+                    console.log('First visit recorded (>= 5 seconds)');
+                } else {
+                    // This visit was too short to count as the first visit
+                    firstVisit = false;
+                    sendMessage('page-unfocused', roundedTime);
+                    firstVisit = true;
+                }
+            } else {
+                sendMessage('page-unfocused', roundedTime);
+            }
         }
 
         function startSession() {
