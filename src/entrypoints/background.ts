@@ -6,7 +6,7 @@ export default defineBackground(() => {
     const tabFavicons = new Map<number, string>();
 
     browser.runtime.onMessage.addListener((message, _, sendResponse) => {
-        console.log('Message from:', message);
+        console.log('New Message:', message);
         const tabId = message.tabId;
 
         if (message.type === 'page-focused') {
@@ -30,20 +30,10 @@ export default defineBackground(() => {
 
             sendResponse({status: 'Page unfocused received'});
             console.log('Time spent on page:', message.time, formattedUrl);
-        } else if (message.type === 'detect-idle') {
-            console.log('idle dectection request received');
-            if (chrome.idle) {
-                chrome.idle.queryState(15, (idleState) => {
-                    sendResponse({status: idleState});
-                });
-            } else {
-                sendResponse({status: 'Error detecting idle state'});
-            }
         } else {
             sendResponse({status: 'Unknown message type'});
         }
 
-        console.log(StorageManager.getAllStoredData());
         return true;
     });
 

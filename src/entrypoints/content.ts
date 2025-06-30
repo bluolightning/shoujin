@@ -1,7 +1,3 @@
-interface MessageResponse {
-    status: string;
-}
-
 export default defineContentScript({
     matches: ['<all_urls>'],
     allFrames: true,
@@ -40,16 +36,14 @@ export default defineContentScript({
         const sendMessage = async (
             type: 'page-focused' | 'page-unfocused' | 'detect-idle',
             time?: number | null | undefined
-        ): Promise<string> => {
-            const response: MessageResponse = await browser.runtime.sendMessage({
+        ): Promise<void> => {
+            await browser.runtime.sendMessage({
                 type,
                 time,
                 url: window.location.hostname,
                 fullurl: window.location.href,
                 firstVisit,
             });
-
-            return response.status;
         };
 
         function endSession() {
