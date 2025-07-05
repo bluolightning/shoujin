@@ -13,7 +13,7 @@ export interface PageTimeEntry {
 }
 
 export class StorageManager {
-    private static readonly STORAGE_KEY = 'timeeo_page_times';
+    private static readonly STORAGE_KEY = 'shoujin_page_data';
 
     static async savePageTime(
         url: string,

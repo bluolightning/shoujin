@@ -41,7 +41,7 @@ function AppSidebar() {
                             fw={700}
                             variant='gradient'
                             gradient={{from: 'blue', to: 'violet', deg: 90}}>
-                            timeeo
+                            shoujin
                         </Text>
                     </div>
                     <Code fw={700}>v0.0.1</Code>

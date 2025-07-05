@@ -43,7 +43,7 @@ const DataSettings = () => {
             const a = document.createElement('a');
             a.href = url;
             const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-            a.download = `timeeo_backup_${date}.json`;
+            a.download = `shoujin_backup_${date}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
