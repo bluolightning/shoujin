@@ -5,9 +5,9 @@ import formatUrl from '@/utils/formatUrl';
 export default defineBackground(() => {
     const tabFavicons = new Map<number, string>();
 
-    browser.runtime.onMessage.addListener((message, _, sendResponse) => {
+    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log('New Message:', message);
-        const tabId = message.tabId;
+        const tabId = sender.tab?.id;
 
         if (message.type === 'page-focused') {
             getFavicon(message.url).then((result) => {
