@@ -4,7 +4,7 @@ import {Button, Text} from '@mantine/core';
 import {modals} from '@mantine/modals';
 import {notifications} from '@mantine/notifications';
 
-const DataSettings = () => {
+export default function DataSettings() {
     const handleDeleteAllData = async () => {
         try {
             console.log('Deleting all data...');
@@ -113,6 +113,4 @@ const DataSettings = () => {
             </Button>
         </>
     );
-};
-
-export default DataSettings;
+}

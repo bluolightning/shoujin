@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Dopcan = () => {
+export default function Dopcan() {
     return (
         <>
             <h1>
@@ -8,6 +8,4 @@ const Dopcan = () => {
             </h1>
         </>
     );
-};
-
-export default Dopcan;
+}

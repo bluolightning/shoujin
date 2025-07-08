@@ -5,7 +5,7 @@ import {useEffect, useState} from 'react';
 import classes from './PieDonutChart.module.css';
 import formatTime from '@/utils/formatTime';
 
-function PieChartDonut() {
+export default function PieChartDonut() {
     const [chartData, setChartData] = useState<DonutChartCell[]>([]);
 
     const chartColors = ['indigo.6', 'yellow.6', 'teal.6', 'cyan.6', 'lime.6', 'orange.6'];
@@ -50,5 +50,3 @@ function PieChartDonut() {
         </Card>
     );
 }
-
-export default PieChartDonut;

@@ -13,7 +13,7 @@ const formatDate = (isoString: string): string => {
     }
 };
 
-const SiteUsageList = () => {
+export default function SiteUsageList() {
     const [usageData, setUsageData] = useState<PageTimeEntry[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -102,6 +102,4 @@ const SiteUsageList = () => {
             )}
         </Card>
     );
-};
-
-export default SiteUsageList;
+}
