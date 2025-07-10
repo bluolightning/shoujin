@@ -33,18 +33,15 @@ export default defineContentScript({
         let sessionStatus: boolean = false;
 
         // Send a message to the background script when the page is focused or unfocused
-        const sendMessage = async (
-            type: 'page-focused' | 'page-unfocused' | 'detect-idle',
-            time?: number | null | undefined
-        ): Promise<void> => {
-            await browser.runtime.sendMessage({
+        function sendMessage(type: 'page-focused' | 'page-unfocused', time?: number | null) {
+            browser.runtime.sendMessage({
                 type,
                 time,
                 url: window.location.hostname,
                 fullurl: window.location.href,
                 firstVisit,
             });
-        };
+        }
 
         function endSession() {
             if (!sessionStatus) {
@@ -59,13 +56,12 @@ export default defineContentScript({
 
             // Handle whether this page record counts as the first visit or not
             if (firstVisit) {
+                firstVisit = false;
                 if (roundedTime >= 5) {
                     sendMessage('page-unfocused', roundedTime);
-                    firstVisit = false;
                     console.log('First visit recorded (>= 5 seconds)');
                 } else {
                     // This visit was too short to count as the first visit
-                    firstVisit = false;
                     sendMessage('page-unfocused', roundedTime);
                     firstVisit = true;
                 }
