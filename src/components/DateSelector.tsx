@@ -1,8 +1,23 @@
 import dayjs from 'dayjs';
 import {DatePicker} from '@mantine/dates';
+import {useContext} from 'react';
+import {dateRangeContext} from '@/utils/dateRangeContext';
 
 export default function DateSelector() {
     const today = dayjs();
+
+    const [dateRange, setDateRange] = useContext(dateRangeContext);
+    const handleDateChange = (dates: Array<string | null>) => {
+        if (dates && dates[0] && dates[1]) {
+            const [start, end] = dates;
+
+            // Call the setter function from the context to update the state in Dashboard
+            setDateRange({
+                startDate: dayjs(start).format('YYYY-MM-DD'),
+                endDate: dayjs(end).format('YYYY-MM-DD'),
+            });
+        }
+    };
 
     return (
         <DatePicker
@@ -45,7 +60,8 @@ export default function DateSelector() {
                     label: 'Last year',
                 },
             ]}
-            defaultValue={[today.format('YYYY-MM-DD'), today.format('YYYY-MM-DD')]}
+            defaultValue={[dateRange.startDate, dateRange.endDate]}
+            onChange={handleDateChange}
         />
     );
 }
