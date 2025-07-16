@@ -1,15 +1,24 @@
-.root {
-  min-height: var(--chart-size, auto);
-  height: var(--chart-size, auto);
-  width: var(--chart-size, auto);
-  min-width: var(--chart-size, auto);
+/*
+ * This file originates from the Mantine project.
+ * Original project: https://github.com/mantinedev/mantine
+ * Copyright (c) 2021 Vitaly Rtishchev
+ * Mantine is licensed under the MIT License. The full license text can be found at:
+ * https://github.com/mantinedev/mantine/blob/master/LICENSE
+ * or in the LICENSE.mantine.txt file distributed with this copy.
+ */
 
-  & :where(*) {
-    outline: 0;
-  }
+.root {
+    min-height: var(--chart-size, auto);
+    height: var(--chart-size, auto);
+    width: var(--chart-size, auto);
+    min-width: var(--chart-size, auto);
+
+    & :where(*) {
+        outline: 0;
+    }
 }
 
 .label {
-  fill: var(--mantine-color-text);
-  font-size: var(--mantine-font-size-sm);
+    fill: var(--mantine-color-text);
+    font-size: var(--mantine-font-size-sm);
 }

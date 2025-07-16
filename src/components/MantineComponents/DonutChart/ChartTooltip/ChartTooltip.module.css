@@ -1,3 +1,12 @@
+/*
+ * This file originates from the Mantine project.
+ * Original project: https://github.com/mantinedev/mantine
+ * Copyright (c) 2021 Vitaly Rtishchev
+ * Mantine is licensed under the MIT License. The full license text can be found at:
+ * https://github.com/mantinedev/mantine/blob/master/LICENSE
+ * or in the LICENSE.mantine.txt file distributed with this copy.
+ */
+
 .tooltip {
     min-width: 200px;
     background-color: var(--mantine-color-body);
