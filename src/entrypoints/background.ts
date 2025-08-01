@@ -98,7 +98,7 @@ export default defineBackground(() => {
             return;
         }
 
-        activeTabId = tab.id;
+        activeTabId = tab.id || null;
         activeTabUrl = tab.url;
         sessionStartTime = Date.now();
 
@@ -140,7 +140,7 @@ export default defineBackground(() => {
     });
 
     // 3. When the user navigates within the same tab
-    browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
         // We only care if the URL changed in the currently active tab
         if (tabId === activeTabId && changeInfo.url) {
             console.log(`URL updated in active tab: ${changeInfo.url}`);
@@ -181,7 +181,7 @@ export default defineBackground(() => {
     });
 
     // 6. Listener for activity pings from content scripts
-    browser.runtime.onMessage.addListener(async (message, sender) => {
+    browser.runtime.onMessage.addListener(async (message) => {
         if (message.type === 'user-activity') {
             console.log('User activity detected from content script');
             await handleUserActivity();
