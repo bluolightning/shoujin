@@ -1,6 +1,7 @@
 import {StorageManager} from '@/modules/storage';
 import getFavicon from '@/utils/getFavicon';
 import formatUrl from '@/utils/formatUrl';
+import getBaseUrl from '@/utils/getBaseUrl';
 
 export default defineBackground(() => {
     let activeTabId: number | null = null;
@@ -125,15 +126,15 @@ export default defineBackground(() => {
         }
 
         activeTabId = tab.id || null;
-        activeTabUrl = tab.url;
+        activeTabUrl = getBaseUrl(tab.url);
         sessionStartTime = Date.now();
 
         console.log(`Starting new session for tab ${activeTabId} on ${activeTabUrl}`);
 
         // Fetch and store favicon/URL info
         if (!tabData.has(tabId)) {
-            const favicon = await getFavicon(tab.url);
-            tabData.set(tabId, {url: tab.url, favicon});
+            const favicon = await getFavicon(activeTabUrl);
+            tabData.set(tabId, {url: activeTabUrl, favicon});
         }
 
         // Start the activity-based idle timer
@@ -155,11 +156,10 @@ export default defineBackground(() => {
     browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
         // If the url changes in the active tab, end and start a \ session
         if (tabId === activeTabId && changeInfo.url) {
+            console.log(`URL updated in active tab: ${changeInfo.url}`);
             await endCurrentSession();
 
-            console.log(`URL updated in active tab: ${changeInfo.url}`);
-            const favicon = await getFavicon(changeInfo.url);
-            tabData.set(tabId, {url: changeInfo.url, favicon});
+            tabData.delete(tabId); // Clear old favicon data for this tab
 
             await startNewSession(tabId);
         }
