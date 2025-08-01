@@ -19,7 +19,7 @@ export class StorageManager {
         url: string,
         timeSpent: number,
         favicon: string | undefined,
-        firstVisit: boolean
+        countAsVisit: boolean
     ): Promise<void> {
         try {
             const data = await this.getAllStoredData();
@@ -40,7 +40,7 @@ export class StorageManager {
                     entry.favicon = favicon;
                 }
                 entry.dateData = dateData;
-                entry.visitCount = entry.visitCount + (firstVisit ? 1 : 0) || 1;
+                entry.visitCount = entry.visitCount + (countAsVisit ? 1 : 0) || 1;
             } else {
                 data.push({
                     url,
