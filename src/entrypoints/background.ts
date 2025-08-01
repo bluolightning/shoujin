@@ -7,7 +7,6 @@ export default defineBackground(() => {
     let activeTabId: number | null = null;
     let activeTabUrl: string | null = null;
     let sessionStartTime: number | null = null;
-    let isEndingSession = false;
     let isIdle = false;
 
     const tabData = new Map<number, {favicon?: string; url: string}>();
@@ -69,36 +68,23 @@ export default defineBackground(() => {
 
     async function endCurrentSession() {
         // Check if the session is already ending or if there is no active session
-        if (isEndingSession || !sessionStartTime || !activeTabId || !activeTabUrl) {
-            if (!isEndingSession) {
-                console.warn('No active session to end.');
-            }
+        if (!sessionStartTime || !activeTabId || !activeTabUrl) {
+            console.warn('No active session to end.');
             return;
         }
 
-        try {
-            isEndingSession = true;
+        const endTime = Date.now();
+        const timeSpent = Math.round((endTime - sessionStartTime) / 1000);
 
-            const endTime = Date.now();
-            const timeSpent = Math.round((endTime - sessionStartTime) / 1000);
+        console.log(`Ending session for ${activeTabUrl}. Duration: ${timeSpent}s`);
 
-            console.log(`Ending session for ${activeTabUrl}. Duration: ${timeSpent}s`);
+        const data = tabData.get(activeTabId);
+        const formattedUrl = formatUrl(activeTabUrl);
 
-            const data = tabData.get(activeTabId);
-            const formattedUrl = formatUrl(activeTabUrl);
+        await StorageManager.savePageTime(formattedUrl, timeSpent, data?.favicon, timeSpent >= 5);
 
-            await StorageManager.savePageTime(
-                formattedUrl,
-                timeSpent,
-                data?.favicon,
-                timeSpent >= 5
-            );
-
-            resetSession();
-            clearActivityIdleTimer();
-        } finally {
-            isEndingSession = false;
-        }
+        resetSession();
+        clearActivityIdleTimer();
     }
 
     function resetSession() {
