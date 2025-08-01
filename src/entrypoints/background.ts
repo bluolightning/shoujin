@@ -119,9 +119,8 @@ export default defineBackground(() => {
 
         const tab = await browser.tabs.get(tabId);
         // Special url - local file or inaccessible tab
-        if (!tab.url || !tab.url.startsWith('http') || tab.url.startsWith('file:')) {
+        if (!tab.url || !(tab.url.startsWith('http') || tab.url.startsWith('file:'))) {
             console.log(`Tab ${tabId} is a special url. Pausing session tracking.`);
-
             return;
         }
 
