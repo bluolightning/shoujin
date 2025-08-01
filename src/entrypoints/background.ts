@@ -87,7 +87,6 @@ export default defineBackground(() => {
             const data = tabData.get(activeTabId);
             const formattedUrl = formatUrl(activeTabUrl);
 
-            // It can check if a URL already exists in storage.
             await StorageManager.savePageTime(
                 formattedUrl,
                 timeSpent,
@@ -95,7 +94,6 @@ export default defineBackground(() => {
                 timeSpent >= 5
             );
 
-            // Clean up
             resetSession();
             clearActivityIdleTimer();
         } finally {
@@ -154,7 +152,7 @@ export default defineBackground(() => {
 
     // When the user navigates within the same tab
     browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
-        // If the url changes in the active tab, end and start a \ session
+        // If the url changes in the active tab, end and start a new session
         if (tabId === activeTabId && changeInfo.url) {
             console.log(`URL updated in active tab: ${changeInfo.url}`);
             await endCurrentSession();
