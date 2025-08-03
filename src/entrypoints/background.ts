@@ -55,16 +55,13 @@ export default defineBackground(() => {
             return;
         }
 
-        // If we were idle, become active again
         if (isIdle) {
             console.log('User activity detected, idle state exited');
             isIdle = false;
         } else if (!sessionStartTime && activeTabId) {
-            // If browser is focused but no active session, start one
             console.log('Browser focused with activity but no session - starting new session');
             await startNewSession(activeTabId);
         } else {
-            // Just reset the timer if we're already active
             resetActivityIdleTimer();
         }
     }
@@ -72,12 +69,12 @@ export default defineBackground(() => {
     // --- Core Session Management Functions ---
 
     async function endCurrentSession() {
-        // Check if the session is already ending or if there is no active session
         if (!sessionStartTime || !activeTabId || !activeTabUrl) {
             console.warn('No active session to end.');
             return;
         }
 
+        // Calculate and store the time spent in the session
         const endTime = Date.now();
         const timeSpent = Math.round((endTime - sessionStartTime) / 1000);
 
@@ -108,7 +105,7 @@ export default defineBackground(() => {
         }
 
         const tab = await browser.tabs.get(tabId);
-        // Special url - local file or inaccessible tab
+        // Special url - inaccessible or restricted tab
         if (!tab.url || !(tab.url.startsWith('http') || tab.url.startsWith('file:'))) {
             console.log(`Tab ${tabId} is a special url. Pausing session tracking.`);
             return;
@@ -132,7 +129,7 @@ export default defineBackground(() => {
 
     // --- Browser Event Listeners ---
 
-    //  When the user changes tabs
+    // Start a new session when a different tab is activated
     browser.tabs.onActivated.addListener(async (activeInfo) => {
         console.log(`Tab activated: ${activeInfo.tabId}`);
         if (sessionStartTime !== null) {
@@ -141,7 +138,6 @@ export default defineBackground(() => {
         await startNewSession(activeInfo.tabId);
     });
 
-    // When the user navigates within the same tab
     browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
         // If the url changes in the active tab, end and start a new session
         if (tabId === activeTabId && changeInfo.url) {
@@ -171,7 +167,7 @@ export default defineBackground(() => {
         }
     });
 
-    // Initial state check on startup
+    // Initial activity check on startup
     browser.windows.getCurrent().then((window) => {
         if (window.focused) {
             browser.tabs.query({active: true, windowId: window.id}).then(([tab]) => {
