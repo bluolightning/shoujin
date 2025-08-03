@@ -42,18 +42,23 @@ export default defineBackground(() => {
         }
     }
 
-    async function handleUserActivity() {
+    async function handleUserActivity(tabId: number | undefined) {
+        if (tabId == undefined) {
+            console.error('Tab ID is required for user activity handling');
+        } else if (!(tabId == activeTabId)) {
+            // The current tab is not the active one, so we need to start a new session
+            console.log('User activity detected on a new tab');
+            if (sessionStartTime) {
+                endCurrentSession();
+            }
+            await startNewSession(tabId);
+            return;
+        }
+
         // If we were idle, become active again
         if (isIdle) {
-            console.log('User activity detected, exiting idle state');
+            console.log('User activity detected, idle state exited');
             isIdle = false;
-
-            // Restart session on current tab if browser is focused
-            if (activeTabId) {
-                await startNewSession(activeTabId);
-            } else {
-                console.warn('No active tab to restart session on.');
-            }
         } else if (!sessionStartTime && activeTabId) {
             // If browser is focused but no active session, start one
             console.log('Browser focused with activity but no session - starting new session');
@@ -159,10 +164,10 @@ export default defineBackground(() => {
     });
 
     // Listener for activity pings from content scripts
-    browser.runtime.onMessage.addListener(async (message) => {
+    browser.runtime.onMessage.addListener(async (message, sender) => {
         if (message.type === 'user-activity') {
             console.log('User activity detected from content script');
-            await handleUserActivity();
+            await handleUserActivity(sender.tab?.id || undefined);
         }
     });
 
