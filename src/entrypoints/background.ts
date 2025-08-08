@@ -42,28 +42,28 @@ export default defineBackground(() => {
         }
     }
 
-    async function handleUserActivity(tabId: number | undefined) {
+    async function handleUserActivity(tabId: number | undefined): Promise<void> {
         if (tabId == undefined) {
             console.error('Tab ID is required for user activity handling');
-        } else if (!(tabId == activeTabId)) {
-            // The current tab is not the active one, so we need to start a new session
-            console.log('User activity detected on a new tab');
+            return;
+        }
+
+        if (tabId !== activeTabId) {
+            console.log(`User activity detected on a new tab (New: ${tabId}, Old: ${activeTabId})`);
             if (sessionStartTime) {
-                endCurrentSession();
+                await endCurrentSession();
             }
             await startNewSession(tabId);
             return;
         }
 
-        if (isIdle) {
-            console.log('User activity detected, idle state exited');
-            isIdle = false;
-        } else if (!sessionStartTime && activeTabId) {
-            console.log('Browser focused with activity but no session - starting new session');
-            await startNewSession(activeTabId);
-        } else {
-            resetActivityIdleTimer();
+        if (!sessionStartTime) {
+            console.log('No active session, starting new session');
+            await startNewSession(tabId);
+            return;
         }
+
+        resetActivityIdleTimer();
     }
 
     // --- Core Session Management Functions ---
@@ -97,10 +97,8 @@ export default defineBackground(() => {
 
     async function startNewSession(tabId: number) {
         // Don't track when idle or unfocused
-        if (isIdle || sessionStartTime) {
-            console.warn(
-                `New session called for ${tabId} while browser is idle or in a current session.`
-            );
+        if (sessionStartTime) {
+            console.warn(`New session called for ${tabId} while browser is in a session.`);
             return;
         }
 
@@ -111,6 +109,7 @@ export default defineBackground(() => {
             return;
         }
 
+        isIdle = false;
         activeTabId = tab.id || null;
         activeTabUrl = getBaseUrl(tab.url);
         sessionStartTime = Date.now();
@@ -162,7 +161,7 @@ export default defineBackground(() => {
     // Listener for activity pings from content scripts
     browser.runtime.onMessage.addListener(async (message, sender) => {
         if (message.type === 'user-activity') {
-            console.log('User activity detected from content script');
+            console.log(`User activity detected from content script`);
             await handleUserActivity(sender.tab?.id || undefined);
         }
     });
