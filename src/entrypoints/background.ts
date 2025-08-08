@@ -8,6 +8,7 @@ export default defineBackground(() => {
     let activeTabUrl: string | null = null;
     let sessionStartTime: number | null = null;
     let isIdle = false;
+    let isSessionEnding = false;
 
     const tabData = new Map<number, {favicon?: string; url: string}>();
 
@@ -69,12 +70,20 @@ export default defineBackground(() => {
     // --- Core Session Management Functions ---
 
     async function endCurrentSession() {
+        if (isSessionEnding) {
+            console.log('Session end already in progress. Skipping duplicate call.');
+            return;
+        }
+
         if (!sessionStartTime || !activeTabId || !activeTabUrl) {
             console.warn('No active session to end.');
             return;
         }
 
         // Calculate and store the time spent in the session
+        try {
+            isSessionEnding = true;
+
         const endTime = Date.now();
         const timeSpent = Math.round((endTime - sessionStartTime) / 1000);
 
@@ -83,10 +92,18 @@ export default defineBackground(() => {
         const data = tabData.get(activeTabId);
         const formattedUrl = formatUrl(activeTabUrl);
 
-        await StorageManager.savePageTime(formattedUrl, timeSpent, data?.favicon, timeSpent >= 5);
+            await StorageManager.savePageTime(
+                formattedUrl,
+                timeSpent,
+                data?.favicon,
+                timeSpent >= 5
+            );
 
         resetSession();
         clearActivityIdleTimer();
+        } finally {
+            isSessionEnding = false;
+        }
     }
 
     function resetSession() {
@@ -131,7 +148,7 @@ export default defineBackground(() => {
     // Start a new session when a different tab is activated
     browser.tabs.onActivated.addListener(async (activeInfo) => {
         console.log(`Tab activated: ${activeInfo.tabId}`);
-        if (sessionStartTime !== null) {
+        if (activeTabId && activeTabId !== activeInfo.tabId) {
             await endCurrentSession();
         }
         await startNewSession(activeInfo.tabId);
