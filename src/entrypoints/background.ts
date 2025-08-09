@@ -2,6 +2,7 @@ import {StorageManager} from '@/modules/storage';
 import getFavicon from '@/utils/getFavicon';
 import formatUrl from '@/utils/formatUrl';
 import getBaseUrl from '@/utils/getBaseUrl';
+import {QueueProcessor, QueueEvent} from '@/utils/QueueProcessor';
 
 export default defineBackground(() => {
     let activeTabId: number | null = null;
@@ -36,6 +37,7 @@ export default defineBackground(() => {
 
     function clearActivityIdleTimer() {
         if (activityIdleTimer) {
+            console.log('Clearing activity idle timer');
             clearTimeout(activityIdleTimer);
             activityIdleTimer = null;
         } else {
@@ -84,13 +86,13 @@ export default defineBackground(() => {
         try {
             isSessionEnding = true;
 
-        const endTime = Date.now();
-        const timeSpent = Math.round((endTime - sessionStartTime) / 1000);
+            const endTime = Date.now();
+            const timeSpent = Math.round((endTime - sessionStartTime) / 1000);
 
-        console.log(`Ending session for ${activeTabUrl}. Duration: ${timeSpent}s`);
+            console.log(`Ending session for ${activeTabUrl}. Duration: ${timeSpent}s`);
 
-        const data = tabData.get(activeTabId);
-        const formattedUrl = formatUrl(activeTabUrl);
+            const data = tabData.get(activeTabId);
+            const formattedUrl = formatUrl(activeTabUrl);
 
             await StorageManager.savePageTime(
                 formattedUrl,
@@ -99,8 +101,8 @@ export default defineBackground(() => {
                 timeSpent >= 5
             );
 
-        resetSession();
-        clearActivityIdleTimer();
+            resetSession();
+            clearActivityIdleTimer();
         } finally {
             isSessionEnding = false;
         }
@@ -143,36 +145,58 @@ export default defineBackground(() => {
         resetActivityIdleTimer();
     }
 
+    // --- Queue Processor ---
+
+    async function handleEvent(event: QueueEvent): Promise<void> {
+        switch (event.type) {
+            case 'tabActivated': {
+                const {tabId} = event.payload.activeInfo;
+                if (activeTabId && activeTabId !== tabId) {
+                    await endCurrentSession();
+                }
+                await startNewSession(tabId);
+                break;
+            }
+            case 'tabRemoved': {
+                const {tabId} = event.payload;
+                if (tabId === activeTabId) {
+                    await endCurrentSession();
+                }
+                tabData.delete(tabId);
+                console.log(`Tab ${tabId} data cleaned up.`);
+                break;
+            }
+            case 'urlUpdated': {
+                const {tabId} = event.payload;
+                if (tabId === activeTabId) {
+                    await endCurrentSession();
+                    tabData.delete(tabId);
+                    await startNewSession(tabId);
+                }
+                break;
+            }
+        }
+    }
+
+    const eventQueue = new QueueProcessor(handleEvent);
+
     // --- Browser Event Listeners ---
 
     // Start a new session when a different tab is activated
     browser.tabs.onActivated.addListener(async (activeInfo) => {
-        console.log(`Tab activated: ${activeInfo.tabId}`);
-        if (activeTabId && activeTabId !== activeInfo.tabId) {
-            await endCurrentSession();
-        }
-        await startNewSession(activeInfo.tabId);
+        eventQueue.enqueue('tabActivated', {activeInfo});
     });
 
     browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
-        // If the url changes in the active tab, end and start a new session
-        if (tabId === activeTabId && changeInfo.url) {
-            console.log(`URL updated in active tab: ${changeInfo.url}`);
-            await endCurrentSession();
-
-            tabData.delete(tabId); // Clear old favicon data for this tab
-
-            await startNewSession(tabId);
+        const currentTab = await browser.tabs.get(tabId);
+        if (currentTab.active && changeInfo.url) {
+            eventQueue.enqueue('urlUpdated', {tabId});
         }
     });
 
     // When a tab is closed, clean up its data
     browser.tabs.onRemoved.addListener(async (tabId) => {
-        if (tabId === activeTabId) {
-            await endCurrentSession();
-        }
-        tabData.delete(tabId);
-        console.log(`Tab ${tabId} closed and data cleaned up.`);
+        eventQueue.enqueue('tabRemoved', {tabId});
     });
 
     // Listener for activity pings from content scripts
