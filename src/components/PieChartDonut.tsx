@@ -1,6 +1,6 @@
 import {Text, Card, Center} from '@mantine/core';
 import {DonutChart, DonutChartCell} from '@/components/MantineComponents/DonutChart/DonutChart';
-import {StorageManager} from '@/modules/storage';
+import {StorageManager} from '@/utils/storage';
 import {useEffect, useState} from 'react';
 import classes from './PieDonutChart.module.css';
 import formatTime from '@/utils/formatTime';

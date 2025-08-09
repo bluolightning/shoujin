@@ -1,4 +1,4 @@
-import {StorageManager} from '@/modules/storage';
+import {StorageManager} from '@/utils/storage';
 import getFavicon from '@/utils/getFavicon';
 import formatUrl from '@/utils/formatUrl';
 import getBaseUrl from '@/utils/getBaseUrl';
