@@ -54,6 +54,10 @@ export default defineContentScript({
 
         console.log('Content script loaded and activity listeners set up.');
 
+        if (document.visibilityState === 'visible' && document.hasFocus()) {
+            notifyBackground();
+        }
+
         /*
         function checkVidStatus() {
             const videos = document.querySelectorAll('video');
