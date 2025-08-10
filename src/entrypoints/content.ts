@@ -2,7 +2,7 @@ export default defineContentScript({
     matches: ['<all_urls>'],
     allFrames: true,
     main() {
-        let lastActivityTime = Date.now();
+        let lastActivityTime = 0; // Initialize to 0 to ensure the initial activity check
         const activityThrottleTime = 2000; // Throttle time in milliseconds
 
         // Notify the background script about user activity
@@ -55,6 +55,7 @@ export default defineContentScript({
         console.log('Content script loaded and activity listeners set up.');
 
         if (document.visibilityState === 'visible' && document.hasFocus()) {
+            console.log('Initial page focus detected');
             notifyBackground();
         }
 

@@ -168,11 +168,16 @@ export default defineBackground(() => {
             }
             case 'urlUpdated': {
                 const {tabId} = event.payload;
-                if (tabId === activeTabId) {
-                    await endCurrentSession();
+                const updatedTab = await browser.tabs.get(tabId);
+
+                if (updatedTab.active) {
+                    if (activeTabId) {
+                        await endCurrentSession();
+                    }
                     tabData.delete(tabId);
                     await startNewSession(tabId);
                 }
+
                 break;
             }
         }
