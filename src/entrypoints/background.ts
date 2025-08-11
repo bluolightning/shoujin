@@ -166,8 +166,14 @@ export default defineBackground(() => {
         switch (message.type) {
             case 'user-activity': {
                 if (tabId === focusedTabId) {
-                    resetIdleTimer();
+                    if (activeSessions.has(tabId)) {
+                        resetIdleTimer();
+                    } else {
+                        console.log(`User activity on idle tab ${tabId}. Restarting session.`);
+                        await startSession(tabId, false);
+                    }
                 }
+
                 break;
             }
 
