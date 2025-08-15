@@ -81,36 +81,48 @@ export default defineBackground(() => {
         }
     }
 
-    async function handleFocusChange(newTabId: number | null) {
-        const oldFocusedTabId = focusedTabId;
-
-        if (oldFocusedTabId === newTabId) {
+    async function handleFocusChange(oldTabId: number | null, newTabId: number | null) {
+        if (oldTabId === newTabId || focusedWindowId === null) {
             return;
         }
 
-        // End the previous session if it was a focus-based one
-        if (oldFocusedTabId) {
-            await endSession(oldFocusedTabId);
+        // End the previous session
+        if (oldTabId) {
+            await endSession(oldTabId);
         }
 
         // Start a new session for the newly focused tab
         if (newTabId) {
-            await startSession(newTabId, false);
+            // Check if the window is actually focused before starting a session
+            const window = await browser.windows.get(focusedWindowId, {populate: false});
+            if (window.focused) {
+                await startSession(newTabId, false);
+            }
         }
+    }
+
+    async function updateFocusedTab(newTabId: number | null) {
+        const oldFocusedTabId = focusedTabId;
+        focusedTabId = newTabId; // CRITICAL: Update the global state
+        await handleFocusChange(oldFocusedTabId, newTabId);
     }
 
     // Idle timer - only for non-media, focused tabs
     function resetIdleTimer() {
         if (idleTimer) clearTimeout(idleTimer);
+        if (focusedTabId === null) return;
+
+        const currentFocusedTab = focusedTabId;
 
         // If the focused tab is also playing media, it won't go idle.
-        const focusedSession = focusedTabId ? activeSessions.get(focusedTabId) : null;
-        if (focusedTabId && focusedSession && !focusedSession.isMedia) {
-            console.log(`Setting idle timer for focused tab ${focusedTabId}`);
+        const focusedSession = activeSessions.get(currentFocusedTab);
+        if (focusedSession && !focusedSession.isMedia) {
+            console.log(`Setting idle timer for focused tab ${currentFocusedTab}`);
             idleTimer = setTimeout(async () => {
-                console.log(`Idle timeout reached for focused tab ${focusedTabId}.`);
-                if (focusedTabId) {
-                    await endSession(focusedTabId); // End only the focused tab's session
+                console.log(`Idle timeout reached for focused tab ${currentFocusedTab}.`);
+                if (focusedTabId === currentFocusedTab) {
+                    // Double check focus hasn't changed
+                    await endSession(currentFocusedTab);
                 }
             }, idleTimeoutLimit);
         }
@@ -122,15 +134,14 @@ export default defineBackground(() => {
         focusedWindowId = windowId; // Update our record of the focused window
 
         if (windowId === browser.windows.WINDOW_ID_NONE) {
-            // Browser lost focus, end the current focused session.
             console.log('Browser lost focus.');
-            await handleFocusChange(null); // End focused tab session
+            await updateFocusedTab(null); // End focused tab session
         } else {
-            // Browser gained focus, find the active tab in this window.
             console.log(`Window ${windowId} gained focus.`);
+            // Find the active tab in this newly focused window and update our state
             const [currentTab] = await browser.tabs.query({active: true, windowId: windowId});
             if (currentTab?.id) {
-                await handleFocusChange(currentTab.id);
+                await updateFocusedTab(currentTab.id);
             }
         }
     });
@@ -138,21 +149,21 @@ export default defineBackground(() => {
     browser.tabs.onActivated.addListener(async (activeInfo) => {
         if (activeInfo.windowId === focusedWindowId) {
             console.log(`Tab activated in focused window: ${activeInfo.tabId}`);
-            await handleFocusChange(activeInfo.tabId);
+            await updateFocusedTab(activeInfo.tabId);
         }
     });
 
     browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         if (tabId === focusedTabId && changeInfo.url) {
             console.log(`Focused tab ${tabId} navigated. Restarting session.`);
-            await handleFocusChange(null); // End  focused tab session
-            await handleFocusChange(tabId);
+            await updateFocusedTab(null); // End old session
+            await updateFocusedTab(tabId); // Start new session  for new URL
         }
     });
 
     browser.tabs.onRemoved.addListener(async (tabId) => {
         if (tabId === focusedTabId) {
-            await handleFocusChange(null); // End focused tab session
+            await updateFocusedTab(null); // End focused tab session
         } else if (activeSessions.has(tabId)) {
             // A background tab with an active (media) session was closed
             await endSession(tabId);
@@ -170,7 +181,7 @@ export default defineBackground(() => {
                         resetIdleTimer();
                     } else {
                         console.log(`User activity on idle tab ${tabId}. Restarting session.`);
-                        await startSession(tabId, false);
+                        await updateFocusedTab(tabId);
                     }
                 }
 
@@ -224,11 +235,11 @@ export default defineBackground(() => {
 
     // Initial startup logic
     browser.windows.getCurrent({populate: true}).then(async (window) => {
-        if (window.focused) {
+        if (window.focused && window.id) {
+            focusedWindowId = window.id;
             const activeTab = window.tabs?.find((t) => t.active);
             if (activeTab?.id) {
-                focusedTabId = activeTab.id;
-                await startSession(focusedTabId, false);
+                await updateFocusedTab(activeTab.id);
             }
         }
     });
