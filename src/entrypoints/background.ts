@@ -259,12 +259,21 @@ export default defineBackground(() => {
     });
 
     // Initial activity check on startup
-    browser.windows.getCurrent().then((window) => {
-        isBrowserFocused = !!window?.focused;
-        if (window.focused) {
-            browser.tabs.query({active: true, windowId: window.id}).then(([tab]) => {
-                if (tab.id) startNewSession(tab.id);
-            });
+    (async () => {
+        try {
+            const lastFocused = await browser.windows.getLastFocused();
+            isBrowserFocused = !!lastFocused?.focused;
+
+            if (
+                lastFocused?.focused &&
+                lastFocused.id != null &&
+                lastFocused.id !== browser.windows.WINDOW_ID_NONE
+            ) {
+                // Enqueue a focus change so the QueueProcessor handles starting the session
+                eventQueue.enqueue('focusChanged', {windowId: lastFocused.id});
+            }
+        } catch (err) {
+            console.error('Error during initial activity check', err);
         }
-    });
+    })();
 });
