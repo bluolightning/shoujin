@@ -10,6 +10,7 @@ export default defineBackground(() => {
     let sessionStartTime: number | null = null;
     let isIdle = false;
     let isSessionEnding = false;
+    let isBrowserFocused = true;
 
     const tabData = new Map<number, {favicon?: string; url: string}>();
 
@@ -46,6 +47,11 @@ export default defineBackground(() => {
     }
 
     async function handleUserActivity(tabId: number | undefined): Promise<void> {
+        if (!isBrowserFocused) {
+            console.log('Browser is not focused, ignoring user activity');
+            return;
+        }
+
         if (tabId == undefined) {
             console.error('Tab ID is required for user activity handling');
             return;
@@ -180,6 +186,41 @@ export default defineBackground(() => {
 
                 break;
             }
+            case 'focusChanged': {
+                const {windowId} = event.payload;
+                if (windowId === browser.windows.WINDOW_ID_NONE) {
+                    isBrowserFocused = false;
+                    if (sessionStartTime) {
+                        console.log('Browser window lost focus, ending current session.');
+                        await endCurrentSession();
+                    }
+
+                    console.log('Browser window lost focus.');
+                    return;
+                }
+
+                isBrowserFocused = true;
+                try {
+                    // Query the active tab in the focused window and start a session for that tab
+                    const tabs = await browser.tabs.query({active: true, windowId});
+                    const tab = tabs?.[0];
+
+                    if (tab?.id != null) {
+                        if (activeTabId && sessionStartTime) {
+                            await endCurrentSession();
+                        }
+                        await startNewSession(tab.id);
+                    } else {
+                        // No active tab found for the focused window
+                        if (sessionStartTime) await endCurrentSession();
+                    }
+                } catch (err) {
+                    console.error('Error handling window focus change', err);
+                }
+
+                console.log('Browser window regained focus.');
+                break;
+            }
         }
     }
 
@@ -212,8 +253,14 @@ export default defineBackground(() => {
         }
     });
 
+    // End or start sessions based on the focused window
+    browser.windows.onFocusChanged.addListener(async (windowId) => {
+        eventQueue.enqueue('focusChanged', {windowId});
+    });
+
     // Initial activity check on startup
     browser.windows.getCurrent().then((window) => {
+        isBrowserFocused = !!window?.focused;
         if (window.focused) {
             browser.tabs.query({active: true, windowId: window.id}).then(([tab]) => {
                 if (tab.id) startNewSession(tab.id);
