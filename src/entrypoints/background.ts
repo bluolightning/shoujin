@@ -165,6 +165,12 @@ export default defineBackground(() => {
             }
             case 'tabRemoved': {
                 const {tabId} = event.payload;
+
+                if (!tabData.has(tabId)) {
+                    console.log(`No stored data for closed tab ${tabId}`);
+                    return;
+                }
+
                 if (tabId === activeTabId) {
                     await endCurrentSession();
                 }
