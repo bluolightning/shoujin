@@ -1,5 +1,4 @@
-import React from 'react';
-import {StorageManager} from '@/utils/storage';
+import {StorageManager, ImportError, BackupRestoreError} from '@/utils/storage';
 import {Button, Text} from '@mantine/core';
 import {modals} from '@mantine/modals';
 import {notifications} from '@mantine/notifications';
@@ -98,16 +97,67 @@ export default function DataSettings() {
                         },
                     });
                 } catch (error) {
-                    notifications.show({
-                        title: 'Import Aborted',
-                        message: 'Error while importing data.',
-                        color: 'red',
-                        withCloseButton: false,
-                        id: 'import-error',
-                        onClick: () => {
-                            notifications.hide('import-error');
-                        },
-                    });
+                    if (error instanceof BackupRestoreError) {
+                        modals.open({
+                            title: 'CRITICAL ERROR: Potential Data Loss',
+                            closeOnClickOutside: false,
+                            closeOnEscape: false,
+                            withCloseButton: false,
+                            id: 'critical-error',
+                            onClick: () => {
+                                notifications.hide('critical-error');
+                            },
+                            children: (
+                                <>
+                                    <Text c='red' fw={700} size='lg'>
+                                        Please read this carefully.
+                                    </Text>
+                                    <Text mt='md'>
+                                        An error occurred while importing your data, and the
+                                        automatic backup could not be restored.
+                                    </Text>
+                                    <Text mt='sm'>
+                                        <strong>Your data may be corrupted or lost.</strong>
+                                    </Text>
+                                    <Text mt='lg'>
+                                        <strong>Error Details:</strong> {error.message}
+                                    </Text>
+                                    <Text mt='lg'>
+                                        <strong>Recommended Action:</strong> If you have recently
+                                        downloaded a backup file (.json), please try to delete all
+                                        your current data and import the backup file.
+                                    </Text>
+                                    <Button fullWidth mt='xl' onClick={() => modals.closeAll()}>
+                                        I Understand
+                                    </Button>
+                                </>
+                            ),
+                        });
+                    } else if (error instanceof ImportError) {
+                        notifications.show({
+                            title: 'Import Failed',
+                            message: error.message, // Use the helpful message from the error object
+                            color: 'orange',
+                            autoClose: 8000, // Give the user more time to read
+                            withCloseButton: false,
+                            id: 'import-error-safe',
+                            onClick: () => {
+                                notifications.hide('import-error-safe');
+                            },
+                        });
+                    } else {
+                        notifications.show({
+                            title: 'Import Aborted',
+                            message: 'The file could not be read or is not formatted correctly.',
+                            color: 'red',
+                            withCloseButton: false,
+                            id: 'import-error-generic',
+                            onClick: () => {
+                                notifications.hide('import-error-generic');
+                            },
+                        });
+                        console.error('Generic import error:', error);
+                    }
                 }
             };
             reader.readAsText(file);

@@ -12,6 +12,20 @@ export interface PageTimeEntry {
     visitCount: number;
 }
 
+export class ImportError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'ImportError';
+    }
+}
+
+export class BackupRestoreError extends ImportError {
+    constructor(message: string) {
+        super(message);
+        this.name = 'BackupRestoreError';
+    }
+}
+
 export class StorageManager {
     private static readonly STORAGE_KEY = 'shoujin_page_data';
     private static readonly BACKUP_KEY = 'shoujin_page_data_backup';
@@ -132,6 +146,7 @@ export class StorageManager {
     }
 
     static async importData(data: PageTimeEntry[]): Promise<void> {
+        console.log('Starting import process...');
         const originalData = await this.getAllStoredData();
 
         try {
@@ -186,25 +201,36 @@ export class StorageManager {
             mergedData.sort((a, b) => b.timeSpent - a.timeSpent);
 
             await browser.storage.local.set({[this.STORAGE_KEY]: mergedData});
-            console.log('Data imported successfully');
+            await browser.storage.local.remove(this.BACKUP_KEY);
+            console.log('Import process completed successfully.');
         } catch (error) {
-            console.error('Error importing data. Restoring backup...', error);
+            console.error('Error during import process. Attempting to restore backup...', error);
+            let restoreSuccessful = false;
+
             try {
                 const backupResult = await browser.storage.local.get(this.BACKUP_KEY);
                 const backupData = backupResult[this.BACKUP_KEY];
                 if (backupData) {
                     await browser.storage.local.set({[this.STORAGE_KEY]: backupData});
-                    console.log('Backup restored successfully.');
+                    await browser.storage.local.remove(this.BACKUP_KEY);
+                    restoreSuccessful = true;
                 } else {
-                    console.error('Backup data not found. Cannot restore.');
+                    throw new BackupRestoreError(
+                        'The import failed, and the backup data could not be found. Your data may be lost.'
+                    );
                 }
             } catch (restoreError) {
                 console.error('CRITICAL: Failed to restore backup.', restoreError);
+                throw new BackupRestoreError(
+                    'The import failed, and a critical error occurred while trying to restore your original data. Your data may be corrupted or lost.'
+                );
             }
 
-            throw new Error('Import failed, backup restored.');
-        } finally {
-            await browser.storage.local.remove(this.BACKUP_KEY);
+            if (restoreSuccessful) {
+                throw new ImportError(
+                    'The import failed due to an error, but your original data has been safely restored.'
+                );
+            }
         }
     }
 }
