@@ -74,6 +74,47 @@ export default function DataSettings() {
         }
     };
 
+    const handleImport = async () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = async (event) => {
+            const file = (event.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data: PageTimeEntry[] = JSON.parse(e.target?.result as string);
+                    await StorageManager.importData(data);
+                    notifications.show({
+                        title: 'Import Successful',
+                        message: 'Your data has been imported successfully.',
+                        color: 'green',
+                        withCloseButton: false,
+                        id: 'import-success',
+                        onClick: () => {
+                            notifications.hide('import-success');
+                        },
+                    });
+                } catch (error) {
+                    notifications.show({
+                        title: 'Import Aborted',
+                        message: 'Error while importing data.',
+                        color: 'red',
+                        withCloseButton: false,
+                        id: 'import-error',
+                        onClick: () => {
+                            notifications.hide('import-error');
+                        },
+                    });
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    };
+
     // Opens a confirmation for data deletion
     const openModal = () =>
         modals.openConfirmModal({
@@ -110,6 +151,13 @@ export default function DataSettings() {
                 gradient={{from: 'blue', to: 'cyan', deg: 90}}
                 onClick={handleBackup}>
                 Backup Data
+            </Button>
+
+            <Button
+                variant='gradient'
+                gradient={{from: 'green', to: 'teal', deg: 90}}
+                onClick={handleImport}>
+                Import Data
             </Button>
         </>
     );
