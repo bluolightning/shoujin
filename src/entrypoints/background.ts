@@ -220,8 +220,8 @@ export default defineBackground(() => {
                         // No active tab found for the focused window
                         if (sessionStartTime) await endCurrentSession();
                     }
-                } catch (err) {
-                    console.error('Error handling window focus change', err);
+                } catch (error) {
+                    console.error('Error handling window focus change', error);
                 }
 
                 console.log('Browser window regained focus.');
@@ -278,8 +278,8 @@ export default defineBackground(() => {
                 // Enqueue a focus change so the QueueProcessor handles starting the session
                 eventQueue.enqueue('focusChanged', {windowId: lastFocused.id});
             }
-        } catch (err) {
-            console.error('Error during initial activity check', err);
+        } catch (error) {
+            console.error('Error during initial activity check', error);
         }
     })();
 });
