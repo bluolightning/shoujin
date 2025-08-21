@@ -1,5 +1,4 @@
-import React from 'react';
-import {StorageManager} from '@/utils/storage';
+import {StorageManager, ImportError, BackupRestoreError} from '@/utils/storage';
 import {Button, Text} from '@mantine/core';
 import {modals} from '@mantine/modals';
 import {notifications} from '@mantine/notifications';
@@ -74,6 +73,98 @@ export default function DataSettings() {
         }
     };
 
+    const handleImport = async () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = async (event) => {
+            const file = (event.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data: PageTimeEntry[] = JSON.parse(e.target?.result as string);
+                    await StorageManager.importData(data);
+                    notifications.show({
+                        title: 'Import Successful',
+                        message: 'Your data has been imported successfully.',
+                        color: 'green',
+                        withCloseButton: false,
+                        id: 'import-success',
+                        onClick: () => {
+                            notifications.hide('import-success');
+                        },
+                    });
+                } catch (error) {
+                    if (error instanceof BackupRestoreError) {
+                        modals.open({
+                            title: 'CRITICAL ERROR: Potential Data Loss',
+                            closeOnClickOutside: false,
+                            closeOnEscape: false,
+                            withCloseButton: false,
+                            id: 'critical-error',
+                            onClick: () => {
+                                notifications.hide('critical-error');
+                            },
+                            children: (
+                                <>
+                                    <Text c='red' fw={700} size='lg'>
+                                        Please read this carefully.
+                                    </Text>
+                                    <Text mt='md'>
+                                        An error occurred while importing your data, and the
+                                        automatic backup could not be restored.
+                                    </Text>
+                                    <Text mt='sm'>
+                                        <strong>Your data may be corrupted or lost.</strong>
+                                    </Text>
+                                    <Text mt='lg'>
+                                        <strong>Error Details:</strong> {error.message}
+                                    </Text>
+                                    <Text mt='lg'>
+                                        <strong>Recommended Action:</strong> If you have recently
+                                        downloaded a backup file (.json), please try to delete all
+                                        your current data and import the backup file.
+                                    </Text>
+                                    <Button fullWidth mt='xl' onClick={() => modals.closeAll()}>
+                                        I Understand
+                                    </Button>
+                                </>
+                            ),
+                        });
+                    } else if (error instanceof ImportError) {
+                        notifications.show({
+                            title: 'Import Failed',
+                            message: error.message, // Use the helpful message from the error object
+                            color: 'orange',
+                            autoClose: 8000, // Give the user more time to read
+                            withCloseButton: false,
+                            id: 'import-error-safe',
+                            onClick: () => {
+                                notifications.hide('import-error-safe');
+                            },
+                        });
+                    } else {
+                        notifications.show({
+                            title: 'Import Aborted',
+                            message: 'The file could not be read or is not formatted correctly.',
+                            color: 'red',
+                            withCloseButton: false,
+                            id: 'import-error-generic',
+                            onClick: () => {
+                                notifications.hide('import-error-generic');
+                            },
+                        });
+                        console.error('Generic import error:', error);
+                    }
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    };
+
     // Opens a confirmation for data deletion
     const openModal = () =>
         modals.openConfirmModal({
@@ -110,6 +201,13 @@ export default function DataSettings() {
                 gradient={{from: 'blue', to: 'cyan', deg: 90}}
                 onClick={handleBackup}>
                 Backup Data
+            </Button>
+
+            <Button
+                variant='gradient'
+                gradient={{from: 'green', to: 'teal', deg: 90}}
+                onClick={handleImport}>
+                Import Data
             </Button>
         </>
     );

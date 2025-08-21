@@ -5,231 +5,281 @@ import getBaseUrl from '@/utils/getBaseUrl';
 import {QueueProcessor, QueueEvent} from '@/utils/QueueProcessor';
 
 export default defineBackground(() => {
-    const activeSessions = new Map<
-        number,
-        {
-            url: string;
-            startTime: number;
-            isMedia: boolean; // Is this session active because of media?
-            favicon?: string;
-        }
-    >();
+    let activeTabId: number | null = null;
+    let activeTabUrl: string | null = null;
+    let sessionStartTime: number | null = null;
+    let isIdle = false;
+    let isSessionEnding = false;
+    let isBrowserFocused = true;
 
-    let focusedTabId: number | null = null;
-    let focusedWindowId: number | null = browser.windows.WINDOW_ID_NONE;
-    let idleTimer: ReturnType<typeof setTimeout> | null = null;
-    const idleTimeoutLimit = 15 * 1000; // Minimum 15 seconds
+    const tabData = new Map<number, {favicon?: string; url: string}>();
 
-    // --- Core Session Management ---
+    const idleTimeoutLimit = 15 * 1000; // Set your idle time in milliseconds (minimum 15 seconds)
+    let activityIdleTimer: ReturnType<typeof setTimeout> | null = null;
 
-    async function startSession(tabId: number, isMediaSession: boolean = false) {
-        if (activeSessions.has(tabId)) {
-            console.warn(`New session called for ${tabId} while tab is in a session.`);
-            return;
+    // --- Idle Time Management  functions ---
+
+    function resetActivityIdleTimer() {
+        // Clear existing timer
+        if (activityIdleTimer) {
+            clearTimeout(activityIdleTimer);
+            activityIdleTimer = null;
         }
 
-        try {
-            const tab = await browser.tabs.get(tabId);
-            if (!tab.url || !(tab.url.startsWith('http') || tab.url.startsWith('file:'))) {
-                return; // Don't track special URLs
-            }
-
-            const url = getBaseUrl(tab.url);
-            const favicon = await getFavicon(url);
-
-            activeSessions.set(tabId, {
-                url: url,
-                startTime: Date.now(),
-                isMedia: isMediaSession,
-                favicon: favicon,
-            });
-
-            console.log(
-                `Starting session for tab ${tabId} (${isMediaSession ? 'Media' : 'Focus'}). URL: ${url}`
-            );
-
-            // If the newly focused tab is starting a session, reset the global idle timer.
-            if (!isMediaSession) {
-                resetIdleTimer();
-            }
-        } catch (error) {
-            console.error(`Error starting session for tab ${tabId}:`, error);
-        }
-    }
-
-    async function endSession(tabId: number) {
-        const session = activeSessions.get(tabId);
-        if (!session) {
-            return; // No session to end
-        }
-
-        const endTime = Date.now();
-        const timeSpent = Math.round((endTime - session.startTime) / 1000);
-
-        activeSessions.delete(tabId);
-        console.log(`Ending session for tab ${tabId}. Duration: ${timeSpent}s`);
-
-        const formattedUrl = formatUrl(session.url);
-        await StorageManager.savePageTime(formattedUrl, timeSpent, session.favicon, timeSpent >= 5);
-    }
-
-    async function endAllSessions() {
-        const allSessionIds = Array.from(activeSessions.keys());
-        console.log(`Ending all ${allSessionIds.length} active sessions.`);
-        for (const tabId of allSessionIds) {
-            await endSession(tabId);
-        }
-    }
-
-    async function handleFocusChange(newTabId: number | null) {
-        const oldFocusedTabId = focusedTabId;
-
-        if (oldFocusedTabId === newTabId) {
-            return;
-        }
-
-        // End the previous session if it was a focus-based one
-        if (oldFocusedTabId) {
-            await endSession(oldFocusedTabId);
-        }
-
-        // Start a new session for the newly focused tab
-        if (newTabId) {
-            await startSession(newTabId, false);
-        }
-    }
-
-    // Idle timer - only for non-media, focused tabs
-    function resetIdleTimer() {
-        if (idleTimer) clearTimeout(idleTimer);
-
-        // If the focused tab is also playing media, it won't go idle.
-        const focusedSession = focusedTabId ? activeSessions.get(focusedTabId) : null;
-        if (focusedTabId && focusedSession && !focusedSession.isMedia) {
-            console.log(`Setting idle timer for focused tab ${focusedTabId}`);
-            idleTimer = setTimeout(async () => {
-                console.log(`Idle timeout reached for focused tab ${focusedTabId}.`);
-                if (focusedTabId) {
-                    await endSession(focusedTabId); // End only the focused tab's session
-                }
+        // If we have an active session and browser is focused, start the timer
+        if (sessionStartTime && !isIdle) {
+            activityIdleTimer = setTimeout(async () => {
+                console.log('Activity-based idle timeout reached');
+                isIdle = true;
+                await endCurrentSession();
             }, idleTimeoutLimit);
         }
     }
 
+    function clearActivityIdleTimer() {
+        if (activityIdleTimer) {
+            console.log('Clearing activity idle timer');
+            clearTimeout(activityIdleTimer);
+            activityIdleTimer = null;
+        } else {
+            console.warn('No activity idle timer to clear.');
+        }
+    }
+
+    async function handleUserActivity(tabId: number | undefined): Promise<void> {
+        if (!isBrowserFocused) {
+            console.log('Browser is not focused, ignoring user activity');
+            return;
+        }
+
+        if (tabId == undefined) {
+            console.error('Tab ID is required for user activity handling');
+            return;
+        }
+
+        if (tabId !== activeTabId) {
+            console.log(`User activity detected on a new tab (New: ${tabId}, Old: ${activeTabId})`);
+            if (sessionStartTime) {
+                await endCurrentSession();
+            }
+            await startNewSession(tabId);
+            return;
+        }
+
+        if (!sessionStartTime) {
+            console.log('No active session, starting new session');
+            await startNewSession(tabId);
+            return;
+        }
+
+        resetActivityIdleTimer();
+    }
+
+    // --- Core Session Management Functions ---
+
+    async function endCurrentSession() {
+        if (isSessionEnding) {
+            console.log('Session end already in progress. Skipping duplicate call.');
+            return;
+        }
+
+        if (!sessionStartTime || !activeTabId || !activeTabUrl) {
+            console.warn('No active session to end.');
+            return;
+        }
+
+        // Calculate and store the time spent in the session
+        try {
+            isSessionEnding = true;
+
+            const endTime = Date.now();
+            const timeSpent = Math.round((endTime - sessionStartTime) / 1000);
+
+            console.log(`Ending session for ${activeTabUrl}. Duration: ${timeSpent}s`);
+
+            const data = tabData.get(activeTabId);
+            const formattedUrl = formatUrl(activeTabUrl);
+
+            await StorageManager.savePageTime(
+                formattedUrl,
+                timeSpent,
+                data?.favicon,
+                timeSpent >= 5
+            );
+
+            resetSession();
+            clearActivityIdleTimer();
+        } finally {
+            isSessionEnding = false;
+        }
+    }
+
+    function resetSession() {
+        sessionStartTime = null;
+        activeTabUrl = null;
+        activeTabId = null;
+    }
+
+    async function startNewSession(tabId: number) {
+        // Don't track when idle or unfocused
+        if (sessionStartTime) {
+            console.warn(`New session called for ${tabId} while browser is in a session.`);
+            return;
+        }
+
+        const tab = await browser.tabs.get(tabId);
+        // Special url - inaccessible or restricted tab
+        if (!tab.url || !(tab.url.startsWith('http') || tab.url.startsWith('file:'))) {
+            console.log(`Tab ${tabId} is a special url. Pausing session tracking.`);
+            return;
+        }
+
+        isIdle = false;
+        activeTabId = tab.id || null;
+        activeTabUrl = getBaseUrl(tab.url);
+        sessionStartTime = Date.now();
+
+        console.log(`Starting new session for tab ${activeTabId} on ${activeTabUrl}`);
+
+        // Fetch and store favicon/URL info
+        if (!tabData.has(tabId)) {
+            const favicon = await getFavicon(activeTabUrl);
+            tabData.set(tabId, {url: activeTabUrl, favicon});
+        }
+
+        // Start the activity-based idle timer
+        resetActivityIdleTimer();
+    }
+
+    // --- Queue Processor ---
+
+    async function handleEvent(event: QueueEvent): Promise<void> {
+        switch (event.type) {
+            case 'tabActivated': {
+                const {tabId} = event.payload.activeInfo;
+                if (activeTabId && activeTabId !== tabId) {
+                    await endCurrentSession();
+                }
+                await startNewSession(tabId);
+                break;
+            }
+            case 'tabRemoved': {
+                const {tabId} = event.payload;
+
+                if (!tabData.has(tabId)) {
+                    console.log(`No stored data for closed tab ${tabId}`);
+                    return;
+                }
+
+                if (tabId === activeTabId) {
+                    await endCurrentSession();
+                }
+                tabData.delete(tabId);
+                console.log(`Tab ${tabId} data cleaned up.`);
+                break;
+            }
+            case 'urlUpdated': {
+                const {tabId} = event.payload;
+                const updatedTab = await browser.tabs.get(tabId);
+
+                if (updatedTab.active) {
+                    if (activeTabId) {
+                        await endCurrentSession();
+                    }
+                    tabData.delete(tabId);
+                    await startNewSession(tabId);
+                }
+
+                break;
+            }
+            case 'focusChanged': {
+                const {windowId} = event.payload;
+                if (windowId === browser.windows.WINDOW_ID_NONE) {
+                    isBrowserFocused = false;
+                    if (sessionStartTime) {
+                        console.log('Browser window lost focus, ending current session.');
+                        await endCurrentSession();
+                    }
+
+                    console.log('Browser window lost focus.');
+                    return;
+                }
+
+                isBrowserFocused = true;
+                try {
+                    // Query the active tab in the focused window and start a session for that tab
+                    const tabs = await browser.tabs.query({active: true, windowId});
+                    const tab = tabs?.[0];
+
+                    if (tab?.id != null) {
+                        if (activeTabId && sessionStartTime) {
+                            await endCurrentSession();
+                        }
+                        await startNewSession(tab.id);
+                    } else {
+                        // No active tab found for the focused window
+                        if (sessionStartTime) await endCurrentSession();
+                    }
+                } catch (error) {
+                    console.error('Error handling window focus change', error);
+                }
+
+                console.log('Browser window regained focus.');
+                break;
+            }
+        }
+    }
+
+    const eventQueue = new QueueProcessor(handleEvent);
+
     // --- Browser Event Listeners ---
 
-    browser.windows.onFocusChanged.addListener(async (windowId) => {
-        focusedWindowId = windowId; // Update our record of the focused window
-
-        if (windowId === browser.windows.WINDOW_ID_NONE) {
-            // Browser lost focus, end the current focused session.
-            console.log('Browser lost focus.');
-            await handleFocusChange(null); // End focused tab session
-        } else {
-            // Browser gained focus, find the active tab in this window.
-            console.log(`Window ${windowId} gained focus.`);
-            const [currentTab] = await browser.tabs.query({active: true, windowId: windowId});
-            if (currentTab?.id) {
-                await handleFocusChange(currentTab.id);
-            }
-        }
-    });
-
+    // Start a new session when a different tab is activated
     browser.tabs.onActivated.addListener(async (activeInfo) => {
-        if (activeInfo.windowId === focusedWindowId) {
-            console.log(`Tab activated in focused window: ${activeInfo.tabId}`);
-            await handleFocusChange(activeInfo.tabId);
+        eventQueue.enqueue('tabActivated', {activeInfo});
+    });
+
+    browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+        const currentTab = await browser.tabs.get(tabId);
+        if (currentTab.active && changeInfo.url) {
+            eventQueue.enqueue('urlUpdated', {tabId});
         }
     });
 
-    browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-        if (tabId === focusedTabId && changeInfo.url) {
-            console.log(`Focused tab ${tabId} navigated. Restarting session.`);
-            await handleFocusChange(null); // End  focused tab session
-            await handleFocusChange(tabId);
-        }
-    });
-
+    // When a tab is closed, clean up its data
     browser.tabs.onRemoved.addListener(async (tabId) => {
-        if (tabId === focusedTabId) {
-            await handleFocusChange(null); // End focused tab session
-        } else if (activeSessions.has(tabId)) {
-            // A background tab with an active (media) session was closed
-            await endSession(tabId);
-        }
+        eventQueue.enqueue('tabRemoved', {tabId});
     });
 
+    // Listener for activity pings from content scripts
     browser.runtime.onMessage.addListener(async (message, sender) => {
-        const tabId = sender.tab?.id;
-        if (!tabId) return;
-
-        switch (message.type) {
-            case 'user-activity': {
-                if (tabId === focusedTabId) {
-                    if (activeSessions.has(tabId)) {
-                        resetIdleTimer();
-                    } else {
-                        console.log(`User activity on idle tab ${tabId}. Restarting session.`);
-                        await startSession(tabId, false);
-                    }
-                }
-
-                break;
-            }
-
-            case 'media-playing': {
-                console.log(`Media started on tab ${tabId}. Starting a media session.`);
-                const session = activeSessions.get(tabId);
-
-                // Start a session for this tab, marking it as a media session
-                if (!session) {
-                    await startSession(tabId, true);
-                } else {
-                    session.isMedia = true;
-                    if (tabId === focusedTabId) {
-                        if (idleTimer) clearTimeout(idleTimer);
-                    }
-                }
-                break;
-            }
-
-            case 'media-paused': {
-                console.log(`Media paused on tab ${tabId}.`);
-                const pausedSession = activeSessions.get(tabId);
-                if (pausedSession && pausedSession.isMedia) {
-                    if (tabId !== focusedTabId) {
-                        await endSession(tabId);
-                    } else {
-                        pausedSession.isMedia = false;
-                        resetIdleTimer();
-                    }
-                }
-                break;
-            }
+        if (message.type === 'user-activity') {
+            console.log(`User activity detected from content script`);
+            await handleUserActivity(sender.tab?.id || undefined);
         }
     });
 
-    browser.idle.onStateChanged.addListener(async (newState) => {
-        console.log(`System idle state changed to: ${newState}`);
-        if (newState === 'idle' || newState === 'locked') {
-            await endAllSessions();
-        } else if (newState === 'active') {
-            const [currentTab] = await browser.tabs.query({active: true, currentWindow: true});
-            if (currentTab?.id && !activeSessions.has(currentTab.id)) {
-                console.log('User is active again, restarting session for focused tab.');
-                await startSession(currentTab.id, false);
-            }
-        }
+    // End or start sessions based on the focused window
+    browser.windows.onFocusChanged.addListener(async (windowId) => {
+        eventQueue.enqueue('focusChanged', {windowId});
     });
 
-    // Initial startup logic
-    browser.windows.getCurrent({populate: true}).then(async (window) => {
-        if (window.focused) {
-            const activeTab = window.tabs?.find((t) => t.active);
-            if (activeTab?.id) {
-                focusedTabId = activeTab.id;
-                await startSession(focusedTabId, false);
+    // Initial activity check on startup
+    (async () => {
+        try {
+            const lastFocused = await browser.windows.getLastFocused();
+            isBrowserFocused = !!lastFocused?.focused;
+
+            if (
+                lastFocused?.focused &&
+                lastFocused.id != null &&
+                lastFocused.id !== browser.windows.WINDOW_ID_NONE
+            ) {
+                // Enqueue a focus change so the QueueProcessor handles starting the session
+                eventQueue.enqueue('focusChanged', {windowId: lastFocused.id});
             }
+        } catch (error) {
+            console.error('Error during initial activity check', error);
         }
-    });
+    })();
 });

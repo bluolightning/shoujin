@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import {Grid} from '@mantine/core';
 import SiteUsageList from '@/components/SiteUsageList';
 import PieChartDonut from '@/components/PieChartDonut';
