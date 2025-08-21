@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import {AppShell, MantineProvider} from '@mantine/core';
 import AppSidebar from '@/components/AppSidebar';
 import {Outlet} from 'react-router';
