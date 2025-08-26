@@ -27,6 +27,7 @@ export default function DateSelector() {
             <DatePicker
                 type='range'
                 allowSingleDateInRange
+                highlightToday
                 presets={[
                     {
                         value: [
