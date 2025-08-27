@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {Grid, Group, Text} from '@mantine/core';
+import {Grid, Group} from '@mantine/core';
 import SiteUsageList from '@/components/SiteUsageList';
 import PieChartDonut from '@/components/PieChartDonut';
 import DateSelector from '@/components/DateSelector';
@@ -19,27 +19,21 @@ export default function Dashboard() {
     return (
         <dateRangeContext.Provider value={[dateRange, setDateRange]}>
             <Group
-                justify='space-between'
+                justify='right'
                 style={{
+                    height: '46px', // Match the height of the sidebar header
                     paddingBottom: 'var(--mantine-spacing-md)',
                     marginBottom: 'calc(var(--mantine-spacing-md) * 1.5)',
                     borderBottom:
                         '1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
                 }}>
                 <div>
-                    <Text size='lg' fw={700}>
-                        Header
-                    </Text>
+                    <DateSelector />
                 </div>
             </Group>
 
             {/* Allow dateRange to be passed to children */}
             <Grid gutter='md'>
-                <Grid.Col span={{base: 12, md: 5, lg: 4}}>
-                    <div>
-                        <DateSelector />
-                    </div>
-                </Grid.Col>
                 <Grid.Col span={{base: 12, md: 5, lg: 4}}>
                     <div>
                         <PieChartDonut />
