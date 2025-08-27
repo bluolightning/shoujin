@@ -14,7 +14,7 @@ import {createTheme, MantineProvider} from '@mantine/core';
 import {ModalsProvider} from '@mantine/modals';
 import {Notifications} from '@mantine/notifications';
 
-import Page from './Sidebar';
+import Page from './Page.tsx';
 
 const theme = createTheme({
     /** Put your mantine theme override here */

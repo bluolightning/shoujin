@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
-import './App.css';
+import './Popup.css';
 
-function App() {
+export default function Popup() {
     const [currentUrl, setCurrentUrl] = useState<string | null>(null);
 
     useEffect(() => {
@@ -24,7 +24,7 @@ function App() {
 
     const openNewTab = () => {
         chrome.tabs.create({
-            url: chrome.runtime.getURL('mainPage.html'),
+            url: chrome.runtime.getURL('MainPage.html'),
         });
     };
 
@@ -35,5 +35,3 @@ function App() {
         </>
     );
 }
-
-export default App;
