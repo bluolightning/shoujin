@@ -44,6 +44,7 @@ export default function SiteUsageList() {
                 <Group gap='sm' wrap='nowrap'>
                     <Avatar
                         src={entry.favicon || undefined}
+                        imageProps={{loading: 'lazy'}}
                         alt={entry.url}
                         size='sm'
                         radius='xl'
