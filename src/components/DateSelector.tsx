@@ -1,21 +1,33 @@
 import dayjs from 'dayjs';
 import {DatePickerInput} from '@mantine/dates';
-import {useContext} from 'react';
+import {useContext, useState} from 'react';
 import {dateRangeContext} from '@/utils/dateRangeContext';
 
 export default function DateSelector() {
     const today = dayjs();
 
     const [dateRange, setDateRange] = useContext(dateRangeContext);
-    const handleDateChange = (dates: Array<string | null>) => {
-        if (dates && dates[0] && dates[1]) {
-            const [start, end] = dates;
 
-            // Call the setter function from the context to update the state in Dashboard
+    const [value, setValue] = useState<[string | null, string | null]>([
+        dateRange.startDate,
+        dateRange.endDate,
+    ]);
+
+    const handleDateChange = (dates: [string | null, string | null]) => {
+        setValue(dates);
+
+        if (dates[0] && dates[1]) {
             setDateRange({
-                startDate: dayjs(start).format('YYYY-MM-DD'),
-                endDate: dayjs(end).format('YYYY-MM-DD'),
+                startDate: dayjs(dates[0]).format('YYYY-MM-DD'),
+                endDate: dayjs(dates[1]).format('YYYY-MM-DD'),
             });
+        }
+    };
+
+    // Prevent the date range from having invalid values
+    const handleDropdownClose = () => {
+        if (!value[0] || !value[1]) {
+            setValue([dateRange.startDate, dateRange.endDate]);
         }
     };
 
@@ -61,8 +73,9 @@ export default function DateSelector() {
                     label: 'Last year',
                 },
             ]}
-            defaultValue={[dateRange.startDate, dateRange.endDate]}
+            value={value}
             onChange={handleDateChange}
+            onDropdownClose={handleDropdownClose}
         />
     );
 }
