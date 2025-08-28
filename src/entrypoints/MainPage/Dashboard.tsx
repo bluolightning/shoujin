@@ -1,12 +1,15 @@
 import {useState, useEffect} from 'react';
-import {Grid, Group} from '@mantine/core';
+import {Grid, Group, Loader, Center} from '@mantine/core';
+
 import SiteUsageList from '@/components/SiteUsageList';
 import PieChartDonut from '@/components/PieChartDonut';
 import DateSelector from '@/components/DateSelector';
 import MainChart from '@/components/MainChart';
 
-import {dateRangeContext} from '@/utils/dateRangeContext';
 import dayjs from 'dayjs';
+import {dateRangeContext} from '@/utils/dateRangeContext';
+import {StorageManager, PageTimeEntry} from '@/utils/storage';
+import filterDataByDate from '@/utils/filterDataByDate';
 
 export default function Dashboard() {
     const [dateRange, setDateRange] = useState({
@@ -16,6 +19,41 @@ export default function Dashboard() {
     useEffect(() => {
         console.log('dateRange changed to', dateRange);
     }, [dateRange]);
+
+    const [allData, setAllData] = useState<PageTimeEntry[]>([]);
+    const [filteredData, setFilteredData] = useState<PageTimeEntry[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Initialize all data from storage
+    useEffect(() => {
+        (async () => {
+            try {
+                const data = await StorageManager.getAllStoredData();
+                setAllData(data);
+            } catch (error) {
+                console.error('Failed to fetch data from storage:', error);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, []);
+
+    // Effect to filter data whenever dateRange or allData changes
+    useEffect(() => {
+        if (allData.length > 0) {
+            const data = filterDataByDate(allData, dateRange.startDate, dateRange.endDate);
+            console.log('Filtered data:', data);
+            setFilteredData(data);
+        }
+    }, [dateRange, allData]);
+
+    if (loading) {
+        return (
+            <Center style={{height: '100%'}}>
+                <Loader />
+            </Center>
+        );
+    }
 
     return (
         <dateRangeContext.Provider value={[dateRange, setDateRange]}>
@@ -37,16 +75,16 @@ export default function Dashboard() {
             <Grid gutter='md'>
                 <Grid.Col span={{base: 12, md: 5, lg: 4}}>
                     <div>
-                        <MainChart />
+                        <MainChart data={filteredData} />
                     </div>
                 </Grid.Col>
                 <Grid.Col span={{base: 12, md: 5, lg: 4}}>
                     <div>
-                        <PieChartDonut />
+                        <PieChartDonut data={filteredData} />
                     </div>
                 </Grid.Col>
                 <Grid.Col span={{base: 12, md: 7, lg: 8}}>
-                    <SiteUsageList />
+                    <SiteUsageList data={filteredData} />
                 </Grid.Col>
             </Grid>
         </dateRangeContext.Provider>
