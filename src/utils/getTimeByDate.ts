@@ -2,7 +2,7 @@ import {PageTimeEntry} from './storage';
 
 export type TimeByDateMap = {[key: string]: number};
 
-export function getTimeByDate(data: PageTimeEntry[]): TimeByDateMap {
+export default function getTimeByDate(data: PageTimeEntry[]): TimeByDateMap {
     return data.reduce((acc, site) => {
         for (const [date, {dailyTime}] of Object.entries(site.dateData)) {
             const roundedTime = Math.round(dailyTime);

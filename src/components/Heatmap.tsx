@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import {Loader, Center, Card, Title} from '@mantine/core';
 import {Heatmap} from '@mantine/charts';
 import {StorageManager} from '@/utils/storage';
-import {getTimeByDate, TimeByDateMap} from '@/utils/getTimeByDate';
+import getTimeByDate, {TimeByDateMap} from '@/utils/getTimeByDate';
 import dayjs from 'dayjs';
 
 export default function HeatmapChart() {
