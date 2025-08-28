@@ -1,10 +1,10 @@
 import {PageTimeEntry} from './storage';
 
-export default async function filterDataByDate(
+export default function filterDataByDate(
     allData: PageTimeEntry[],
     start: string,
     end: string
-): Promise<PageTimeEntry[]> {
+): PageTimeEntry[] {
     if (start > end) {
         console.warn('Start date is after end date. Reversing...');
         [start, end] = [end, start];
