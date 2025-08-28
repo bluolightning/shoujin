@@ -19,7 +19,6 @@ export default function MainChart() {
                     usage: usage,
                 }));
 
-                console.log('Structured Data:', structuredData);
                 setUsageData(structuredData);
             } catch (error) {
                 console.error('Failed to fetch usage data:', error);
