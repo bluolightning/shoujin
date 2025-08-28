@@ -38,11 +38,15 @@ export default function DateSelector() {
             highlightToday
             presets={[
                 {
+                    value: [today.format('YYYY-MM-DD'), today.format('YYYY-MM-DD')],
+                    label: 'Today',
+                },
+                {
                     value: [
-                        today.subtract(2, 'day').format('YYYY-MM-DD'),
+                        today.subtract(3, 'day').format('YYYY-MM-DD'),
                         today.format('YYYY-MM-DD'),
                     ],
-                    label: 'Last two days',
+                    label: 'Last 3 days',
                 },
                 {
                     value: [
