@@ -3,6 +3,7 @@ import {Grid, Group} from '@mantine/core';
 import SiteUsageList from '@/components/SiteUsageList';
 import PieChartDonut from '@/components/PieChartDonut';
 import DateSelector from '@/components/DateSelector';
+import MainChart from '@/components/MainChart';
 
 import {dateRangeContext} from '@/utils/dateRangeContext';
 import dayjs from 'dayjs';
@@ -34,6 +35,11 @@ export default function Dashboard() {
 
             {/* Allow dateRange to be passed to children */}
             <Grid gutter='md'>
+                <Grid.Col span={{base: 12, md: 5, lg: 4}}>
+                    <div>
+                        <MainChart />
+                    </div>
+                </Grid.Col>
                 <Grid.Col span={{base: 12, md: 5, lg: 4}}>
                     <div>
                         <PieChartDonut />
