@@ -42,7 +42,6 @@ export default function Dashboard() {
     useEffect(() => {
         if (allData.length > 0) {
             const data = filterDataByDate(allData, dateRange.startDate, dateRange.endDate);
-            console.log('Filtered data:', data);
             setFilteredData(data);
         }
     }, [dateRange, allData]);

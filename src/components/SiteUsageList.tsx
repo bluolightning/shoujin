@@ -1,6 +1,5 @@
-import {useEffect, useState} from 'react';
-import {Card, Table, Text, Title, ScrollArea, Avatar, Group, Loader, Center} from '@mantine/core';
-import {StorageManager, PageTimeEntry} from '@/utils/storage';
+import {Card, Table, Text, Title, ScrollArea, Avatar, Group, Center} from '@mantine/core';
+import {PageTimeEntry} from '@/utils/storage';
 import formatTime from '@/utils/formatTime';
 
 // Helper function to format ISO date string
