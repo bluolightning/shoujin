@@ -107,6 +107,7 @@ export default defineBackground(() => {
                 timeSpent >= 5
             );
 
+            tabData.delete(activeTabId);
             resetSession();
             clearActivityIdleTimer();
         } finally {
