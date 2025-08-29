@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import {DatePickerInput} from '@mantine/dates';
 import {useContext, useState} from 'react';
 import {dateRangeContext} from '@/utils/dateRangeContext';
+import {StorageManager} from '@/utils/storage';
 
 export default function DateSelector() {
     const today = dayjs();
@@ -30,6 +31,29 @@ export default function DateSelector() {
             setValue([dateRange.startDate, dateRange.endDate]);
         }
     };
+
+    /*
+    async function calcMaxDateRange() {
+        const data = await StorageManager.getAllStoredData();
+        if (data.length > 0) {
+            const allDates: string[] = [];
+            for (const entry of data) {
+                if (entry.dateData) {
+                    allDates.push(...Object.keys(entry.dateData));
+                }
+            }
+
+            if (allDates.length > 0) {
+                allDates.sort();
+                const minDate = allDates[0];
+                const maxDate = allDates[allDates.length - 1];
+                return [minDate, maxDate];
+            }
+        } else {
+            return [today, today]; // Default to today if no data
+        }
+    }
+    */
 
     return (
         <DatePickerInput

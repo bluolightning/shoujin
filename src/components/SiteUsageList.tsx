@@ -12,31 +12,8 @@ const formatDate = (isoString: string): string => {
     }
 };
 
-export default function SiteUsageList() {
-    const [usageData, setUsageData] = useState<PageTimeEntry[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await StorageManager.getAllStoredData();
-                setUsageData(data);
-            } catch (error) {
-                console.error('Failed to fetch usage data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
-
-    if (loading) {
-        return (
-            <Center style={{height: '100%'}}>
-                <Loader />
-            </Center>
-        );
-    }
+export default function SiteUsageList(data: {data: PageTimeEntry[]}) {
+    const usageData = data.data;
 
     const rows = usageData.map((entry) => (
         <Table.Tr key={entry.url}>

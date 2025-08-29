@@ -13,7 +13,7 @@ import filterDataByDate from '@/utils/filterDataByDate';
 
 export default function Dashboard() {
     const [dateRange, setDateRange] = useState({
-        startDate: dayjs().format('YYYY-MM-DD'),
+        startDate: dayjs().subtract(7, 'day').format('YYYY-MM-DD'),
         endDate: dayjs().format('YYYY-MM-DD'),
     });
     useEffect(() => {

@@ -5,7 +5,7 @@ import {Card, Loader, Center} from '@mantine/core';
 import {StorageManager} from '@/utils/storage';
 import getTimeByDate from '@/utils/getTimeByDate';
 
-export default function MainChart() {
+export default function MainChart(data: {data: PageTimeEntry[]}) {
     const [usageData, setUsageData] = useState<{date: string; usage: number}[]>([]);
     const [loading, setLoading] = useState(true);
 
