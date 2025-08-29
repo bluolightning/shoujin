@@ -1,6 +1,6 @@
 import {Card, Table, Text, Title, ScrollArea, Avatar, Group, Center} from '@mantine/core';
-import {PageTimeEntry} from '@/utils/storage';
 import formatTime from '@/utils/formatTime';
+import type {PageTimeEntry} from '@/utils/storage';
 
 // Helper function to format ISO date string
 const formatDate = (isoString: string): string => {

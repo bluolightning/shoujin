@@ -8,7 +8,7 @@ import MainChart from '@/components/MainChart';
 
 import dayjs from 'dayjs';
 import {dateRangeContext} from '@/utils/dateRangeContext';
-import {StorageManager, PageTimeEntry} from '@/utils/storage';
+import {StorageManager, type PageTimeEntry} from '@/utils/storage';
 import filterDataByDate from '@/utils/filterDataByDate';
 
 export default function Dashboard() {
@@ -16,9 +16,6 @@ export default function Dashboard() {
         startDate: dayjs().subtract(7, 'day').format('YYYY-MM-DD'),
         endDate: dayjs().format('YYYY-MM-DD'),
     });
-    useEffect(() => {
-        console.log('dateRange changed to', dateRange);
-    }, [dateRange]);
 
     const [allData, setAllData] = useState<PageTimeEntry[]>([]);
     const [filteredData, setFilteredData] = useState<PageTimeEntry[]>([]);
@@ -38,7 +35,7 @@ export default function Dashboard() {
         })();
     }, []);
 
-    // Effect to filter data whenever dateRange or allData changes
+    // Refilter data whenever dateRange or allData changes
     useEffect(() => {
         if (allData.length > 0) {
             const data = filterDataByDate(allData, dateRange.startDate, dateRange.endDate);

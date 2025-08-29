@@ -7,7 +7,7 @@
  * or in the LICENSE.mantine.txt file distributed with this copy.
  */
 
-import {ChartSeries} from './types';
+import type {ChartSeries} from './types';
 
 type ChartSeriesLabels = Record<string, string | undefined>;
 

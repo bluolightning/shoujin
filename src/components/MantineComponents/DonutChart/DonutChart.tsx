@@ -34,7 +34,7 @@ import {
     useResolvedStylesApi,
     useStyles,
 } from '@mantine/core';
-import {ChartTooltip, ChartTooltipStylesNames} from './ChartTooltip/ChartTooltip';
+import {ChartTooltip, type ChartTooltipStylesNames} from './ChartTooltip/ChartTooltip';
 import classes from './DonutChart.module.css';
 
 export interface DonutChartCell {

@@ -1,4 +1,4 @@
-import {PageTimeEntry} from './storage';
+import type {PageTimeEntry} from './storage';
 
 export default function filterDataByDate(
     allData: PageTimeEntry[],

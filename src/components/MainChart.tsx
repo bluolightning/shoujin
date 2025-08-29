@@ -1,6 +1,5 @@
 import {AreaChart, BarChart} from '@mantine/charts';
 import {Card} from '@mantine/core';
-
 import getTimeByDate from '@/utils/getTimeByDate';
 
 export default function MainChart(data: {data: PageTimeEntry[]}) {
