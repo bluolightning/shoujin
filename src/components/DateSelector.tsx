@@ -86,19 +86,10 @@ export default function DateSelector() {
                     ],
                     label: 'This month',
                 },
+
                 {
-                    value: [
-                        today.subtract(1, 'month').startOf('month').format('YYYY-MM-DD'),
-                        today.subtract(1, 'month').endOf('month').format('YYYY-MM-DD'),
-                    ],
-                    label: 'Last month',
-                },
-                {
-                    value: [
-                        today.subtract(1, 'year').startOf('year').format('YYYY-MM-DD'),
-                        today.subtract(1, 'year').endOf('year').format('YYYY-MM-DD'),
-                    ],
-                    label: 'Last year',
+                    value: [today.startOf('year').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')],
+                    label: 'This year',
                 },
             ]}
             value={value}
