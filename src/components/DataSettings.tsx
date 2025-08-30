@@ -186,9 +186,6 @@ export default function DataSettings() {
 
     return (
         <>
-            <h1>
-                Hello from the <strong>DataSettings</strong> page of the app!
-            </h1>
             <Button
                 variant='gradient'
                 gradient={{from: 'red', to: 'pink', deg: 90}}

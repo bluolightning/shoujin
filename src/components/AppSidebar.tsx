@@ -9,8 +9,7 @@ import ThemeToggle from './ThemeToggle';
 
 const data = [
     {link: 'Dashboard', label: 'Dashboard', icon: IconBellRinging},
-    {link: 'Dopcan', label: 'Other Settings', icon: IconSettings},
-    {link: 'DataSettings', label: 'Data Settings', icon: IconDatabaseImport},
+    {link: 'Settings', label: 'Settings', icon: IconSettings},
 ];
 
 export default function AppSidebar() {

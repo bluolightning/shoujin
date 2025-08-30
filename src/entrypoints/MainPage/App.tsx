@@ -2,8 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {createBrowserRouter, RouterProvider} from 'react-router';
 import Dashboard from './Dashboard';
-import Dopcan from './Dopcan';
-import DataSettings from './DataSettings';
+import Settings from './Settings.tsx';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
@@ -34,12 +33,8 @@ const router = createBrowserRouter([
                 element: <Dashboard />,
             },
             {
-                path: 'Dopcan',
-                element: <Dopcan />,
-            },
-            {
-                path: 'DataSettings',
-                element: <DataSettings />,
+                path: 'Settings',
+                element: <Settings />,
             },
         ],
     },
