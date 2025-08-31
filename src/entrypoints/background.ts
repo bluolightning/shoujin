@@ -23,7 +23,7 @@ export default defineBackground(() => {
 
     async function loadSettings() {
         settings = await SettingsStorage.getSettings();
-        idleTimeoutLimit = Math.max(settings.idleTimeout * 1000, 15000); // Minimum 15 seconds
+        idleTimeoutLimit = settings.idleTimeout * 1000;
         console.log('Settings loaded:', settings);
     }
 
@@ -31,7 +31,7 @@ export default defineBackground(() => {
         settings = {...settings, [key]: value};
 
         if (key === 'idleTimeout') {
-            idleTimeoutLimit = Math.max((value as number) * 1000, 15000);
+            idleTimeoutLimit = (value as number) * 1000;
             // Reset timer with new timeout if session is active
             if (sessionStartTime && !isIdle) {
                 resetActivityIdleTimer();
@@ -265,6 +265,7 @@ export default defineBackground(() => {
             }
             case 'focusChanged': {
                 const {windowId} = event.payload;
+                console.log(`Window focus changed: ${windowId}`);
                 if (windowId === browser.windows.WINDOW_ID_NONE) {
                     isBrowserFocused = false;
                     if (sessionStartTime) {
