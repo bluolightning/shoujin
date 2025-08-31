@@ -17,6 +17,8 @@ import {
     Tooltip,
     Paper,
     Alert,
+    Center,
+    Loader,
 } from '@mantine/core';
 import {
     IconSettings,
@@ -30,6 +32,7 @@ import {
     IconRefresh,
 } from '@tabler/icons-react';
 import DataSettings from '@/components/DataSettings';
+import {SettingsStorage, AppSettings} from '@/utils/settingsStorage';
 
 interface SettingsSectionProps {
     title: string;
@@ -97,26 +100,44 @@ function SettingItem({label, description, children, disabled = false}: SettingIt
 }
 
 export default function Settings() {
-    // Tracking Settings State
-    const [trackingEnabled, setTrackingEnabled] = useState(true);
-    const [idleTimeout, setIdleTimeout] = useState(15);
-    const [minimumVisitTime, setMinimumVisitTime] = useState(5);
-    const [trackInPrivate, setTrackInPrivate] = useState(false);
+    const [settings, setSettings] = useState<AppSettings | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Privacy Settings State
-    const [collectFavicons, setCollectFavicons] = useState(true);
-    const [anonymizeUrls, setAnonymizeUrls] = useState(false);
-    const [retentionPeriod, setRetentionPeriod] = useState('unlimited');
+    useEffect(() => {
+        (async function loadSettings() {
+            try {
+                const loadedSettings = await SettingsStorage.getSettings();
+                setSettings(loadedSettings);
+            } catch (error) {
+                console.error('Failed to load settings:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        })();
+    }, []);
 
-    // Notification Settings State
-    const [dailyReminders, setDailyReminders] = useState(false);
-    const [focusBreaks, setFocusBreaks] = useState(false);
-    const [weeklyReports, setWeeklyReports] = useState(true);
+    // Helper to update a single setting
+    const updateSetting = async <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
+        if (!settings) return;
 
-    // Display Settings State
-    const [dateFormat, setDateFormat] = useState('YYYY-MM-DD');
-    const [timeFormat, setTimeFormat] = useState('24h');
-    const [chartTheme, setChartTheme] = useState('auto');
+        try {
+            await SettingsStorage.saveSetting(key, value);
+            setSettings((prev) => (prev ? {...prev, [key]: value} : null));
+        } catch (error) {
+            console.error(`Failed to save setting ${key}:`, error);
+        }
+    };
+
+    if (isLoading || !settings) {
+        return (
+            <Container size='lg' py='xl'>
+                <Text>Loading settings...</Text>
+                <Center>
+                    <Loader />
+                </Center>
+            </Container>
+        );
+    }
 
     return (
         <Container size='lg' py='xl'>
@@ -136,7 +157,6 @@ export default function Settings() {
                         </div>
                     </Group>
                 </div>
-
                 {/* Tracking Settings */}
                 <SettingsSection
                     title='Tracking'
@@ -146,8 +166,10 @@ export default function Settings() {
                         label='Enable tracking'
                         description='Toggle to start or stop tracking your browsing activity'>
                         <Switch
-                            checked={trackingEnabled}
-                            onChange={(event) => setTrackingEnabled(event.currentTarget.checked)}
+                            checked={settings.trackingEnabled}
+                            onChange={(event) =>
+                                updateSetting('trackingEnabled', event.currentTarget.checked)
+                            }
                             size='md'
                         />
                     </SettingItem>
@@ -155,46 +177,47 @@ export default function Settings() {
                     <SettingItem
                         label='Idle timeout'
                         description='Stop tracking after this many seconds of inactivity'
-                        disabled={!trackingEnabled}>
+                        disabled={!settings.trackingEnabled}>
                         <NumberInput
-                            value={idleTimeout}
-                            onChange={(val) => setIdleTimeout(Number(val) || 15)}
+                            value={settings.idleTimeout}
+                            onChange={(val) => updateSetting('idleTimeout', Number(val) || 15)}
                             min={5}
                             max={300}
                             suffix=' sec'
                             style={{width: 120}}
-                            disabled={!trackingEnabled}
+                            disabled={!settings.trackingEnabled}
                         />
                     </SettingItem>
 
                     <SettingItem
                         label='Minimum visit time'
                         description='Only count visits longer than this duration'
-                        disabled={!trackingEnabled}>
+                        disabled={!settings.trackingEnabled}>
                         <NumberInput
-                            value={minimumVisitTime}
-                            onChange={(val) => setMinimumVisitTime(Number(val) || 5)}
+                            value={settings.minimumVisitTime}
+                            onChange={(val) => updateSetting('minimumVisitTime', Number(val) || 5)}
                             min={1}
                             max={60}
                             suffix=' sec'
                             style={{width: 120}}
-                            disabled={!trackingEnabled}
+                            disabled={!settings.trackingEnabled}
                         />
                     </SettingItem>
 
                     <SettingItem
                         label='Track in private/incognito mode'
                         description='Include browsing activity from private browsing sessions'
-                        disabled={!trackingEnabled}>
+                        disabled={!settings.trackingEnabled}>
                         <Switch
-                            checked={trackInPrivate}
-                            onChange={(event) => setTrackInPrivate(event.currentTarget.checked)}
+                            checked={settings.trackInPrivate}
+                            onChange={(event) =>
+                                updateSetting('trackInPrivate', event.currentTarget.checked)
+                            }
                             size='md'
-                            disabled={!trackingEnabled}
+                            disabled={!settings.trackingEnabled}
                         />
                     </SettingItem>
                 </SettingsSection>
-
                 {/* Privacy Settings */}
                 <SettingsSection
                     title='Privacy'
@@ -205,8 +228,10 @@ export default function Settings() {
                         label='Collect website favicons'
                         description='Store website icons for better visual identification'>
                         <Switch
-                            checked={collectFavicons}
-                            onChange={(event) => setCollectFavicons(event.currentTarget.checked)}
+                            checked={settings.collectFavicons}
+                            onChange={(event) =>
+                                updateSetting('collectFavicons', event.currentTarget.checked)
+                            }
                             size='md'
                         />
                     </SettingItem>
@@ -215,8 +240,10 @@ export default function Settings() {
                         label='Anonymize URLs'
                         description='Replace specific page paths with domain names only'>
                         <Switch
-                            checked={anonymizeUrls}
-                            onChange={(event) => setAnonymizeUrls(event.currentTarget.checked)}
+                            checked={settings.anonymizeUrls}
+                            onChange={(event) =>
+                                updateSetting('anonymizeUrls', event.currentTarget.checked)
+                            }
                             size='md'
                         />
                     </SettingItem>
@@ -225,8 +252,8 @@ export default function Settings() {
                         label='Data retention period'
                         description='Automatically delete data older than selected period'>
                         <Select
-                            value={retentionPeriod}
-                            onChange={(val) => setRetentionPeriod(val || 'unlimited')}
+                            value={settings.retentionPeriod}
+                            onChange={(val) => updateSetting('retentionPeriod', val || 'unlimited')}
                             data={[
                                 {value: 'unlimited', label: 'Keep forever'},
                                 {value: '1year', label: '1 year'},
@@ -240,6 +267,7 @@ export default function Settings() {
                 </SettingsSection>
 
                 {/* Notifications Settings */}
+                {/*
                 <SettingsSection
                     title='Notifications'
                     description='Manage alerts and reminders'
@@ -281,6 +309,7 @@ export default function Settings() {
                         />
                     </SettingItem>
                 </SettingsSection>
+                */}
 
                 {/* Display Settings */}
                 <SettingsSection
@@ -291,8 +320,8 @@ export default function Settings() {
                         label='Date format'
                         description='How dates appear throughout the application'>
                         <Select
-                            value={dateFormat}
-                            onChange={(val) => setDateFormat(val || 'YYYY-MM-DD')}
+                            value={settings.dateFormat}
+                            onChange={(val) => updateSetting('dateFormat', val || 'YYYY-MM-DD')}
                             data={[
                                 {value: 'YYYY-MM-DD', label: '2025-08-30'},
                                 {value: 'MM/DD/YYYY', label: '08/30/2025'},
@@ -305,8 +334,8 @@ export default function Settings() {
 
                     <SettingItem label='Time format' description='12-hour or 24-hour time display'>
                         <Select
-                            value={timeFormat}
-                            onChange={(val) => setTimeFormat(val || '24h')}
+                            value={settings.timeFormat}
+                            onChange={(val) => updateSetting('timeFormat', val || '24h')}
                             data={[
                                 {value: '24h', label: '24-hour (15:30)'},
                                 {value: '12h', label: '12-hour (3:30 PM)'},
@@ -319,8 +348,8 @@ export default function Settings() {
                         label='Chart color theme'
                         description='Color scheme for charts and graphs'>
                         <Select
-                            value={chartTheme}
-                            onChange={(val) => setChartTheme(val || 'auto')}
+                            value={settings.chartTheme}
+                            onChange={(val) => updateSetting('chartTheme', val || 'auto')}
                             data={[
                                 {value: 'auto', label: 'Auto (follows app theme)'},
                                 {value: 'light', label: 'Light theme'},
@@ -331,7 +360,6 @@ export default function Settings() {
                         />
                     </SettingItem>
                 </SettingsSection>
-
                 {/* Data Management */}
                 <SettingsSection
                     title='Data Management'
@@ -351,6 +379,7 @@ export default function Settings() {
                 </SettingsSection>
 
                 {/* Advanced Settings */}
+                {/*
                 <SettingsSection
                     title='Advanced'
                     description='Developer and advanced user options'
@@ -422,6 +451,7 @@ export default function Settings() {
                         </Accordion.Item>
                     </Accordion>
                 </SettingsSection>
+                */}
 
                 {/* Footer */}
                 <Paper p='md' radius='md' bg='var(--mantine-color-gray-0)'>

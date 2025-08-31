@@ -3,6 +3,7 @@ import getFavicon from '@/utils/getFavicon';
 import formatUrl from '@/utils/formatUrl';
 import getBaseUrl from '@/utils/getBaseUrl';
 import {QueueProcessor, QueueEvent} from '@/utils/QueueProcessor';
+import {SettingsStorage, AppSettings} from '@/utils/settingsStorage';
 
 export default defineBackground(() => {
     let activeTabId: number | null = null;
@@ -11,11 +12,41 @@ export default defineBackground(() => {
     let isIdle = false;
     let isSessionEnding = false;
     let isBrowserFocused = true;
+    let settings: AppSettings;
+    let idleTimeoutLimit = 15 * 1000; // Will be updated from settings
 
     const tabData = new Map<number, {favicon?: string; url: string}>();
 
-    const idleTimeoutLimit = 15 * 1000; // Set your idle time in milliseconds (minimum 15 seconds)
     let activityIdleTimer: ReturnType<typeof setTimeout> | null = null;
+
+    // --- Settings Management ---
+
+    async function loadSettings() {
+        settings = await SettingsStorage.getSettings();
+        idleTimeoutLimit = Math.max(settings.idleTimeout * 1000, 15000); // Minimum 15 seconds
+        console.log('Settings loaded:', settings);
+    }
+
+    function handleSettingChange(key: keyof AppSettings, value: AppSettings[keyof AppSettings]) {
+        settings = {...settings, [key]: value};
+
+        if (key === 'idleTimeout') {
+            idleTimeoutLimit = Math.max((value as number) * 1000, 15000);
+            // Reset timer with new timeout if session is active
+            if (sessionStartTime && !isIdle) {
+                resetActivityIdleTimer();
+            }
+        }
+
+        if (key === 'trackingEnabled' && !value) {
+            // If tracking is disabled, end current session
+            if (sessionStartTime) {
+                endCurrentSession();
+            }
+        }
+
+        console.log(`Setting changed: ${key} = ${value}`);
+    }
 
     // --- Idle Time Management  functions ---
 
@@ -47,6 +78,12 @@ export default defineBackground(() => {
     }
 
     async function handleUserActivity(tabId: number | undefined): Promise<void> {
+        // Check if tracking is enabled
+        if (!settings?.trackingEnabled) {
+            console.log('Tracking is disabled, ignoring user activity');
+            return;
+        }
+
         if (!isBrowserFocused) {
             console.log('Browser is not focused, ignoring user activity');
             return;
@@ -55,6 +92,19 @@ export default defineBackground(() => {
         if (tabId == undefined) {
             console.error('Tab ID is required for user activity handling');
             return;
+        }
+
+        // Check if we should track private/incognito tabs
+        if (!settings?.trackInPrivate) {
+            try {
+                const tab = await browser.tabs.get(tabId);
+                if (tab.incognito) {
+                    console.log('Tracking is disabled for incognito, ignoring user activity');
+                    return;
+                }
+            } catch (error) {
+                console.warn('Could not check if tab is incognito:', error);
+            }
         }
 
         if (tabId !== activeTabId) {
@@ -99,12 +149,13 @@ export default defineBackground(() => {
 
             const data = tabData.get(activeTabId);
             const formattedUrl = formatUrl(activeTabUrl);
+            const minimumVisitTime = settings?.minimumVisitTime ?? 5;
 
             await StorageManager.savePageTime(
                 formattedUrl,
                 timeSpent,
                 data?.favicon,
-                timeSpent >= 5
+                timeSpent >= minimumVisitTime
             );
 
             tabData.delete(activeTabId);
@@ -122,6 +173,12 @@ export default defineBackground(() => {
     }
 
     async function startNewSession(tabId: number) {
+        // Check if tracking is enabled
+        if (!settings?.trackingEnabled) {
+            console.log('Tracking is disabled, not starting session');
+            return;
+        }
+
         // Don't track when idle or unfocused
         if (sessionStartTime) {
             console.warn(`New session called for ${tabId} while browser is in a session.`);
@@ -129,6 +186,13 @@ export default defineBackground(() => {
         }
 
         const tab = await browser.tabs.get(tabId);
+
+        // Check if we should track private/incognito tabs
+        if (!settings?.trackInPrivate && tab.incognito) {
+            console.log('Private/incognito tab detected and tracking disabled for private tabs');
+            return;
+        }
+
         // Special url - inaccessible or restricted tab
         if (!tab.url || !(tab.url.startsWith('http') || tab.url.startsWith('file:'))) {
             console.log(`Tab ${tabId} is a special url. Pausing session tracking.`);
@@ -155,6 +219,12 @@ export default defineBackground(() => {
     // --- Queue Processor ---
 
     async function handleEvent(event: QueueEvent): Promise<void> {
+        // Skip event processing if tracking is disabled
+        if (!settings?.trackingEnabled) {
+            console.log(`Tracking is disabled, skipping ${event.type} event`);
+            return;
+        }
+
         switch (event.type) {
             case 'tabActivated': {
                 const {tabId} = event.payload.activeInfo;
@@ -252,11 +322,15 @@ export default defineBackground(() => {
         eventQueue.enqueue('tabRemoved', {tabId});
     });
 
-    // Listener for activity pings from content scripts
+    // Listener for activity pings from content scripts and settings changes
     browser.runtime.onMessage.addListener(async (message, sender) => {
         if (message.type === 'user-activity') {
             console.log(`User activity detected from content script`);
             await handleUserActivity(sender.tab?.id || undefined);
+        } else if (message.type === 'setting-changed') {
+            handleSettingChange(message.key, message.value);
+        } else if (message.type === 'settings-reset') {
+            await loadSettings();
         }
     });
 
@@ -265,9 +339,12 @@ export default defineBackground(() => {
         eventQueue.enqueue('focusChanged', {windowId});
     });
 
-    // Initial activity check on startup
+    // Initial setup
     (async () => {
         try {
+            // Load settings first
+            await loadSettings();
+
             const lastFocused = await browser.windows.getLastFocused();
             isBrowserFocused = !!lastFocused?.focused;
 
@@ -280,7 +357,7 @@ export default defineBackground(() => {
                 eventQueue.enqueue('focusChanged', {windowId: lastFocused.id});
             }
         } catch (error) {
-            console.error('Error during initial activity check', error);
+            console.error('Error during initial setup', error);
         }
     })();
 });
