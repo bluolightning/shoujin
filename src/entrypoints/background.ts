@@ -226,6 +226,11 @@ export default defineBackground(() => {
         }
 
         switch (event.type) {
+            case 'userActivity': {
+                const {tabId} = event.payload;
+                await handleUserActivity(tabId);
+                break;
+            }
             case 'tabActivated': {
                 const {tabId} = event.payload.activeInfo;
                 if (activeTabId && activeTabId !== tabId) {
@@ -327,7 +332,7 @@ export default defineBackground(() => {
     browser.runtime.onMessage.addListener(async (message, sender) => {
         if (message.type === 'user-activity') {
             console.log(`User activity detected from content script`);
-            await handleUserActivity(sender.tab?.id || undefined);
+            eventQueue.enqueue('userActivity', {tabId: sender.tab?.id || undefined});
         } else if (message.type === 'setting-changed') {
             handleSettingChange(message.key, message.value);
         } else if (message.type === 'settings-reset') {

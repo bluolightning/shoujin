@@ -3,6 +3,7 @@ export interface EventPayloadMap {
     tabRemoved: {tabId: number};
     urlUpdated: {tabId: number};
     focusChanged: {windowId: number};
+    userActivity: {tabId: number | undefined};
 }
 
 export type QueueEvent = {
