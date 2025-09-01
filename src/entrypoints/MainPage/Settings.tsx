@@ -217,9 +217,8 @@ export default function Settings() {
                 {/* Privacy Settings */}
                 <SettingsSection
                     title='Privacy'
-                    description='Control what data is collected and stored'
-                    icon={<IconShield size='1.2rem' />}
-                    badge='Important'>
+                    description='Control data usage and collection'
+                    icon={<IconShield size='1.2rem' />}>
                     <SettingItem
                         label='Use external favicon services'
                         description={'Use third-party services to improve favicon reliability'}>
@@ -328,10 +327,10 @@ export default function Settings() {
                             style={{width: 150}}
                         />
                     </SettingItem>
-
+                    {/*
                     <SettingItem
-                        label='Chart color theme'
-                        description='Color scheme for charts and graphs'>
+                        label='Color theme'
+                        description='Color scheme for the application interface'>
                         <Select
                             value={settings.chartTheme}
                             onChange={(val) => updateSetting('chartTheme', val || 'auto')}
@@ -344,6 +343,7 @@ export default function Settings() {
                             style={{width: 200}}
                         />
                     </SettingItem>
+                    */}
                 </SettingsSection>
                 {/* Data Management */}
                 <SettingsSection
