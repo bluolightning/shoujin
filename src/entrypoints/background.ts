@@ -11,7 +11,6 @@ export default defineBackground(() => {
     let sessionStartTime: number | null = null;
     let isIdle = false;
     let isSessionEnding = false;
-    let isBrowserFocused = true;
     let settings: AppSettings;
     let idleTimeoutLimit = 15 * 1000; // Will be updated from settings
 
@@ -81,11 +80,6 @@ export default defineBackground(() => {
         // Check if tracking is enabled
         if (!settings?.trackingEnabled) {
             console.log('Tracking is disabled, ignoring user activity');
-            return;
-        }
-
-        if (!isBrowserFocused) {
-            console.log('Browser is not focused, ignoring user activity');
             return;
         }
 
@@ -272,7 +266,6 @@ export default defineBackground(() => {
                 const {windowId} = event.payload;
                 console.log(`Window focus changed: ${windowId}`);
                 if (windowId === browser.windows.WINDOW_ID_NONE) {
-                    isBrowserFocused = false;
                     if (sessionStartTime) {
                         console.log('Browser window lost focus, ending current session.');
                         await endCurrentSession();
@@ -282,7 +275,6 @@ export default defineBackground(() => {
                     return;
                 }
 
-                isBrowserFocused = true;
                 try {
                     // Query the active tab in the focused window and start a session for that tab
                     const tabs = await browser.tabs.query({active: true, windowId});
@@ -352,7 +344,6 @@ export default defineBackground(() => {
             await loadSettings();
 
             const lastFocused = await browser.windows.getLastFocused();
-            isBrowserFocused = !!lastFocused?.focused;
 
             if (
                 lastFocused?.focused &&
