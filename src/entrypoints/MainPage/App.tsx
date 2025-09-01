@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {createBrowserRouter, RouterProvider} from 'react-router';
 import Dashboard from './Dashboard';
-import Settings from './Settings.tsx';
+import Settings from './Settings';
+import SiteLimits from './SiteLimits';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
             {
                 path: 'Dashboard',
                 element: <Dashboard />,
+            },
+            {
+                path: 'SiteLimits',
+                element: <SiteLimits />,
             },
             {
                 path: 'Settings',
