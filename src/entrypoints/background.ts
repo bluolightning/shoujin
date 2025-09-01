@@ -208,7 +208,7 @@ export default defineBackground(() => {
 
         // Fetch and store favicon/URL info
         if (!tabData.has(tabId)) {
-            const favicon = await getFavicon(activeTabUrl);
+            const favicon = await getFavicon(activeTabUrl, settings.useFaviconService);
             tabData.set(tabId, {url: activeTabUrl, favicon});
         }
 

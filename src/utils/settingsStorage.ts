@@ -8,7 +8,7 @@ export interface AppSettings {
     trackInPrivate: boolean;
 
     // Privacy Settings
-    collectFavicons: boolean;
+    useFaviconService: boolean;
     anonymizeUrls: boolean;
     retentionPeriod: string;
 
@@ -23,7 +23,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     idleTimeout: 15,
     minimumVisitTime: 5,
     trackInPrivate: false,
-    collectFavicons: true,
+    useFaviconService: true,
     anonymizeUrls: false,
     retentionPeriod: 'unlimited',
     dateFormat: 'YYYY-MM-DD',

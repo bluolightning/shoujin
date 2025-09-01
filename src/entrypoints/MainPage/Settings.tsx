@@ -225,29 +225,17 @@ export default function Settings() {
                     icon={<IconShield size='1.2rem' />}
                     badge='Important'>
                     <SettingItem
-                        label='Collect website favicons'
-                        description='Store website icons for better visual identification'>
+                        label='Use external favicon services'
+                        description={'Use third-party services to improve favicon reliability'}>
                         <Switch
-                            checked={settings.collectFavicons}
+                            checked={settings.useFaviconService}
                             onChange={(event) =>
-                                updateSetting('collectFavicons', event.currentTarget.checked)
+                                updateSetting('useFaviconService', event.currentTarget.checked)
                             }
                             size='md'
                         />
                     </SettingItem>
-
-                    <SettingItem
-                        label='Anonymize URLs'
-                        description='Replace specific page paths with domain names only'>
-                        <Switch
-                            checked={settings.anonymizeUrls}
-                            onChange={(event) =>
-                                updateSetting('anonymizeUrls', event.currentTarget.checked)
-                            }
-                            size='md'
-                        />
-                    </SettingItem>
-
+                    {/*
                     <SettingItem
                         label='Data retention period'
                         description='Automatically delete data older than selected period'>
@@ -264,6 +252,7 @@ export default function Settings() {
                             style={{width: 150}}
                         />
                     </SettingItem>
+                    */}
                 </SettingsSection>
 
                 {/* Notifications Settings */}
