@@ -3,11 +3,12 @@ import {Loader, Center, Card, Title} from '@mantine/core';
 import {Heatmap} from '@mantine/charts';
 import {StorageManager} from '@/utils/storage';
 import getTimeByDate, {TimeByDateMap} from '@/utils/getTimeByDate';
-import dayjs from 'dayjs';
+import {formatDateFromSettings} from '@/utils/formatDate';
 
 export default function HeatmapChart() {
     const [usageData, setUsageData] = useState<TimeByDateMap>({});
     const [loading, setLoading] = useState(true);
+    const [formattedDateCache, setFormattedDateCache] = useState<{[key: string]: string}>({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -15,6 +16,20 @@ export default function HeatmapChart() {
                 const data = await StorageManager.getAllStoredData();
                 const structuredData = getTimeByDate(data);
                 setUsageData(structuredData);
+
+                // Pre-format all dates in the data
+                const dateCache: {[key: string]: string} = {};
+                const uniqueDates = Object.keys(structuredData);
+                await Promise.all(
+                    uniqueDates.map(async (date) => {
+                        try {
+                            dateCache[date] = await formatDateFromSettings(date);
+                        } catch {
+                            dateCache[date] = date; // fallback to original date
+                        }
+                    })
+                );
+                setFormattedDateCache(dateCache);
             } catch (error) {
                 console.error('Failed to fetch usage data:', error);
             } finally {
@@ -41,7 +56,7 @@ export default function HeatmapChart() {
                 data={usageData}
                 withTooltip
                 getTooltipLabel={({date, value}) =>
-                    `${dayjs(date).format('DD MMM, YYYY')} - ${value === null || value === 0 ? 'No time spent' : `${value} second${value > 1 ? 's' : ''}`}`
+                    `${formattedDateCache[date] || date} - ${value === null || value === 0 ? 'No time spent' : `${value} second${value > 1 ? 's' : ''}`}`
                 }
             />
         </Card>

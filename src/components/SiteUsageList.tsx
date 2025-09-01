@@ -1,18 +1,27 @@
 import {Card, Table, Text, Title, ScrollArea, Avatar, Group, Center} from '@mantine/core';
 import formatTime from '@/utils/formatTime';
+import {formatDateFromSettings} from '@/utils/formatDate';
 import type {PageTimeEntry} from '@/utils/storage';
-
-// Helper function to format ISO date string
-const formatDate = (isoString: string): string => {
-    try {
-        return new Date(isoString).toLocaleString();
-    } catch (error) {
-        return 'Invalid Date. Error: ' + error;
-    }
-};
+import {useEffect, useState} from 'react';
 
 export default function SiteUsageList(data: {data: PageTimeEntry[]}) {
     const usageData = data.data;
+    const [formattedDates, setFormattedDates] = useState<{[key: string]: string}>({});
+
+    useEffect(() => {
+        const formatDates = async () => {
+            const dateMap: {[key: string]: string} = {};
+            for (const entry of usageData) {
+                try {
+                    dateMap[entry.url] = await formatDateFromSettings(entry.lastVisited);
+                } catch {
+                    dateMap[entry.url] = 'Invalid Date';
+                }
+            }
+            setFormattedDates(dateMap);
+        };
+        formatDates();
+    }, [usageData]);
 
     const rows = usageData.map((entry) => (
         <Table.Tr key={entry.url}>
@@ -40,7 +49,7 @@ export default function SiteUsageList(data: {data: PageTimeEntry[]}) {
                 <Text size='sm'>{formatTime(entry.timeSpent, true)}</Text>
             </Table.Td>
             <Table.Td>
-                <Text size='sm'>{formatDate(entry.lastVisited)}</Text>
+                <Text size='sm'>{formattedDates[entry.url] || 'Loading...'}</Text>
             </Table.Td>
             <Table.Td>
                 <Text size='sm'>{String(entry.visitCount)}</Text>

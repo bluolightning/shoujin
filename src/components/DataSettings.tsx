@@ -2,6 +2,7 @@ import {StorageManager, ImportError, BackupRestoreError} from '@/utils/storage';
 import {Button, Text} from '@mantine/core';
 import {modals} from '@mantine/modals';
 import {notifications} from '@mantine/notifications';
+import {formatDateFromSettings} from '@/utils/formatDate';
 
 export default function DataSettings() {
     const handleDeleteAllData = async () => {
@@ -41,8 +42,10 @@ export default function DataSettings() {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-            a.download = `shoujin_backup_${date}.json`;
+            const date = await formatDateFromSettings(new Date());
+            // Replace slashes and spaces with underscores for filename compatibility
+            const safeDate = date.replace(/[/\s,]/g, '_');
+            a.download = `shoujin_backup_${safeDate}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

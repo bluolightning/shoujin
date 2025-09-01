@@ -1,18 +1,36 @@
 import {AreaChart, BarChart} from '@mantine/charts';
 import {Card} from '@mantine/core';
 import getTimeByDate from '@/utils/getTimeByDate';
+import {formatDateFromSettings} from '@/utils/formatDate';
+import {useEffect, useState} from 'react';
+import type {PageTimeEntry} from '@/utils/storage';
 
 export default function MainChart(data: {data: PageTimeEntry[]}) {
-    const usageData = Object.entries(getTimeByDate(data.data)).map(([date, usage]) => ({
-        date: date,
-        usage: usage,
-    }));
+    const [chartData, setChartData] = useState<{date: string; usage: number}[]>([]);
+
+    useEffect(() => {
+        const formatChartData = async () => {
+            const timeByDate = getTimeByDate(data.data);
+            const formattedData = await Promise.all(
+                Object.entries(timeByDate).map(async ([date, usage]) => {
+                    try {
+                        const formattedDate = await formatDateFromSettings(date);
+                        return {date: formattedDate, usage};
+                    } catch {
+                        return {date, usage}; // fallback to original date
+                    }
+                })
+            );
+            setChartData(formattedData);
+        };
+        formatChartData();
+    }, [data.data]);
 
     return (
         <Card shadow='sm' padding='lg' radius='md' withBorder style={{height: '100%'}}>
             <AreaChart
                 h={300}
-                data={usageData}
+                data={chartData}
                 dataKey='date'
                 series={[{name: 'usage', color: 'blue.6'}]}
                 curveType='linear'
