@@ -81,6 +81,13 @@ export default function DateSelector() {
                 },
                 {
                     value: [
+                        today.subtract(30, 'day').format('YYYY-MM-DD'),
+                        today.format('YYYY-MM-DD'),
+                    ],
+                    label: 'Last 30 days',
+                },
+                {
+                    value: [
                         today.startOf('month').format('YYYY-MM-DD'),
                         today.format('YYYY-MM-DD'),
                     ],
