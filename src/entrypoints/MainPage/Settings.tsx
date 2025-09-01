@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Container,
     Title,
@@ -13,9 +13,6 @@ import {
     Badge,
     ThemeIcon,
     Accordion,
-    ActionIcon,
-    Tooltip,
-    Paper,
     Alert,
     Center,
     Loader,
@@ -28,7 +25,6 @@ import {
     IconBell,
     IconPalette,
     IconInfoCircle,
-    IconExternalLink,
     IconRefresh,
 } from '@tabler/icons-react';
 import DataSettings from '@/components/DataSettings';
@@ -442,31 +438,8 @@ export default function Settings() {
                 </SettingsSection>
                 */}
 
-                {/* Footer */}
-                <Paper p='md' radius='md' bg='var(--mantine-color-gray-0)'>
-                    <Group justify='space-between'>
-                        <div>
-                            <Text size='sm' fw={500}>
-                                Shoujin v0.0.1
-                            </Text>
-                            <Text size='xs' c='dimmed'>
-                                Web Extension for Time Tracking
-                            </Text>
-                        </div>
-                        <Group gap='xs'>
-                            <Tooltip label='Documentation'>
-                                <ActionIcon variant='subtle' disabled={true}>
-                                    <IconInfoCircle size='1rem' />
-                                </ActionIcon>
-                            </Tooltip>
-                            <Tooltip label='GitHub Repository'>
-                                <ActionIcon variant='subtle' disabled={true}>
-                                    <IconExternalLink size='1rem' />
-                                </ActionIcon>
-                            </Tooltip>
-                        </Group>
-                    </Group>
-                </Paper>
+                {/* Empty spacer */}
+                <div style={{height: 16}} />
             </Stack>
         </Container>
     );
