@@ -5,7 +5,7 @@ export interface SiteLimit {
     time: number;
 }
 
-const STORAGE_KEY = 'siteLimits';
+const STORAGE_KEY = 'site_limits';
 
 async function readStorage(): Promise<SiteLimit[]> {
     try {
@@ -66,12 +66,12 @@ export async function isSiteBlocked(url: string, todayUsageMinutes: number): Pro
     try {
         const limits = await getSiteLimits();
         const siteLimit = limits.find((limit) => url.includes(limit.url));
-        
+
         if (!siteLimit) {
             // No limit set for this site
             return false;
         }
-        
+
         return todayUsageMinutes >= siteLimit.time;
     } catch (error) {
         console.error('Error checking if site is blocked:', error);
@@ -85,15 +85,18 @@ export async function isSiteBlocked(url: string, todayUsageMinutes: number): Pro
  * @param todayUsageMinutes How many minutes have been spent on this site today
  * @returns remaining minutes, or null if no limit is set
  */
-export async function getRemainingTime(url: string, todayUsageMinutes: number): Promise<number | null> {
+export async function getRemainingTime(
+    url: string,
+    todayUsageMinutes: number
+): Promise<number | null> {
     try {
         const limits = await getSiteLimits();
         const siteLimit = limits.find((limit) => url.includes(limit.url));
-        
+
         if (!siteLimit) {
             return null;
         }
-        
+
         return Math.max(0, siteLimit.time - todayUsageMinutes);
     } catch (error) {
         console.error('Error getting remaining time:', error);
