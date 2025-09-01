@@ -1,3 +1,5 @@
+import {formatDate} from './formatDate';
+
 export interface PageTimeEntry {
     url: string;
     timeSpent: number;
@@ -90,7 +92,7 @@ export class StorageManager {
         while (currentTime < endTime) {
             const currentHour = currentTime.getHours();
             const hourKey = 'h' + currentHour;
-            const dateKey = this.getDateKey(currentTime);
+            const dateKey = formatDate(currentTime);
 
             // Initialize date data if it doesn't exist
             if (!dateData[dateKey]) {
@@ -117,14 +119,6 @@ export class StorageManager {
             // Move to the next hour
             currentTime.setTime(Math.min(nextHour.getTime(), endTime.getTime()));
         }
-    }
-
-    // Helper function to format date as YYYY-MM-DD
-    private static getDateKey(date: Date): string {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
     }
 
     static async getAllStoredData(): Promise<PageTimeEntry[]> {
@@ -242,7 +236,7 @@ export class StorageManager {
     static async getTodayUsage(url: string): Promise<number> {
         try {
             const data = await this.getAllStoredData();
-            const today = this.getDateKey(new Date());
+            const today = formatDate(new Date());
             
             const entry = data.find((item) => item.url === url);
             if (!entry || !entry.dateData[today]) {
