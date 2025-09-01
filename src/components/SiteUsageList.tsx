@@ -13,7 +13,12 @@ export default function SiteUsageList(data: {data: PageTimeEntry[]}) {
             const dateMap: {[key: string]: string} = {};
             for (const entry of usageData) {
                 try {
-                    dateMap[entry.url] = await formatDateFromSettings(entry.lastVisited);
+                    const datePart = await formatDateFromSettings(entry.lastVisited);
+                    const lastVisited = new Date(entry.lastVisited);
+                    const timePart = !isNaN(lastVisited.getTime())
+                        ? lastVisited.toLocaleTimeString()
+                        : '';
+                    dateMap[entry.url] = timePart ? `${datePart}, ${timePart}` : datePart;
                 } catch {
                     dateMap[entry.url] = 'Invalid Date';
                 }
