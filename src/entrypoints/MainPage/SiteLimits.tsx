@@ -14,17 +14,16 @@ import {
 import {FormEvent, useEffect, useState} from 'react';
 import {IconClockCog} from '@tabler/icons-react';
 
-// This would come from site limits storage
-// For now, using mock data.
-const initialLimits: SiteLimit[] = [
-    {url: 'youtube.com', time: 60},
-    {url: 'twitter.com', time: 30},
-];
+import {
+    SiteLimit as StoredSiteLimit,
+    getSiteLimits,
+    addSiteLimit,
+    updateSiteLimit,
+    removeSiteLimit,
+} from '../../utils/siteLimitsStorage';
 
-interface SiteLimit {
-    url: string;
-    time: number; // in minutes
-}
+// Remove local interface; reuse imported StoredSiteLimit as SiteLimit
+type SiteLimit = StoredSiteLimit;
 
 export default function SiteLimits() {
     const [limits, setLimits] = useState<SiteLimit[]>([]);
@@ -34,30 +33,46 @@ export default function SiteLimits() {
     const [editingUrl, setEditingUrl] = useState<string | null>(null);
     const [editTime, setEditTime] = useState<number | ''>(0);
 
-    // TODO: Load limits from storage on component mount
+    // Load limits from storage on component mount
     useEffect(() => {
-        // async function loadLimits() {
-        //   const storedLimits = ...;
-        //   setLimits(storedLimits);
-        // }
-        // loadLimits();
-        setLimits(initialLimits); // Using mock data for now
+        let mounted = true;
+        (async () => {
+            try {
+                const stored = await getSiteLimits();
+                if (!mounted) return;
+                setLimits(stored);
+            } catch {
+                // on error, set empty list
+                setLimits([]);
+            }
+        })();
+        return () => {
+            mounted = false;
+        };
     }, []);
 
-    const handleAddLimit = (event: FormEvent) => {
+    const handleAddLimit = async (event: FormEvent) => {
         event.preventDefault();
         if (newUrl && newTime) {
-            const newLimit: SiteLimit = {url: newUrl, time: Number(newTime)};
-            // TODO: Persist with StorageManager.addSiteLimit(newLimit)
-            setLimits([...limits, newLimit]);
-            setNewUrl('');
-            setNewTime(30);
+            const newLimit: SiteLimit = {url: newUrl.trim(), time: Number(newTime)};
+            try {
+                const updated = await addSiteLimit(newLimit);
+                setLimits(updated);
+                setNewUrl('');
+                setNewTime(30);
+            } catch {
+                // handle/save error silently for now
+            }
         }
     };
 
-    const handleDeleteLimit = (urlToDelete: string) => {
-        // TODO: Persist with StorageManager.removeSiteLimit(urlToDelete)
-        setLimits(limits.filter((limit) => limit.url !== urlToDelete));
+    const handleDeleteLimit = async (urlToDelete: string) => {
+        try {
+            const updated = await removeSiteLimit(urlToDelete);
+            setLimits(updated);
+        } catch {
+            // ignore errors for now
+        }
     };
 
     const handleEdit = (limit: SiteLimit) => {
@@ -65,15 +80,19 @@ export default function SiteLimits() {
         setEditTime(limit.time);
     };
 
-    const handleUpdateLimit = () => {
+    const handleUpdateLimit = async () => {
         if (editingUrl && editTime) {
             const updatedLimit: SiteLimit = {
                 url: editingUrl,
                 time: Number(editTime),
             };
-            // TODO: Persist with StorageManager.updateSiteLimit(updatedLimit)
-            setLimits(limits.map((limit) => (limit.url === editingUrl ? updatedLimit : limit)));
-            setEditingUrl(null);
+            try {
+                const updated = await updateSiteLimit(updatedLimit);
+                setLimits(updated);
+                setEditingUrl(null);
+            } catch {
+                // ignore
+            }
         }
     };
 
@@ -88,7 +107,14 @@ export default function SiteLimits() {
                 <Table.Td>{limit.url}</Table.Td>
                 <Table.Td>
                     {isEditing ? (
-                        <NumberInput value={editTime} onChange={setEditTime} min={1} w={100} />
+                        <NumberInput
+                            value={editTime}
+                            onChange={(val: string | number) =>
+                                setEditTime(val === '' ? '' : Number(val))
+                            }
+                            min={1}
+                            w={100}
+                        />
                     ) : (
                         `${limit.time} minutes`
                     )}
@@ -151,7 +177,9 @@ export default function SiteLimits() {
                         <NumberInput
                             label='Time limit (minutes)'
                             value={newTime}
-                            onChange={setNewTime}
+                            onChange={(val: string | number) =>
+                                setNewTime(val === '' ? '' : Number(val))
+                            }
                             min={1}
                             required
                         />
