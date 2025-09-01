@@ -233,4 +233,27 @@ export class StorageManager {
             }
         }
     }
+
+    /**
+     * Get today's usage in minutes for a specific site
+     * @param url The site URL to check
+     * @returns Minutes spent on the site today
+     */
+    static async getTodayUsage(url: string): Promise<number> {
+        try {
+            const data = await this.getAllStoredData();
+            const today = this.getDateKey(new Date());
+            
+            const entry = data.find((item) => item.url === url);
+            if (!entry || !entry.dateData[today]) {
+                return 0;
+            }
+            
+            // Return daily time in minutes (stored in seconds, so divide by 60)
+            return Math.round(entry.dateData[today].dailyTime / 60);
+        } catch (error) {
+            console.error('Error getting today usage:', error);
+            return 0;
+        }
+    }
 }

@@ -4,6 +4,7 @@ import formatUrl from '@/utils/formatUrl';
 import getBaseUrl from '@/utils/getBaseUrl';
 import {QueueProcessor, QueueEvent} from '@/utils/QueueProcessor';
 import {SettingsStorage, AppSettings} from '@/utils/settingsStorage';
+import {isSiteBlocked} from '@/utils/siteLimitsStorage';
 
 export default defineBackground(() => {
     let activeTabId: number | null = null;
@@ -119,6 +120,37 @@ export default defineBackground(() => {
         resetActivityIdleTimer();
     }
 
+    // --- Site Blocking Functions ---
+
+    async function checkSiteLimit(url: string): Promise<boolean> {
+        try {
+            const formattedUrl = formatUrl(url);
+            const todayUsageMinutes = await StorageManager.getTodayUsage(formattedUrl);
+            return await isSiteBlocked(formattedUrl, todayUsageMinutes);
+        } catch (error) {
+            console.error('Error checking site limit:', error);
+            return false;
+        }
+    }
+
+    async function blockSite(tabId: number, url: string) {
+        try {
+            const formattedUrl = formatUrl(url);
+            const todayUsageMinutes = await StorageManager.getTodayUsage(formattedUrl);
+
+            const pageUrl = browser.runtime.getURL(
+                `/SiteBlocking.html?site=${encodeURIComponent(formattedUrl)}&minutes=${encodeURIComponent(String(todayUsageMinutes))}`
+            );
+
+            // Navigate the tab to the packaged blocking page
+            await browser.tabs.update(tabId, {url: pageUrl});
+
+            console.log(`Blocked access to ${formattedUrl} - time limit exceeded`);
+        } catch (error) {
+            console.error('Error blocking site:', error);
+        }
+    }
+
     // --- Core Session Management Functions ---
 
     async function endCurrentSession() {
@@ -193,9 +225,19 @@ export default defineBackground(() => {
             return;
         }
 
+        const baseUrl = getBaseUrl(tab.url);
+
+        // Check if the site is blocked due to time limits
+        const isBlocked = await checkSiteLimit(baseUrl);
+        if (isBlocked) {
+            console.log(`Site ${baseUrl} is blocked due to time limit`);
+            await blockSite(tabId, baseUrl);
+            return;
+        }
+
         isIdle = false;
         activeTabId = tab.id || null;
-        activeTabUrl = getBaseUrl(tab.url);
+        activeTabUrl = baseUrl;
         sessionStartTime = Date.now();
 
         console.log(`Starting new session for tab ${activeTabId} on ${activeTabUrl}`);
@@ -310,7 +352,18 @@ export default defineBackground(() => {
 
     browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
         const currentTab = await browser.tabs.get(tabId);
-        if (currentTab.active && changeInfo.url) {
+
+        // Check for site blocking when URL changes
+        if (currentTab.active && changeInfo.url && changeInfo.url.startsWith('http')) {
+            const baseUrl = getBaseUrl(changeInfo.url);
+            const isBlocked = await checkSiteLimit(baseUrl);
+
+            if (isBlocked) {
+                console.log(`Blocking navigation to ${baseUrl} due to time limit`);
+                await blockSite(tabId, baseUrl);
+                return;
+            }
+
             eventQueue.enqueue('urlUpdated', {tabId});
         }
     });

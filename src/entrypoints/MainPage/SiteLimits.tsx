@@ -10,6 +10,8 @@ import {
     Title,
     ThemeIcon,
     Text,
+    Progress,
+    Badge,
 } from '@mantine/core';
 import {FormEvent, useEffect, useState} from 'react';
 import {IconClockCog} from '@tabler/icons-react';
@@ -21,29 +23,58 @@ import {
     updateSiteLimit,
     removeSiteLimit,
 } from '../../utils/siteLimitsStorage';
+import {StorageManager} from '../../utils/storage';
 
 // Remove local interface; reuse imported StoredSiteLimit as SiteLimit
 type SiteLimit = StoredSiteLimit;
 
+type SiteLimitWithUsage = SiteLimit & {
+    todayUsage: number; // in minutes
+    isBlocked: boolean;
+    percentUsed: number;
+};
+
 export default function SiteLimits() {
-    const [limits, setLimits] = useState<SiteLimit[]>([]);
+    const [limitsWithUsage, setLimitsWithUsage] = useState<SiteLimitWithUsage[]>([]);
     const [newUrl, setNewUrl] = useState('');
     const [newTime, setNewTime] = useState<number | ''>(30);
 
     const [editingUrl, setEditingUrl] = useState<string | null>(null);
     const [editTime, setEditTime] = useState<number | ''>(0);
 
-    // Load limits from storage on component mount
+    // Load usage data for all sites
+    const loadUsageData = async (siteLimit: SiteLimit[]): Promise<SiteLimitWithUsage[]> => {
+        const usagePromises = siteLimit.map(async (limit): Promise<SiteLimitWithUsage> => {
+            const todayUsage = await StorageManager.getTodayUsage(limit.url);
+            const percentUsed = Math.min((todayUsage / limit.time) * 100, 100);
+            const isBlocked = todayUsage >= limit.time;
+            
+            return {
+                ...limit,
+                todayUsage,
+                isBlocked,
+                percentUsed,
+            };
+        });
+        
+        return Promise.all(usagePromises);
+    };
+
+    // Load limits and usage data from storage on component mount
     useEffect(() => {
         let mounted = true;
         (async () => {
             try {
                 const stored = await getSiteLimits();
                 if (!mounted) return;
-                setLimits(stored);
+                
+                const withUsage = await loadUsageData(stored);
+                if (!mounted) return;
+                
+                setLimitsWithUsage(withUsage);
             } catch {
                 // on error, set empty list
-                setLimits([]);
+                setLimitsWithUsage([]);
             }
         })();
         return () => {
@@ -57,7 +88,10 @@ export default function SiteLimits() {
             const newLimit: SiteLimit = {url: newUrl.trim(), time: Number(newTime)};
             try {
                 const updated = await addSiteLimit(newLimit);
-                setLimits(updated);
+                
+                const withUsage = await loadUsageData(updated);
+                setLimitsWithUsage(withUsage);
+                
                 setNewUrl('');
                 setNewTime(30);
             } catch {
@@ -69,7 +103,9 @@ export default function SiteLimits() {
     const handleDeleteLimit = async (urlToDelete: string) => {
         try {
             const updated = await removeSiteLimit(urlToDelete);
-            setLimits(updated);
+            
+            const withUsage = await loadUsageData(updated);
+            setLimitsWithUsage(withUsage);
         } catch {
             // ignore errors for now
         }
@@ -88,7 +124,10 @@ export default function SiteLimits() {
             };
             try {
                 const updated = await updateSiteLimit(updatedLimit);
-                setLimits(updated);
+                
+                const withUsage = await loadUsageData(updated);
+                setLimitsWithUsage(withUsage);
+                
                 setEditingUrl(null);
             } catch {
                 // ignore
@@ -100,11 +139,13 @@ export default function SiteLimits() {
         setEditingUrl(null);
     };
 
-    const rows = limits.map((limit) => {
-        const isEditing = editingUrl === limit.url;
+    const rows = limitsWithUsage.map((limitWithUsage) => {
+        const isEditing = editingUrl === limitWithUsage.url;
+        const remainingTime = Math.max(0, limitWithUsage.time - limitWithUsage.todayUsage);
+        
         return (
-            <Table.Tr key={limit.url}>
-                <Table.Td>{limit.url}</Table.Td>
+            <Table.Tr key={limitWithUsage.url}>
+                <Table.Td>{limitWithUsage.url}</Table.Td>
                 <Table.Td>
                     {isEditing ? (
                         <NumberInput
@@ -116,8 +157,34 @@ export default function SiteLimits() {
                             w={100}
                         />
                     ) : (
-                        `${limit.time} minutes`
+                        `${limitWithUsage.time} minutes`
                     )}
+                </Table.Td>
+                <Table.Td>
+                    <Stack gap="xs">
+                        <Group gap="xs">
+                            <Text size="sm">
+                                {limitWithUsage.todayUsage} / {limitWithUsage.time} min
+                            </Text>
+                            {limitWithUsage.isBlocked ? (
+                                <Badge color="red" size="sm">Blocked</Badge>
+                            ) : remainingTime <= 5 ? (
+                                <Badge color="orange" size="sm">Warning</Badge>
+                            ) : (
+                                <Badge color="green" size="sm">Active</Badge>
+                            )}
+                        </Group>
+                        <Progress 
+                            value={limitWithUsage.percentUsed} 
+                            size="sm" 
+                            color={limitWithUsage.isBlocked ? "red" : limitWithUsage.percentUsed > 80 ? "orange" : "blue"}
+                        />
+                        {!limitWithUsage.isBlocked && (
+                            <Text size="xs" c="dimmed">
+                                {remainingTime} minutes remaining
+                            </Text>
+                        )}
+                    </Stack>
                 </Table.Td>
                 <Table.Td>
                     {isEditing ? (
@@ -129,14 +196,14 @@ export default function SiteLimits() {
                         </Group>
                     ) : (
                         <Group>
-                            <Button variant='light' size='xs' onClick={() => handleEdit(limit)}>
+                            <Button variant='light' size='xs' onClick={() => handleEdit(limitWithUsage)}>
                                 Edit
                             </Button>
                             <Button
                                 variant='light'
                                 color='red'
                                 size='xs'
-                                onClick={() => handleDeleteLimit(limit.url)}>
+                                onClick={() => handleDeleteLimit(limitWithUsage.url)}>
                                 Delete
                             </Button>
                         </Group>
@@ -195,6 +262,7 @@ export default function SiteLimits() {
                         <Table.Tr>
                             <Table.Th>Website</Table.Th>
                             <Table.Th>Time Limit</Table.Th>
+                            <Table.Th>Today&apos;s Usage</Table.Th>
                             <Table.Th>Actions</Table.Th>
                         </Table.Tr>
                     </Table.Thead>
