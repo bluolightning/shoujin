@@ -37,7 +37,7 @@ export default function SiteUsageList(data: {data: PageTimeEntry[]}) {
                 </Group>
             </Table.Td>
             <Table.Td>
-                <Text size='sm'>{formatTime(entry.timeSpent)}</Text>
+                <Text size='sm'>{formatTime(entry.timeSpent, true)}</Text>
             </Table.Td>
             <Table.Td>
                 <Text size='sm'>{formatDate(entry.lastVisited)}</Text>

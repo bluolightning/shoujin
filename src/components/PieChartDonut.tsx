@@ -42,9 +42,9 @@ export default function PieChartDonut(data: {data: PageTimeEntry[]}) {
                         labelsType='name'
                         withLabels={true}
                         data={chartData}
-                        chartLabel={formatTime(totalTime)}
+                        chartLabel={formatTime(totalTime, true)}
                         pieChartProps={{className: classes.chartWithVisibleLabels}}
-                        valueFormatter={formatTime}
+                        valueFormatter={(value: number) => formatTime(value, false)}
                     />
                 </div>
             </Center>
