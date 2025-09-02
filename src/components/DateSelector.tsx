@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import {DatePickerInput} from '@mantine/dates';
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {dateRangeContext} from '@/utils/dateRangeContext';
+import {SettingsStorage} from '@/utils/settingsStorage';
 import {StorageManager} from '@/utils/storage';
 
 export default function DateSelector() {
@@ -13,6 +14,13 @@ export default function DateSelector() {
         dateRange.startDate,
         dateRange.endDate,
     ]);
+
+    const [dateFormat, setDateFormat] = useState('YYYY-MM-DD');
+    useEffect(() => {
+        SettingsStorage.getSettings().then((s) => {
+            setDateFormat(s.dateFormat || 'YYYY-MM-DD');
+        });
+    }, []);
 
     const handleDateChange = (dates: [string | null, string | null]) => {
         setValue(dates);
@@ -102,6 +110,7 @@ export default function DateSelector() {
             value={value}
             onChange={handleDateChange}
             onDropdownClose={handleDropdownClose}
+            valueFormat={dateFormat}
         />
     );
 }
