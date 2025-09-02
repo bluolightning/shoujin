@@ -1,7 +1,6 @@
-export default function formatClockNotation(
-    dateInput: Date | string | number,
-    format: string
-): string {
+import {SettingsStorage} from '@/utils/settingsStorage';
+
+export function formatClockNotation(dateInput: Date | string | number, format: string): string {
     let date: Date;
     if (dateInput instanceof Date) {
         date = dateInput;
@@ -29,4 +28,9 @@ export default function formatClockNotation(
     // Fallback to 24h if unknown format
     console.warn(`Unknown format "${format}", defaulting to 24h format.`);
     return `${pad(hours)}:${pad(minutes)}`;
+}
+
+export async function getClockNotationFormat() {
+    const settings = await SettingsStorage.getSettings();
+    return settings.timeFormat || '24h';
 }

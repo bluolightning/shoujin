@@ -1,6 +1,7 @@
 import {Card, Table, Text, Title, ScrollArea, Avatar, Group, Center} from '@mantine/core';
 import formatTime from '@/utils/formatTime';
 import {formatDateFromSettings} from '@/utils/formatDate';
+import {formatClockNotation, getClockNotationFormat} from '@/utils/formatClockNotation';
 import type {PageTimeEntry} from '@/utils/storage';
 import {useEffect, useState} from 'react';
 
@@ -23,23 +24,21 @@ export default function SiteUsageList(data: {data: PageTimeEntry[]}) {
     }
 
     useEffect(() => {
-        const formatDates = async () => {
+        (async () => {
             const dateMap: {[key: string]: string} = {};
+            const timeFormat = await getClockNotationFormat();
+
             for (const entry of usageData) {
                 try {
                     const datePart = await formatDateFromSettings(entry.lastVisited);
-                    const lastVisited = new Date(entry.lastVisited);
-                    const timePart = !isNaN(lastVisited.getTime())
-                        ? lastVisited.toLocaleTimeString()
-                        : '';
+                    const timePart = formatClockNotation(entry.lastVisited, timeFormat);
                     dateMap[entry.url] = timePart ? `${datePart}, ${timePart}` : datePart;
                 } catch {
                     dateMap[entry.url] = 'Invalid Date';
                 }
             }
             setFormattedDates(dateMap);
-        };
-        formatDates();
+        })();
     }, [usageData]);
 
     const rows = usageData.map((entry) => (
