@@ -4,6 +4,7 @@ import getTimeByDate from '@/utils/getTimeByDate';
 import {formatDateFromSettings} from '@/utils/formatDate';
 import {useEffect, useState} from 'react';
 import type {PageTimeEntry} from '@/utils/storage';
+import formatTime from '@/utils/formatTime';
 
 export default function MainChart(data: {data: PageTimeEntry[]}) {
     const [chartData, setChartData] = useState<{date: string; usage: number}[]>([]);
@@ -32,9 +33,10 @@ export default function MainChart(data: {data: PageTimeEntry[]}) {
                 h={300}
                 data={chartData}
                 dataKey='date'
-                series={[{name: 'usage', color: 'blue.6'}]}
+                series={[{name: 'usage', label: 'Time Spent', color: 'blue.6'}]}
                 curveType='linear'
                 tooltipAnimationDuration={200}
+                valueFormatter={(value) => formatTime(value as number, false)}
             />
         </Card>
     );
