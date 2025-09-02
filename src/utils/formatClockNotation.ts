@@ -14,20 +14,21 @@ export function formatClockNotation(dateInput: Date | string | number, format: s
 
     const hours = date.getHours();
     const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
 
     const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
 
     if (format === '24h') {
-        return `${pad(hours)}:${pad(minutes)}`;
+        return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
     } else if (format === '12h') {
         const period = hours >= 12 ? 'PM' : 'AM';
         const h12 = hours % 12 === 0 ? 12 : hours % 12;
-        return `${h12}:${pad(minutes)} ${period}`;
+        return `${h12}:${pad(minutes)}:${pad(seconds)} ${period}`;
     }
 
     // Fallback to 24h if unknown format
     console.warn(`Unknown format "${format}", defaulting to 24h format.`);
-    return `${pad(hours)}:${pad(minutes)}`;
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
 export async function getClockNotationFormat() {
