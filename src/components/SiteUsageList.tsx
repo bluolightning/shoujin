@@ -8,6 +8,20 @@ export default function SiteUsageList(data: {data: PageTimeEntry[]}) {
     const usageData = data.data;
     const [formattedDates, setFormattedDates] = useState<{[key: string]: string}>({});
 
+    function computeVisits(entry: PageTimeEntry): number {
+        try {
+            let total = 0;
+            for (const dateInfo of Object.values(entry.dateData)) {
+                for (const hourEntry of Object.values(dateInfo.hours)) {
+                    total += hourEntry.visits || 0;
+                }
+            }
+            return total || 1;
+        } catch {
+            return 1;
+        }
+    }
+
     useEffect(() => {
         const formatDates = async () => {
             const dateMap: {[key: string]: string} = {};
@@ -57,7 +71,7 @@ export default function SiteUsageList(data: {data: PageTimeEntry[]}) {
                 <Text size='sm'>{formattedDates[entry.url] || 'Loading...'}</Text>
             </Table.Td>
             <Table.Td>
-                <Text size='sm'>{String(entry.visitCount)}</Text>
+                <Text size='sm'>{String(computeVisits(entry))}</Text>
             </Table.Td>
         </Table.Tr>
     ));
