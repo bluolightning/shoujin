@@ -7,7 +7,7 @@ export default function Popup() {
     useEffect(() => {
         const getCurrentTabUrl = async () => {
             try {
-                const tabs = await chrome.tabs.query({
+                const tabs = await browser.tabs.query({
                     active: true,
                     currentWindow: true,
                 });
@@ -23,8 +23,8 @@ export default function Popup() {
     }, []);
 
     const openNewTab = () => {
-        chrome.tabs.create({
-            url: chrome.runtime.getURL('MainPage.html'),
+        browser.tabs.create({
+            url: browser.runtime.getURL('/MainPage.html'),
         });
     };
 
