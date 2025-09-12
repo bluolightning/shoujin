@@ -1,4 +1,5 @@
-import './Popup.css';
+import '@mantine/core/styles.css';
+import {Button, Paper, Stack, Title} from '@mantine/core';
 
 export default function Popup() {
     const openNewTab = () => {
@@ -8,8 +9,13 @@ export default function Popup() {
     };
 
     return (
-        <>
-            <button onClick={openNewTab}>Open Extension Page</button>
-        </>
+        <Paper shadow='md' p='lg' radius='md' withBorder style={{minWidth: '300px'}}>
+            <Stack align='center'>
+                <Title order={2}>Shoujin</Title>
+                <Button variant='filled' onClick={openNewTab} fullWidth>
+                    Open Dashboard
+                </Button>
+            </Stack>
+        </Paper>
     );
 }
