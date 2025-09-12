@@ -1,3 +1,5 @@
+import {formatDate} from './formatDate';
+
 export interface PageTimeEntry {
     url: string;
     timeSpent: number;
@@ -6,10 +8,9 @@ export interface PageTimeEntry {
     dateData: {
         [date: string]: {
             dailyTime: number;
-            hours: {[hour: string]: number};
+            hours: {[hour: string]: {time: number; visits?: number}};
         };
     };
-    visitCount: number;
 }
 
 export class ImportError extends Error {
@@ -45,8 +46,8 @@ export class StorageManager {
 
             const dateData = entry?.dateData || {};
 
-            // Distribute time across the correct hours
-            this.distributeTimeAcrossHours(startTime, endTime, dateData);
+            // Distribute time across the correct hours and record a visit
+            this.distributeTimeAcrossHours(startTime, endTime, dateData, countAsVisit);
 
             if (entry) {
                 entry.timeSpent += timeSpent;
@@ -55,7 +56,6 @@ export class StorageManager {
                     entry.favicon = favicon;
                 }
                 entry.dateData = dateData;
-                entry.visitCount = entry.visitCount + (countAsVisit ? 1 : 0) || 1;
             } else {
                 data.push({
                     url,
@@ -63,7 +63,6 @@ export class StorageManager {
                     lastVisited: endTime.toISOString(),
                     favicon,
                     dateData,
-                    visitCount: 1,
                 });
             }
 
@@ -81,23 +80,24 @@ export class StorageManager {
         dateData: {
             [date: string]: {
                 dailyTime: number;
-                hours: {[hour: string]: number};
+                hours: {[hour: string]: {time: number; visits?: number}};
             };
-        }
+        },
+        countAsVisit: boolean
     ): void {
         const currentTime = new Date(startTime);
 
         while (currentTime < endTime) {
             const currentHour = currentTime.getHours();
             const hourKey = 'h' + currentHour;
-            const dateKey = this.getDateKey(currentTime);
+            const dateKey = formatDate(currentTime);
 
-            // Initialize date data if it doesn't exist
+            // Initialize data if it doesn't exist
             if (!dateData[dateKey]) {
                 dateData[dateKey] = {dailyTime: 0, hours: {}};
             }
             if (!dateData[dateKey].hours[hourKey]) {
-                dateData[dateKey].hours[hourKey] = 0;
+                dateData[dateKey].hours[hourKey] = {time: 0, visits: 0};
             }
 
             // Calculate the end of the current hour
@@ -111,20 +111,20 @@ export class StorageManager {
             );
 
             // Add time to this hour and daily total
-            dateData[dateKey].hours[hourKey] += timeInThisHour;
+            const hourObj = dateData[dateKey].hours[hourKey];
+            hourObj.time += timeInThisHour;
             dateData[dateKey].dailyTime += timeInThisHour;
+
+            // If this save counts as a visit, increment visits for the hour at the end time
+            if (countAsVisit) {
+                if (nextHour.getTime() >= endTime.getTime()) {
+                    hourObj.visits = (hourObj.visits || 0) + 1;
+                }
+            }
 
             // Move to the next hour
             currentTime.setTime(Math.min(nextHour.getTime(), endTime.getTime()));
         }
-    }
-
-    // Helper function to format date as YYYY-MM-DD
-    private static getDateKey(date: Date): string {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
     }
 
     static async getAllStoredData(): Promise<PageTimeEntry[]> {
@@ -169,7 +169,6 @@ export class StorageManager {
                 if (mergedDataMap[entry.url]) {
                     const existingEntry = mergedDataMap[entry.url];
                     existingEntry.timeSpent += entry.timeSpent;
-                    existingEntry.visitCount += entry.visitCount || 0;
                     existingEntry.lastVisited =
                         new Date(existingEntry.lastVisited) > new Date(entry.lastVisited)
                             ? existingEntry.lastVisited
@@ -182,11 +181,20 @@ export class StorageManager {
                             existingEntry.dateData[date] = dateInfo;
                         } else {
                             existingEntry.dateData[date].dailyTime += dateInfo.dailyTime;
-                            for (const [hour, time] of Object.entries(dateInfo.hours)) {
-                                if (!existingEntry.dateData[date].hours[hour]) {
-                                    existingEntry.dateData[date].hours[hour] = time;
+                            for (const [hour, hourInfo] of Object.entries(dateInfo.hours)) {
+                                const existingHour = existingEntry.dateData[date].hours[hour];
+
+                                if (!existingHour) {
+                                    existingEntry.dateData[date].hours[hour] = {
+                                        time: hourInfo.time,
+                                        visits: hourInfo.visits || 0,
+                                    };
                                 } else {
-                                    existingEntry.dateData[date].hours[hour] += time;
+                                    // Correctly accumulate into the existing hour object
+                                    existingEntry.dateData[date].hours[hour] = {
+                                        time: existingHour.time + hourInfo.time,
+                                        visits: (existingHour.visits || 0) + (hourInfo.visits || 0),
+                                    };
                                 }
                             }
                         }
@@ -231,6 +239,29 @@ export class StorageManager {
                     'The import failed due to an error, but your original data has been safely restored.'
                 );
             }
+        }
+    }
+
+    /**
+     * Get today's usage in minutes for a specific site
+     * @param url The site URL to check
+     * @returns Minutes spent on the site today
+     */
+    static async getTodayUsage(url: string): Promise<number> {
+        try {
+            const data = await this.getAllStoredData();
+            const today = formatDate(new Date());
+
+            const entry = data.find((item) => item.url === url);
+            if (!entry || !entry.dateData[today]) {
+                return 0;
+            }
+
+            // Return daily time in minutes (stored in seconds, so divide by 60)
+            return Math.round(entry.dateData[today].dailyTime / 60);
+        } catch (error) {
+            console.error('Error getting today usage:', error);
+            return 0;
         }
     }
 }

@@ -3,6 +3,7 @@ export interface EventPayloadMap {
     tabRemoved: {tabId: number};
     urlUpdated: {tabId: number};
     focusChanged: {windowId: number};
+    userActivity: {tabId: number | undefined};
 }
 
 export type QueueEvent = {
@@ -28,7 +29,6 @@ export class QueueProcessor {
 
     // Adds an event to the queue and starts processing if not already active.
     public enqueue<K extends keyof EventPayloadMap>(type: K, payload: EventPayloadMap[K]): void {
-        console.log(`[Queue] Enqueuing event: ${type}`);
         const event = {type, payload} as QueueEvent;
         this.queue.push(event);
         // Use Promise.resolve().then() to avoid deep call stacks on a busy queue
@@ -50,7 +50,6 @@ export class QueueProcessor {
         }
 
         try {
-            console.log(`[Queue] Processing event: ${event.type}`, event.payload);
             await this.eventHandler(event);
         } catch (error) {
             console.error(`[Queue] Error processing event ${event.type}:`, error);

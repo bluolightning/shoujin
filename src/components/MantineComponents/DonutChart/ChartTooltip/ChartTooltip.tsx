@@ -19,7 +19,7 @@ import {
     useProps,
     useStyles,
 } from '@mantine/core';
-import {ChartSeries} from './types';
+import type {ChartSeries} from './types';
 import {getSeriesLabels} from './getSeriesLabels';
 import classes from './ChartTooltip.module.css';
 

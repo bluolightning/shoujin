@@ -3,6 +3,8 @@ import getFavicon from '@/utils/getFavicon';
 import formatUrl from '@/utils/formatUrl';
 import getBaseUrl from '@/utils/getBaseUrl';
 import {QueueProcessor, QueueEvent} from '@/utils/QueueProcessor';
+import {SettingsStorage, AppSettings} from '@/utils/settingsStorage';
+import {isSiteBlocked} from '@/utils/siteLimitsStorage';
 
 export default defineBackground(() => {
     let activeTabId: number | null = null;
@@ -10,12 +12,41 @@ export default defineBackground(() => {
     let sessionStartTime: number | null = null;
     let isIdle = false;
     let isSessionEnding = false;
-    let isBrowserFocused = true;
+    let settings: AppSettings;
+    let idleTimeoutLimit = 15 * 1000; // Will be updated from settings
 
     const tabData = new Map<number, {favicon?: string; url: string}>();
 
-    const idleTimeoutLimit = 15 * 1000; // Set your idle time in milliseconds (minimum 15 seconds)
     let activityIdleTimer: ReturnType<typeof setTimeout> | null = null;
+
+    // --- Settings Management ---
+
+    async function loadSettings() {
+        settings = await SettingsStorage.getSettings();
+        idleTimeoutLimit = settings.idleTimeout * 1000;
+        console.log('Settings loaded:', settings);
+    }
+
+    function handleSettingChange(key: keyof AppSettings, value: AppSettings[keyof AppSettings]) {
+        settings = {...settings, [key]: value};
+
+        if (key === 'idleTimeout') {
+            idleTimeoutLimit = (value as number) * 1000;
+            // Reset timer with new timeout if session is active
+            if (sessionStartTime && !isIdle) {
+                resetActivityIdleTimer();
+            }
+        }
+
+        if (key === 'trackingEnabled' && !value) {
+            // If tracking is disabled, end current session
+            if (sessionStartTime) {
+                endCurrentSession();
+            }
+        }
+
+        console.log(`Setting changed: ${key} = ${value}`);
+    }
 
     // --- Idle Time Management  functions ---
 
@@ -47,14 +78,28 @@ export default defineBackground(() => {
     }
 
     async function handleUserActivity(tabId: number | undefined): Promise<void> {
-        if (!isBrowserFocused) {
-            console.log('Browser is not focused, ignoring user activity');
+        // Check if tracking is enabled
+        if (!settings?.trackingEnabled) {
+            console.log('Tracking is disabled, ignoring user activity');
             return;
         }
 
         if (tabId == undefined) {
             console.error('Tab ID is required for user activity handling');
             return;
+        }
+
+        // Check if we should track private/incognito tabs
+        if (!settings?.trackInPrivate) {
+            try {
+                const tab = await browser.tabs.get(tabId);
+                if (tab.incognito) {
+                    console.log('Tracking is disabled for incognito, ignoring user activity');
+                    return;
+                }
+            } catch (error) {
+                console.warn('Could not check if tab is incognito:', error);
+            }
         }
 
         if (tabId !== activeTabId) {
@@ -73,6 +118,37 @@ export default defineBackground(() => {
         }
 
         resetActivityIdleTimer();
+    }
+
+    // --- Site Blocking Functions ---
+
+    async function checkSiteLimit(url: string): Promise<boolean> {
+        try {
+            const formattedUrl = formatUrl(url);
+            const todayUsageMinutes = await StorageManager.getTodayUsage(formattedUrl);
+            return await isSiteBlocked(formattedUrl, todayUsageMinutes);
+        } catch (error) {
+            console.error('Error checking site limit:', error);
+            return false;
+        }
+    }
+
+    async function blockSite(tabId: number, url: string) {
+        try {
+            const formattedUrl = formatUrl(url);
+            const todayUsageMinutes = await StorageManager.getTodayUsage(formattedUrl);
+
+            const pageUrl = browser.runtime.getURL(
+                `/SiteBlocking.html?site=${encodeURIComponent(formattedUrl)}&minutes=${encodeURIComponent(String(todayUsageMinutes))}`
+            );
+
+            // Navigate the tab to the packaged blocking page
+            await browser.tabs.update(tabId, {url: pageUrl});
+
+            console.log(`Blocked access to ${formattedUrl} - time limit exceeded`);
+        } catch (error) {
+            console.error('Error blocking site:', error);
+        }
     }
 
     // --- Core Session Management Functions ---
@@ -99,14 +175,16 @@ export default defineBackground(() => {
 
             const data = tabData.get(activeTabId);
             const formattedUrl = formatUrl(activeTabUrl);
+            const minimumVisitTime = settings?.minimumVisitTime ?? 5;
 
             await StorageManager.savePageTime(
                 formattedUrl,
                 timeSpent,
                 data?.favicon,
-                timeSpent >= 5
+                timeSpent >= minimumVisitTime
             );
 
+            tabData.delete(activeTabId);
             resetSession();
             clearActivityIdleTimer();
         } finally {
@@ -121,6 +199,12 @@ export default defineBackground(() => {
     }
 
     async function startNewSession(tabId: number) {
+        // Check if tracking is enabled
+        if (!settings?.trackingEnabled) {
+            console.log('Tracking is disabled, not starting session');
+            return;
+        }
+
         // Don't track when idle or unfocused
         if (sessionStartTime) {
             console.warn(`New session called for ${tabId} while browser is in a session.`);
@@ -128,22 +212,39 @@ export default defineBackground(() => {
         }
 
         const tab = await browser.tabs.get(tabId);
+
+        // Check if we should track private/incognito tabs
+        if (!settings?.trackInPrivate && tab.incognito) {
+            console.log('Private/incognito tab detected and tracking disabled for private tabs');
+            return;
+        }
+
         // Special url - inaccessible or restricted tab
         if (!tab.url || !(tab.url.startsWith('http') || tab.url.startsWith('file:'))) {
             console.log(`Tab ${tabId} is a special url. Pausing session tracking.`);
             return;
         }
 
+        const baseUrl = getBaseUrl(tab.url);
+
+        // Check if the site is blocked due to time limits
+        const isBlocked = await checkSiteLimit(baseUrl);
+        if (isBlocked) {
+            console.log(`Site ${baseUrl} is blocked due to time limit`);
+            await blockSite(tabId, baseUrl);
+            return;
+        }
+
         isIdle = false;
         activeTabId = tab.id || null;
-        activeTabUrl = getBaseUrl(tab.url);
+        activeTabUrl = baseUrl;
         sessionStartTime = Date.now();
 
         console.log(`Starting new session for tab ${activeTabId} on ${activeTabUrl}`);
 
         // Fetch and store favicon/URL info
         if (!tabData.has(tabId)) {
-            const favicon = await getFavicon(activeTabUrl);
+            const favicon = getFavicon(activeTabUrl, tab.favIconUrl, settings.useFaviconService);
             tabData.set(tabId, {url: activeTabUrl, favicon});
         }
 
@@ -154,7 +255,18 @@ export default defineBackground(() => {
     // --- Queue Processor ---
 
     async function handleEvent(event: QueueEvent): Promise<void> {
+        // Skip event processing if tracking is disabled
+        if (!settings?.trackingEnabled) {
+            console.log(`Tracking is disabled, skipping ${event.type} event`);
+            return;
+        }
+
         switch (event.type) {
+            case 'userActivity': {
+                const {tabId} = event.payload;
+                await handleUserActivity(tabId);
+                break;
+            }
             case 'tabActivated': {
                 const {tabId} = event.payload.activeInfo;
                 if (activeTabId && activeTabId !== tabId) {
@@ -194,8 +306,8 @@ export default defineBackground(() => {
             }
             case 'focusChanged': {
                 const {windowId} = event.payload;
+                console.log(`Window focus changed: ${windowId}`);
                 if (windowId === browser.windows.WINDOW_ID_NONE) {
-                    isBrowserFocused = false;
                     if (sessionStartTime) {
                         console.log('Browser window lost focus, ending current session.');
                         await endCurrentSession();
@@ -205,7 +317,6 @@ export default defineBackground(() => {
                     return;
                 }
 
-                isBrowserFocused = true;
                 try {
                     // Query the active tab in the focused window and start a session for that tab
                     const tabs = await browser.tabs.query({active: true, windowId});
@@ -241,7 +352,18 @@ export default defineBackground(() => {
 
     browser.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
         const currentTab = await browser.tabs.get(tabId);
-        if (currentTab.active && changeInfo.url) {
+
+        // Check for site blocking when URL changes
+        if (currentTab.active && changeInfo.url && changeInfo.url.startsWith('http')) {
+            const baseUrl = getBaseUrl(changeInfo.url);
+            const isBlocked = await checkSiteLimit(baseUrl);
+
+            if (isBlocked) {
+                console.log(`Blocking navigation to ${baseUrl} due to time limit`);
+                await blockSite(tabId, baseUrl);
+                return;
+            }
+
             eventQueue.enqueue('urlUpdated', {tabId});
         }
     });
@@ -251,11 +373,15 @@ export default defineBackground(() => {
         eventQueue.enqueue('tabRemoved', {tabId});
     });
 
-    // Listener for activity pings from content scripts
+    // Listener for activity pings from content scripts and settings changes
     browser.runtime.onMessage.addListener(async (message, sender) => {
         if (message.type === 'user-activity') {
             console.log(`User activity detected from content script`);
-            await handleUserActivity(sender.tab?.id || undefined);
+            eventQueue.enqueue('userActivity', {tabId: sender.tab?.id || undefined});
+        } else if (message.type === 'setting-changed') {
+            handleSettingChange(message.key, message.value);
+        } else if (message.type === 'settings-reset') {
+            await loadSettings();
         }
     });
 
@@ -264,11 +390,13 @@ export default defineBackground(() => {
         eventQueue.enqueue('focusChanged', {windowId});
     });
 
-    // Initial activity check on startup
+    // Initial setup
     (async () => {
         try {
+            // Load settings first
+            await loadSettings();
+
             const lastFocused = await browser.windows.getLastFocused();
-            isBrowserFocused = !!lastFocused?.focused;
 
             if (
                 lastFocused?.focused &&
@@ -279,7 +407,7 @@ export default defineBackground(() => {
                 eventQueue.enqueue('focusChanged', {windowId: lastFocused.id});
             }
         } catch (error) {
-            console.error('Error during initial activity check', error);
+            console.error('Error during initial setup', error);
         }
     })();
 });

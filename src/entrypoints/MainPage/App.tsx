@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {createBrowserRouter, RouterProvider} from 'react-router';
 import Dashboard from './Dashboard';
-import Dopcan from './Dopcan';
-import DataSettings from './DataSettings';
+import Settings from './Settings';
+import SiteLimits from './SiteLimits';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
@@ -14,7 +14,7 @@ import {createTheme, MantineProvider} from '@mantine/core';
 import {ModalsProvider} from '@mantine/modals';
 import {Notifications} from '@mantine/notifications';
 
-import Page from './Sidebar';
+import Page from './Page.tsx';
 
 const theme = createTheme({
     /** Put your mantine theme override here */
@@ -34,12 +34,12 @@ const router = createBrowserRouter([
                 element: <Dashboard />,
             },
             {
-                path: 'Dopcan',
-                element: <Dopcan />,
+                path: 'SiteLimits',
+                element: <SiteLimits />,
             },
             {
-                path: 'DataSettings',
-                element: <DataSettings />,
+                path: 'Settings',
+                element: <Settings />,
             },
         ],
     },

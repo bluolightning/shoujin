@@ -1,43 +1,45 @@
-import {useEffect, useState} from 'react';
-import {Card, Table, Text, Title, ScrollArea, Avatar, Group, Loader, Center} from '@mantine/core';
-import {StorageManager} from '@/utils/storage';
+import {Card, Table, Text, Title, ScrollArea, Avatar, Group, Center} from '@mantine/core';
 import formatTime from '@/utils/formatTime';
+import {formatDateFromSettings} from '@/utils/formatDate';
+import {formatClockNotation, getClockNotationFormat} from '@/utils/formatClockNotation';
 import type {PageTimeEntry} from '@/utils/storage';
+import {useEffect, useState} from 'react';
 
-// Helper function to format ISO date string
-const formatDate = (isoString: string): string => {
-    try {
-        return new Date(isoString).toLocaleString();
-    } catch (error) {
-        return 'Invalid Date. Error: ' + error;
+export default function SiteUsageList(data: {data: PageTimeEntry[]}) {
+    const usageData = data.data;
+    const [formattedDates, setFormattedDates] = useState<{[key: string]: string}>({});
+
+    function computeVisits(entry: PageTimeEntry): number {
+        try {
+            let total = 0;
+            for (const dateInfo of Object.values(entry.dateData)) {
+                for (const hourEntry of Object.values(dateInfo.hours)) {
+                    total += hourEntry.visits || 0;
+                }
+            }
+            return total || 1;
+        } catch {
+            return 1;
+        }
     }
-};
-
-export default function SiteUsageList() {
-    const [usageData, setUsageData] = useState<PageTimeEntry[]>([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await StorageManager.getAllStoredData();
-                setUsageData(data);
-            } catch (error) {
-                console.error('Failed to fetch usage data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+        (async () => {
+            const dateMap: {[key: string]: string} = {};
+            const timeFormat = await getClockNotationFormat();
 
-    if (loading) {
-        return (
-            <Center style={{height: '100%'}}>
-                <Loader />
-            </Center>
-        );
-    }
+            for (const entry of usageData) {
+                try {
+                    const datePart = await formatDateFromSettings(entry.lastVisited);
+                    const timePart = formatClockNotation(entry.lastVisited, timeFormat);
+                    dateMap[entry.url] = timePart ? `${datePart}, ${timePart}` : datePart;
+                } catch {
+                    dateMap[entry.url] = 'Invalid Date';
+                }
+            }
+            setFormattedDates(dateMap);
+        })();
+    }, [usageData]);
 
     const rows = usageData.map((entry) => (
         <Table.Tr key={entry.url}>
@@ -45,6 +47,7 @@ export default function SiteUsageList() {
                 <Group gap='sm' wrap='nowrap'>
                     <Avatar
                         src={entry.favicon || undefined}
+                        imageProps={{loading: 'lazy'}}
                         alt={entry.url}
                         size='sm'
                         radius='xl'
@@ -61,13 +64,13 @@ export default function SiteUsageList() {
                 </Group>
             </Table.Td>
             <Table.Td>
-                <Text size='sm'>{formatTime(entry.timeSpent)}</Text>
+                <Text size='sm'>{formatTime(entry.timeSpent, true)}</Text>
             </Table.Td>
             <Table.Td>
-                <Text size='sm'>{formatDate(entry.lastVisited)}</Text>
+                <Text size='sm'>{formattedDates[entry.url] || 'Loading...'}</Text>
             </Table.Td>
             <Table.Td>
-                <Text size='sm'>{String(entry.visitCount)}</Text>
+                <Text size='sm'>{String(computeVisits(entry))}</Text>
             </Table.Td>
         </Table.Tr>
     ));

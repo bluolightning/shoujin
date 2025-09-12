@@ -1,6 +1,6 @@
 // Helper function to format seconds into a readable string (e.g., 1h 23m 45s)
 
-export default function formatTime(totalSeconds: number): string {
+export default function formatTime(totalSeconds: number, includeSeconds: boolean): string {
     if (totalSeconds < 1) return '<1s'; // Handle case where totalSeconds is less than 1 second
 
     const hours = Math.floor(totalSeconds / 3600);
@@ -10,7 +10,7 @@ export default function formatTime(totalSeconds: number): string {
     let result = '';
     if (hours > 0) result += `${hours}h `;
     if (minutes > 0) result += `${minutes}m `;
-    if (seconds > 0 || (hours === 0 && minutes === 0)) result += `${seconds}s`;
+    if (includeSeconds && (seconds > 0 || (hours === 0 && minutes === 0))) result += `${seconds}s`;
 
     return result.trim();
 }
