@@ -86,6 +86,10 @@ export default function SiteLimits() {
     const handleAddLimit = async (event: FormEvent) => {
         event.preventDefault();
         if (newUrl && newTime) {
+            if (newUrl.trim() === '' || newTime <= 0) {
+                return;
+            }
+
             const newLimit: SiteLimit = {url: newUrl.trim(), time: Number(newTime)};
             try {
                 const updated = await addSiteLimit(newLimit);
@@ -263,6 +267,9 @@ export default function SiteLimits() {
                                 <NumberInput
                                     label='Time limit (minutes)'
                                     value={newTime}
+                                    error={
+                                        newTime === '' ? 'Please enter a valid time limit' : false
+                                    }
                                     onChange={(val: string | number) =>
                                         setNewTime(val === '' ? '' : Number(val))
                                     }
