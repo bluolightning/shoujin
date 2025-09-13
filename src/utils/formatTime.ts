@@ -1,6 +1,7 @@
 // Helper function to format seconds into a readable string (e.g., 1h 23m 45s)
 
 export default function formatTime(totalSeconds: number, includeSeconds: boolean): string {
+    if (!totalSeconds) return '0s';
     if (totalSeconds < 1) return '<1s'; // Handle case where totalSeconds is less than 1 second
 
     const hours = Math.floor(totalSeconds / 3600);
@@ -12,5 +13,14 @@ export default function formatTime(totalSeconds: number, includeSeconds: boolean
     if (minutes > 0) result += `${minutes}m `;
     if (includeSeconds && (seconds > 0 || (hours === 0 && minutes === 0))) result += `${seconds}s`;
 
+    if (result.trim() === '') {
+        console.error(
+            'FormatTime resulted in an empty string. totalSeconds: ' +
+                totalSeconds +
+                ', includeSeconds: ' +
+                includeSeconds
+        );
+        return '0s';
+    }
     return result.trim();
 }

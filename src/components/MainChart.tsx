@@ -75,7 +75,7 @@ export default function MainChart(data: {data: PageTimeEntry[]}) {
                         h={300}
                         data={hourlyData}
                         dataKey='hour'
-                        series={[{name: 'usage', label: 'Time Spent', color: 'teal.6'}]}
+                        series={[{name: 'usage', label: 'Time Spent', color: 'blue.6'}]}
                         tooltipAnimationDuration={200}
                         valueFormatter={(value) => formatTime(value as number, false)}
                     />
