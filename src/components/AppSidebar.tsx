@@ -1,10 +1,11 @@
 import {useState} from 'react';
 import {IconBellRinging, IconClockCog, IconSettings, IconFlag} from '@tabler/icons-react';
 // import {IconShieldLock} from '@tabler/icons-react';
-import {Code, Group, Text, Tooltip} from '@mantine/core';
+import {Code, Group, Text, Tooltip, SimpleGrid} from '@mantine/core';
 import classes from './AppSidebar.module.css';
 import {Link} from 'react-router';
 import ThemeToggle from './ThemeToggle';
+import GitHubIcon from '@/components/MantineComponents/GitHubIcon';
 //import LogoImage from '~/assets/clock-img.jpeg';
 
 const data = [
@@ -51,11 +52,18 @@ export default function AppSidebar() {
             </div>
 
             <div className={classes.footer}>
-                <Tooltip label='Toggle theme'>
-                    <div>
-                        <ThemeToggle />
-                    </div>
-                </Tooltip>
+                <SimpleGrid cols={5} spacing='xs' style={{width: '100%'}}>
+                    <Tooltip label='Toggle theme'>
+                        <div>
+                            <ThemeToggle />
+                        </div>
+                    </Tooltip>
+                    <Tooltip label='Source code'>
+                        <div>
+                            <GitHubIcon />
+                        </div>
+                    </Tooltip>
+                </SimpleGrid>
             </div>
         </nav>
     );
