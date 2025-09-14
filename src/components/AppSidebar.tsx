@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {IconBellRinging, IconClockCog, IconSettings} from '@tabler/icons-react';
+import {IconBellRinging, IconClockCog, IconSettings, IconFlag} from '@tabler/icons-react';
 // import {IconShieldLock} from '@tabler/icons-react';
 import {Code, Group, Text, Tooltip} from '@mantine/core';
 import classes from './AppSidebar.module.css';
@@ -9,6 +9,7 @@ import ThemeToggle from './ThemeToggle';
 
 const data = [
     {link: 'Dashboard', label: 'Dashboard', icon: IconBellRinging},
+    {link: 'Pomodoro', label: 'Pomodoro', icon: IconFlag},
     {link: 'SiteLimits', label: 'Site Limits', icon: IconClockCog},
     {link: 'Settings', label: 'Settings', icon: IconSettings},
 ];
