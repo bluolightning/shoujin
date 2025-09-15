@@ -13,17 +13,22 @@ import {
     Divider,
     Button,
 } from '@mantine/core';
-import {modals} from '@mantine/modals';
+import {modals} from '@mantine/modals'; // Todo: use for settings
 
 import {IconFlag} from '@tabler/icons-react';
 
 // Pomodoro durations in seconds (temporary values for testing)
-const pomoDuration = 0.1 * 60;
-const shortBreakDuration = 0.2 * 60;
-const longBreakDuration = 0.3 * 60;
+const durations = {
+    pomodoro: 0.1 * 60,
+    shortBreak: 0.2 * 60,
+    longBreak: 0.3 * 60,
+};
+
+type TimerMode = keyof typeof durations;
 
 export default function Pomodoro() {
-    const [timeRemaining, setTimeRemaining] = useState(pomoDuration);
+    const [mode, setMode] = useState<TimerMode>('pomodoro');
+    const [timeRemaining, setTimeRemaining] = useState(durations[mode]);
     const [isRunning, setIsRunning] = useState(false);
 
     useEffect(() => {
@@ -34,8 +39,7 @@ export default function Pomodoro() {
             }, 1000);
         } else if (timeRemaining === 0) {
             setIsRunning(false);
-            resetTimer();
-            // TODO: Add notification or sound for completion
+            onTimerEnd();
         }
 
         return () => {
@@ -57,11 +61,17 @@ export default function Pomodoro() {
             .padStart(2, '0')}`;
     }
 
-    function resetTimer() {
-        setTimeRemaining(pomoDuration);
+    function onTimerEnd() {
+        setTimeRemaining(durations[mode]);
     }
 
-    const progressValue = ((pomoDuration - timeRemaining) / pomoDuration) * 100;
+    function selectMode(newMode: TimerMode) {
+        setMode(newMode);
+        setIsRunning(false);
+        setTimeRemaining(durations[newMode]);
+    }
+
+    const progressValue = ((durations[mode] - timeRemaining) / durations[mode]) * 100;
 
     return (
         <Container size='lg' py='xl'>
@@ -83,9 +93,25 @@ export default function Pomodoro() {
                 </div>
 
                 {/* Main Content */}
-
                 <Card shadow='sm' p='lg' radius='md' withBorder>
                     <Stack align='center'>
+                        <Group>
+                            <Button
+                                variant={mode === 'pomodoro' ? 'filled' : 'outline'}
+                                onClick={() => selectMode('pomodoro')}>
+                                Pomodoro
+                            </Button>
+                            <Button
+                                variant={mode === 'shortBreak' ? 'filled' : 'outline'}
+                                onClick={() => selectMode('shortBreak')}>
+                                Short Break
+                            </Button>
+                            <Button
+                                variant={mode === 'longBreak' ? 'filled' : 'outline'}
+                                onClick={() => selectMode('longBreak')}>
+                                Long Break
+                            </Button>
+                        </Group>
                         <Card
                             shadow='sm'
                             p='lg'
