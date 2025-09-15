@@ -1,3 +1,4 @@
+import {useState, useEffect} from 'react';
 import {
     Container,
     Card,
@@ -16,11 +17,52 @@ import {modals} from '@mantine/modals';
 
 import {IconFlag} from '@tabler/icons-react';
 
-function startTimer() {
-    console.log('Start timer');
-}
+// Pomodoro durations in seconds (temporary values for testing)
+const pomoDuration = 0.1 * 60;
+const shortBreakDuration = 0.2 * 60;
+const longBreakDuration = 0.3 * 60;
 
 export default function Pomodoro() {
+    const [timeRemaining, setTimeRemaining] = useState(pomoDuration);
+    const [isRunning, setIsRunning] = useState(false);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout | null = null;
+        if (isRunning && timeRemaining > 0) {
+            interval = setInterval(() => {
+                setTimeRemaining((time) => time - 1);
+            }, 1000);
+        } else if (timeRemaining === 0) {
+            setIsRunning(false);
+            resetTimer();
+            // TODO: Add notification or sound for completion
+        }
+
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
+    }, [isRunning, timeRemaining]);
+
+    function toggleTimer() {
+        setIsRunning((prev) => !prev);
+    }
+
+    function formatTime(seconds: number) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds
+            .toString()
+            .padStart(2, '0')}`;
+    }
+
+    function resetTimer() {
+        setTimeRemaining(pomoDuration);
+    }
+
+    const progressValue = ((pomoDuration - timeRemaining) / pomoDuration) * 100;
+
     return (
         <Container size='lg' py='xl'>
             <Stack gap='xl'>
@@ -53,16 +95,16 @@ export default function Pomodoro() {
                             <Stack align='center'>
                                 <Progress
                                     style={{width: '100%'}} // Prevent disappearing in the Stack component
-                                    value={30} // filled percent
+                                    value={progressValue} // filled percent
                                     size='md'
                                     radius='xl'
                                     color='blue'
                                 />
                                 <Title order={1} size={64}>
-                                    25:00
+                                    {formatTime(timeRemaining)}
                                 </Title>
-                                <Button size='md' radius='md' onClick={startTimer}>
-                                    Start
+                                <Button size='md' radius='md' onClick={toggleTimer}>
+                                    {isRunning ? 'Pause' : 'Start'}
                                 </Button>
                             </Stack>
                         </Card>
