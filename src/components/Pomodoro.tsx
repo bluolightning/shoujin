@@ -7,37 +7,80 @@ import {
     Group,
     ThemeIcon,
     Title,
-    Center,
-    Paper,
     Progress,
     Divider,
     Button,
+    ActionIcon,
+    Loader,
+    Center,
 } from '@mantine/core';
-import {modals} from '@mantine/modals'; // Todo: use for settings
+import {modals} from '@mantine/modals';
+import {notifications} from '@mantine/notifications';
 
-import {IconFlag} from '@tabler/icons-react';
+import {IconFlag, IconSettings} from '@tabler/icons-react';
+import {
+    PomodoroSettings,
+    DEFAULT_POMODORO_SETTINGS,
+    PomodoroSettingsStorage,
+} from '../utils/pomodoroSettingsStorage';
+import PomodoroSettingsModal from './PomodoroSettingsModal';
 
-// Pomodoro durations in seconds (temporary values for testing)
-const durations = {
-    pomodoro: 0.1 * 60,
-    shortBreak: 0.2 * 60,
-    longBreak: 0.3 * 60,
-};
-
-type TimerMode = keyof typeof durations;
+type TimerMode = 'pomodoro' | 'shortBreak' | 'longBreak';
 
 export default function Pomodoro() {
     const [mode, setMode] = useState<TimerMode>('pomodoro');
-    const [timeRemaining, setTimeRemaining] = useState(durations[mode]);
+    const [timeRemaining, setTimeRemaining] = useState(25 * 60); // in seconds
     const [isRunning, setIsRunning] = useState(false);
+    const [settings, setSettings] = useState<PomodoroSettings>(DEFAULT_POMODORO_SETTINGS);
+    const [isSettingsLoaded, setIsSettingsLoaded] = useState(false);
+    const [completedPomodoros, setCompletedPomodoros] = useState(0);
+
+    // Load settings on component mount
+    useEffect(() => {
+        loadSettings();
+    }, []);
+
+    // Update timer when mode or settings change
+    useEffect(() => {
+        if (isSettingsLoaded) {
+            const duration = getDurationForMode(mode);
+            setTimeRemaining(duration);
+            setIsRunning(false);
+        }
+    }, [mode, settings, isSettingsLoaded]);
+
+    async function loadSettings() {
+        try {
+            const savedSettings = await PomodoroSettingsStorage.getSettings();
+            setSettings(savedSettings);
+            setIsSettingsLoaded(true);
+        } catch (error) {
+            console.error('Failed to load Pomodoro settings:', error);
+            setSettings(DEFAULT_POMODORO_SETTINGS);
+            setIsSettingsLoaded(true);
+        }
+    }
+
+    function getDurationForMode(mode: TimerMode): number {
+        switch (mode) {
+            case 'pomodoro':
+                return settings.pomodoroDuration * 60;
+            case 'shortBreak':
+                return settings.shortBreakDuration * 60;
+            case 'longBreak':
+                return settings.longBreakDuration * 60;
+            default:
+                return settings.pomodoroDuration * 60;
+        }
+    }
 
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null;
         if (isRunning && timeRemaining > 0) {
             interval = setInterval(() => {
-                setTimeRemaining((time) => time - 1);
+                setTimeRemaining((time: number) => time - 1);
             }, 1000);
-        } else if (timeRemaining === 0) {
+        } else if (timeRemaining === 0 && isRunning) {
             setIsRunning(false);
             onTimerEnd();
         }
@@ -62,16 +105,84 @@ export default function Pomodoro() {
     }
 
     function onTimerEnd() {
-        setTimeRemaining(durations[mode]);
+        // Show notification if enabled
+        if (settings.enableNotifications) {
+            notifications.show({
+                title: 'Timer Complete!',
+                message: `${mode === 'pomodoro' ? 'Pomodoro' : 'Break'} session finished`,
+                color: mode === 'pomodoro' ? 'green' : 'blue',
+                withCloseButton: false,
+                id: 'pomodoro-timer-complete',
+                onClick: () => {
+                    notifications.hide('pomodoro-timer-complete');
+                },
+            });
+        }
+
+        // Handle pomodoro completion and auto-transitions
+        if (mode === 'pomodoro') {
+            const newCompletedPomodoros = completedPomodoros + 1;
+            setCompletedPomodoros(newCompletedPomodoros);
+
+            // Determine next break type
+            const shouldTakeLongBreak = newCompletedPomodoros % settings.longBreakInterval === 0;
+            const nextMode = shouldTakeLongBreak ? 'longBreak' : 'shortBreak';
+
+            if (settings.autoStartBreaks) {
+                selectMode(nextMode);
+                setIsRunning(true);
+            } else {
+                selectMode(nextMode);
+            }
+        } else {
+            // Break ended
+            if (settings.autoStartPomodoros) {
+                selectMode('pomodoro');
+                setIsRunning(true);
+            } else {
+                selectMode('pomodoro');
+            }
+        }
+
+        setTimeRemaining(getDurationForMode(mode));
     }
 
     function selectMode(newMode: TimerMode) {
         setMode(newMode);
         setIsRunning(false);
-        setTimeRemaining(durations[newMode]);
+        if (isSettingsLoaded) {
+            setTimeRemaining(getDurationForMode(newMode));
+        }
     }
 
-    const progressValue = ((durations[mode] - timeRemaining) / durations[mode]) * 100;
+    function onSettingsChange(newSettings: PomodoroSettings) {
+        setSettings(newSettings);
+    }
+
+    const currentDuration = getDurationForMode(mode);
+    const progressValue =
+        currentDuration > 0 ? ((currentDuration - timeRemaining) / currentDuration) * 100 : 0;
+
+    function openSettingsModal() {
+        modals.open({
+            title: 'Pomodoro Settings',
+            size: 'lg',
+            children: (
+                <PomodoroSettingsModal
+                    onSettingsChange={onSettingsChange}
+                    onClose={() => modals.closeAll()}
+                />
+            ),
+        });
+    }
+
+    if (!isSettingsLoaded) {
+        return (
+            <Center style={{height: '100%'}}>
+                <Loader />
+            </Center>
+        );
+    }
 
     return (
         <Container size='lg' py='xl'>
@@ -94,6 +205,13 @@ export default function Pomodoro() {
 
                 {/* Main Content */}
                 <Card shadow='sm' p='lg' radius='md' withBorder>
+                    <ActionIcon
+                        variant='subtle'
+                        size='lg'
+                        onClick={openSettingsModal}
+                        style={{position: 'absolute', top: 16, right: 16}}>
+                        <IconSettings />
+                    </ActionIcon>
                     <Stack align='center'>
                         <Group>
                             <Button
