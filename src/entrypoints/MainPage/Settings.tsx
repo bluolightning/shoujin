@@ -217,7 +217,7 @@ export default function Settings() {
                 {/* Privacy Settings */}
                 <SettingsSection
                     title='Privacy'
-                    description='Control data usage and collection'
+                    description='Control data usage and sharing preferences'
                     icon={<IconShield size='1.2rem' />}>
                     <SettingItem
                         label='Use external favicon services'
