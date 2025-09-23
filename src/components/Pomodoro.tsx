@@ -15,7 +15,6 @@ import {
     Center,
 } from '@mantine/core';
 import {modals} from '@mantine/modals';
-import {notifications} from '@mantine/notifications';
 
 import {IconFlag, IconSettings} from '@tabler/icons-react';
 import {
@@ -107,16 +106,19 @@ export default function Pomodoro() {
     function onTimerEnd() {
         // Show notification if enabled
         if (settings.enableNotifications) {
-            notifications.show({
-                title: 'Timer Complete!',
-                message: `${mode === 'pomodoro' ? 'Pomodoro' : 'Break'} session finished`,
-                color: mode === 'pomodoro' ? 'green' : 'blue',
-                withCloseButton: false,
-                id: 'pomodoro-timer-complete',
-                onClick: () => {
-                    notifications.hide('pomodoro-timer-complete');
-                },
-            });
+            try {
+                browser.notifications.create({
+                    type: 'basic',
+                    iconUrl: browser.runtime.getURL('/icons/128.png'),
+                    title: mode === 'pomodoro' ? 'Pomodoro Complete!' : 'Break Over!',
+                    message:
+                        mode === 'pomodoro'
+                            ? "Great work! It's time for a break."
+                            : 'Time to get back to work!',
+                });
+            } catch (error) {
+                console.log('Notification error:', error);
+            }
         }
 
         // Handle pomodoro completion and auto-transitions
