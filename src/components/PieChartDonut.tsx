@@ -16,13 +16,21 @@ export default function PieChartDonut(data: {data: PageTimeEntry[]}) {
 
     useEffect(() => {
         const chartDataFetched: DonutChartCell[] = [];
-        for (let i = 0; i < 6; i++) {
+
+        // Only include sites that actually have data
+        const filteredUsageData = usageData.filter((site) => site && site.timeSpent > 0);
+
+        // Take up to 6 sites with actual data
+        const sitesToShow = Math.min(filteredUsageData.length, 6);
+
+        for (let i = 0; i < sitesToShow; i++) {
             chartDataFetched.push({
-                name: usageData[i]?.url || 'No Data',
-                value: Math.round(usageData[i]?.timeSpent) || 1,
-                color: chartColors[i],
+                name: filteredUsageData[i].url,
+                value: Math.round(filteredUsageData[i].timeSpent),
+                color: chartColors[i % chartColors.length],
             });
         }
+
         setChartData(chartDataFetched);
     }, [usageData]);
 
@@ -33,19 +41,27 @@ export default function PieChartDonut(data: {data: PageTimeEntry[]}) {
             <Center>
                 <div>
                     <Text fz='lg' fw={700} mb='md' ta='center'>
-                        Top Sites
+                        Top {chartData.length !== 0 ? chartData.length : ''} Sites
                     </Text>
-                    <DonutChart
-                        size={200}
-                        thickness={28}
-                        withLabelsLine={false}
-                        labelsType='name'
-                        withLabels={true}
-                        data={chartData}
-                        chartLabel={formatTime(totalTime, true)}
-                        pieChartProps={{className: classes.chartWithVisibleLabels}}
-                        valueFormatter={(value: number) => formatTime(value, false)}
-                    />
+                    {chartData.length > 0 ? (
+                        <DonutChart
+                            size={200}
+                            thickness={28}
+                            withLabelsLine={false}
+                            labelsType='name'
+                            withLabels={true}
+                            data={chartData}
+                            chartLabel={formatTime(totalTime, true)}
+                            pieChartProps={{className: classes.chartWithVisibleLabels}}
+                            valueFormatter={(value: number) => formatTime(value, false)}
+                        />
+                    ) : (
+                        <Center style={{height: 200}}>
+                            <Text c='dimmed' ta='center'>
+                                No usage data available
+                            </Text>
+                        </Center>
+                    )}
                 </div>
             </Center>
         </Card>
