@@ -7,6 +7,6 @@ export default defineConfig({
     srcDir: 'src',
 
     manifest: {
-        permissions: ['tabs', 'storage', 'idle', 'activeTab'],
+        permissions: ['tabs', 'storage', 'idle', 'activeTab', 'notifications'],
     },
 });

@@ -15,6 +15,7 @@ import {
     Center,
 } from '@mantine/core';
 import {modals} from '@mantine/modals';
+import {notifications} from '@mantine/notifications';
 
 import {IconFlag, IconSettings} from '@tabler/icons-react';
 import {
@@ -118,6 +119,16 @@ export default function Pomodoro() {
                 });
             } catch (error) {
                 console.log('Notification error:', error);
+                notifications.show({
+                    title: 'Notification Error',
+                    message: 'Failed to send Pomodoro timer end notification.',
+                    color: 'red',
+                    withCloseButton: false,
+                    id: 'pomo-notification-error',
+                    onClick: () => {
+                        notifications.hide('pomo-notification-error');
+                    },
+                });
             }
         }
 
