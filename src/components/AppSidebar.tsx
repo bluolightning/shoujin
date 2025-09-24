@@ -6,7 +6,7 @@ import classes from './AppSidebar.module.css';
 import {Link} from 'react-router';
 import ThemeToggle from './ThemeToggle';
 import GitHubIcon from '@/components/MantineComponents/GitHubIcon';
-//import LogoImage from '~/assets/clock-img.jpeg';
+//import LogoImage from '/assets/icons/128.png';
 
 const data = [
     {link: 'Dashboard', label: 'Dashboard', icon: IconBellRinging},
