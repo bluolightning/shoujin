@@ -8,7 +8,13 @@ export default function getFavicon(
     if (tabFavIconUrl) {
         return tabFavIconUrl;
     } else if (useFaviconService) {
-        console.log('No favicon found, using Google favicon service.');
+        console.log('No favicon found, using external favicon service.');
+
+        const favicon = `https://icons.duckduckgo.com/ip3/${getBaseUrl(url)}.ico`;
+        if (favicon) {
+            return favicon;
+        }
+
         return `https://www.google.com/s2/favicons?domain=${getBaseUrl(url)}&sz=128`;
     } else {
         return undefined;
