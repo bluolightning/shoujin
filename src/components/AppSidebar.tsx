@@ -46,7 +46,7 @@ export default function AppSidebar() {
                             shoujin
                         </Text>
                     </div>
-                    <Code fw={700}>v0.0.1</Code>
+                    <Code fw={700}>v1.0.0</Code>
                 </Group>
                 {links}
             </div>
