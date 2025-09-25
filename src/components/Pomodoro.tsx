@@ -267,8 +267,6 @@ export default function Pomodoro() {
                         </Card>
 
                         <Divider />
-
-                        <Text>Tasks</Text>
                     </Stack>
                 </Card>
 
