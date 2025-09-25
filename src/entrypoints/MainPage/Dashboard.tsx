@@ -5,6 +5,7 @@ import SiteUsageList from '@/components/SiteUsageList';
 import PieChartDonut from '@/components/PieChartDonut';
 import DateSelector from '@/components/DateSelector';
 import MainChart from '@/components/MainChart';
+import HeatmapChart from '@/components/Heatmap';
 
 import dayjs from 'dayjs';
 import {dateRangeContext} from '@/utils/dateRangeContext';
@@ -81,6 +82,9 @@ export default function Dashboard() {
                 </Grid.Col>
                 <Grid.Col span={{base: 12, md: 7, lg: 8}}>
                     <SiteUsageList data={filteredData} />
+                </Grid.Col>
+                <Grid.Col span={{base: 12, md: 7, lg: 8}}>
+                    <HeatmapChart />
                 </Grid.Col>
             </Grid>
         </dateRangeContext.Provider>
