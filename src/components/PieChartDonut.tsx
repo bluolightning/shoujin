@@ -38,7 +38,7 @@ export default function PieChartDonut(data: {data: PageTimeEntry[]}) {
 
     return (
         <Card shadow='sm' padding='lg' radius='md' withBorder style={{height: '100%'}}>
-            <Center>
+            <Center style={{height: 352}}>
                 <div>
                     <Text fz='lg' fw={700} mb='md' ta='center'>
                         Top {chartData.length !== 0 ? chartData.length : ''} Sites
