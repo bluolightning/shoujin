@@ -13,6 +13,7 @@
         "zip": "wxt zip",
         "zip:firefox": "wxt zip -b firefox",
         "zip:edge": "wxt zip -b edge",
+        "zip:all": "npm run zip && npm run zip:firefox && npm run zip:edge",
         "compile": "tsc --noEmit",
         "postinstall": "wxt prepare"
     },
