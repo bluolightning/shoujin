@@ -4,6 +4,7 @@ import {Heatmap} from '@mantine/charts';
 import {StorageManager} from '@/utils/storage';
 import getTimeByDate, {TimeByDateMap} from '@/utils/getTimeByDate';
 import {formatDateFromSettings} from '@/utils/formatDate';
+import formatTime from '@/utils/formatTime';
 
 export default function HeatmapChart() {
     const [usageData, setUsageData] = useState<TimeByDateMap>({});
@@ -67,7 +68,7 @@ export default function HeatmapChart() {
                 withWeekdayLabels
                 withMonthLabels
                 getTooltipLabel={({date, value}) =>
-                    `${formattedDateCache[date] || date} - ${value === null || value === 0 ? 'No time spent' : `${value} second${value > 1 ? 's' : ''}`}`
+                    `${formattedDateCache[date] || date} - ${value === null || value === 0 ? 'No time spent' : `${formatTime(value, false)}`}`
                 }
             />
         </Card>
