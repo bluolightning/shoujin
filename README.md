@@ -20,8 +20,8 @@ A browser extension for tracking and analyzing web browsing time and productivit
 To use Shoujin, install it from the releases or the official browser store:
 
 - **Chrome**: (coming soon)
-- **Firefox**: (coming soon)
-- **Edge**: (coming soon)
+- **Firefox**: https://addons.mozilla.org/en-US/firefox/addon/shoujin/
+- **Edge**: https://microsoftedge.microsoft.com/addons/detail/shoujin/bdoaedfmfmonahpiejikghmbjadpghok
 
 Alternatively, for development and testing, see our [Contribution Guide](CONTRIBUTING.md).
 
