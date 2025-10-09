@@ -1,6 +1,6 @@
 # Shoujin Web Extension
 
-A browser extension for tracking and analyzing web browsing time and productivity. Built with WXT, React, TypeScript, and Mantine UI.
+A browser extension for tracking and analyzing web browsing time and productivity. Built with WXT, React, TypeScript, and Mantine.
 
 **Note**: This extension tracks your browsing activity locally - all browsing data is solely on your device.
 
