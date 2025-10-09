@@ -36,9 +36,7 @@ Alternatively, for development and testing, see our [Contribution Guide](CONTRIB
 The extension requires the following permissions to function correctly:
 
 - `tabs`: Monitor tab changes and URL updates.
-- `storage`: Persist tracking data locally on your device.
-- `idle`: Detect when you are away from your computer.
-- `activeTab`: Access the current tab's information for session tracking.
+- `storage`: Store data locally on your device.
 - `notifications`: Display productivity alerts, such as Pomodoro timers.
 
 All data is stored locally on your device and is never sent to external servers. If enabled, domain names may be sent to external servers to enhance favicon reliability.
